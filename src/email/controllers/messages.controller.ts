@@ -1,5 +1,4 @@
 import { Controller, Post } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
 import { Auth } from '@authentication/decorators/auth.decorator';
 import { AuthType } from '@authentication/enums/auth-type.enum';
 import { Roles } from '@authentication/decorators/roles.decorator';
@@ -13,7 +12,6 @@ import { QueryDto } from '../dto/messages/query.dto';
 import { UpdateDto } from '../dto/messages/update.dto';
 import { EmailSyncService } from '../services/email-sync.service';
 
-@ApiTags('Email - Messages')
 @Auth(AuthType.Bearer)
 @Roles(Role.Admin)
 @Controller('email/messages')

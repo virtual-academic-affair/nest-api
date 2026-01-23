@@ -1,5 +1,4 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
 import { UsersService } from '../services/users.service';
 import { Auth } from '@authentication/decorators/auth.decorator';
 import { AuthType } from '@authentication/enums/auth-type.enum';
@@ -13,7 +12,6 @@ import { ResourceController } from '@shared/resource/controllers/resource.contro
 import { ResourceAction } from '@shared/resource/enums/resource-action.enum';
 import { RestrictMethods } from '@shared/resource/decorators/restrict-methods.decorator';
 
-@ApiTags('Users')
 @Auth(AuthType.Bearer)
 @Roles(Role.Admin)
 @Controller('authentication/users')

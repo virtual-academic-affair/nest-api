@@ -47,7 +47,6 @@ npm run start:prod
 
 5. **Access:**
     - API: http://localhost:3000
-    - Swagger Documentation: http://localhost:3000/api
 
 ## Email Processing Flow
 

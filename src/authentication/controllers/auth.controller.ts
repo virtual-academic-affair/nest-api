@@ -1,5 +1,4 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
 import { Auth } from '@authentication/decorators/auth.decorator';
 import { AuthType } from '@authentication/enums/auth-type.enum';
 import { RefreshTokenDto } from '@authentication/dtos/auth/refresh-token.dto';
@@ -8,7 +7,6 @@ import { ActiveUserData } from '@authentication/interfaces/active-user-data.inte
 import { UsersService } from '../services/users.service';
 import { AuthService } from '@authentication/services/auth.service';
 
-@ApiTags('Authentication')
 @Controller('authentication/auth')
 export class AuthenticationController {
   constructor(

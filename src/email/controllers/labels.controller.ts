@@ -1,5 +1,4 @@
 import { Body, Controller, Get, Post, Put } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
 import { Auth } from '@authentication/decorators/auth.decorator';
 import { AuthType } from '@authentication/enums/auth-type.enum';
 import { Roles } from '@authentication/decorators/roles.decorator';
@@ -7,7 +6,6 @@ import { Role } from '@authentication/enums/role.enum';
 import { LabelsService } from '../services/labels.service';
 import { UpdateDto } from '../dto/labels/update.dto';
 
-@ApiTags('Email - Labels')
 @Auth(AuthType.Bearer)
 @Roles(Role.Admin)
 @Controller('email/labels')

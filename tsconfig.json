@@ -19,6 +19,7 @@
     "noFallthroughCasesInSwitch": false,
     "paths": {
       "@authentication/*": ["src/authentication/*"],
+      "@email/*": ["src/email/*"],
       "@shared/*": ["src/shared/*"]
     }
   }

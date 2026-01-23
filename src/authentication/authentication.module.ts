@@ -4,7 +4,6 @@ import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { APP_GUARD } from '@nestjs/core';
 import jwtConfig from '@shared/config/jwt.config';
-import { SharedModule } from '@shared/shared.module';
 import { AuthenticationGuard } from './guards/authentication.guard';
 import { AccessTokenGuard } from './guards/access-token.guard';
 import { RolesGuard } from './guards/roles.guard';
@@ -21,7 +20,6 @@ import { AuthService } from './services/auth.service';
     ConfigModule.forFeature(jwtConfig),
     JwtModule.registerAsync(jwtConfig.asProvider()),
     TypeOrmModule.forFeature([User]),
-    SharedModule,
   ],
   controllers: [UsersController, AuthenticationController, GoogleController],
   providers: [

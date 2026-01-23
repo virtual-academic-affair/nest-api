@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, Repository } from 'typeorm';
 import { RabbitMQService } from '@shared/services/rabbitmq.service';
@@ -15,7 +15,7 @@ import { validateDto } from '@shared/resource/utils/validate-dto.util';
 import { UpdateDto } from '../dto/labels/update.dto';
 
 @Injectable()
-export class NlpLabeledService implements OnModuleInit {
+export class NlpLabeledService implements OnApplicationBootstrap {
   constructor(
     private readonly rabbitmqService: RabbitMQService,
     private readonly settingService: SettingService,
@@ -24,7 +24,7 @@ export class NlpLabeledService implements OnModuleInit {
     private readonly emailRepository: Repository<Email>
   ) {}
 
-  async onModuleInit() {
+  async onApplicationBootstrap() {
     await this.rabbitmqService.subscribe(
       QUEUE_NLP_LABELED,
       EmailRoutingKey.NlpLabeled,

@@ -1,6 +1,6 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import { REQUEST_USER_KEY } from '@shared/authentication/guards/access-token.guard';
-import { ActiveUserData } from '@shared/authentication/interfaces/active-user-data.interface';
+import { REQUEST_USER_KEY } from '@authentication/guards/access-token.guard';
+import { ActiveUserData } from '@authentication/interfaces/active-user-data.interface';
 
 export const ActiveUser = createParamDecorator(
   (field: keyof ActiveUserData | undefined, ctx: ExecutionContext) => {

@@ -1,10 +1,10 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { Auth } from '@shared/authentication/decorators/auth.decorator';
-import { AuthType } from '@shared/authentication/enums/auth-type.enum';
+import { Auth } from '@authentication/decorators/auth.decorator';
+import { AuthType } from '@authentication/enums/auth-type.enum';
 import { RefreshTokenDto } from '@authentication/dtos/auth/refresh-token.dto';
-import { ActiveUser } from '@shared/authentication/decorators/active-user.decorator';
-import { ActiveUserData } from '@shared/authentication/interfaces/active-user-data.interface';
+import { ActiveUser } from '@authentication/decorators/active-user.decorator';
+import { ActiveUserData } from '@authentication/interfaces/active-user-data.interface';
 import { UsersService } from '../services/users.service';
 import { AuthService } from '@authentication/services/auth.service';
 

@@ -66,6 +66,20 @@ AuthService (Verify & Generate New Tokens) → Frontend (Save & Retry)
 - Admin gán/thay đổi role
 - Admin có thể active/deactive user (`isActive`)
 
+### 5. Guards & Decorators
+
+Module cung cấp các guards và decorators cho authentication và authorization:
+
+**Guards:**
+- **AuthenticationGuard**: Guard toàn cục kiểm tra xác thực người dùng
+- **AccessTokenGuard**: Xác thực access token (JWT)
+- **RolesGuard**: Phân quyền theo role (Admin, Student, Lecture)
+
+**Decorators:**
+- **@Auth(authType)**: Chỉ định loại xác thực (Bearer hoặc None)
+- **@Roles(...roles)**: Chỉ định role được phép truy cập
+- **@ActiveUser()**: Lấy thông tin user hiện tại từ request
+
 ## Services
 
 | Service           | Chức năng                                        |

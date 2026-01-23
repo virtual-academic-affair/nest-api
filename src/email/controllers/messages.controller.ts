@@ -1,9 +1,9 @@
 import { Controller, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { Auth } from '@shared/authentication/decorators/auth.decorator';
-import { AuthType } from '@shared/authentication/enums/auth-type.enum';
-import { Roles } from '@shared/authorization/decorators/roles.decorator';
-import { Role } from '@shared/authorization/enums/role.enum';
+import { Auth } from '@authentication/decorators/auth.decorator';
+import { AuthType } from '@authentication/enums/auth-type.enum';
+import { Roles } from '@authentication/decorators/roles.decorator';
+import { Role } from '@authentication/enums/role.enum';
 import { ResourceController } from '@shared/resource/controllers/resource.controller';
 import { ResourceAction } from '@shared/resource/enums/resource-action.enum';
 import { RestrictMethods } from '@shared/resource/decorators/restrict-methods.decorator';

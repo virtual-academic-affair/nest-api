@@ -9,7 +9,7 @@ import { AuthService } from './auth.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '@authentication/entities/user.entity';
-import { Role } from '@shared/authorization/enums/role.enum';
+import { Role } from '@authentication/enums/role.enum';
 import { SettingService } from '@shared/setting/services/setting.service';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
 import { CodeDto } from '@authentication/dtos/google/code.dto';

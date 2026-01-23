@@ -2,8 +2,8 @@
 
 ## Introduction
 
-Module **Shared** chứa các cấu hình, service, guard và decorator dùng chung cho toàn bộ ứng dụng. Module này đảm bảo
-logic thống nhất về xác thực, phân quyền và các tác vụ CRUD.
+Module **Shared** chứa các cấu hình, service và utilities dùng chung cho toàn bộ ứng dụng. Module này đảm bảo
+logic thống nhất về hashing, caching, message queue và resource pattern.
 
 ## Config
 
@@ -14,20 +14,12 @@ Module cung cấp các configuration được tải từ environment variables:
 - **RabbitMQ Config** (`rabbitmq.config.ts`): Cấu hình message queue để giao tiếp giữa các service
 - **Google OAuth Config** (`google.config.ts`): Cấu hình Google OAuth cho đăng nhập
 
-## Guards & Decorators
+## Guards
 
-### Guards
-
-- **AuthenticationGuard**: Guard toàn cục kiểm tra xác thực người dùng
-- **AccessTokenGuard**: Xác thực access token (JWT)
-- **RolesGuard**: Phân quyền theo role (Admin, Student, Lecture)
 - **RestrictMethodsGuard**: Giới hạn các method CRUD được phép trên từng resource
 
-### Decorators
+## Decorators
 
-- **@Auth(authType)**: Chỉ định loại xác thực (Bearer hoặc None)
-- **@Roles(...roles)**: Chỉ định role được phép truy cập
-- **@ActiveUser()**: Lấy thông tin user hiện tại từ request
 - **@RestrictMethods()**: Giới hạn các action CRUD (only/except)
 
 ## Services
@@ -48,25 +40,6 @@ Module cung cấp **base classes** cho CRUD chuẩn:
 Các controller khác có thể extend `ResourceController` để tự động có đầy đủ CRUD endpoints.
 
 ## Enums
-
-### Role (Authorization)
-
-Các vai trò trong hệ thống:
-
-| Giá trị   | Mô tả                   |
-|-----------|-------------------------|
-| `student` | Sinh viên               |
-| `admin`   | Quản trị viên (Giáo vụ) |
-| `lecture` | Giảng viên              |
-
-### AuthType (Authentication)
-
-Loại xác thực:
-
-| Giá trị  | Mô tả                           |
-|----------|---------------------------------|
-| `Bearer` | Yêu cầu JWT token trong header  |
-| `None`   | Không yêu cầu xác thực (public) |
 
 ### SystemLabel (Email Classification)
 

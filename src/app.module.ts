@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
-import { ScheduleModule } from '@nestjs/schedule';
-import { AuthenticationModule } from '@authentication/authentication.module';
-import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { SharedModule } from '@shared/shared.module';
 import { ConfigModule } from '@nestjs/config';
-import { EmailModule } from './email/email.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ApiResponseModule } from '@zabih-dev/nest-api-response';
 import { DatabaseType } from 'typeorm';
+import { AuthenticationModule } from '@authentication/authentication.module';
+import { SharedModule } from '@shared/shared.module';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [

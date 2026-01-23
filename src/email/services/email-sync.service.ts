@@ -1,18 +1,18 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { gmail_v1 } from 'googleapis';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import * as parseMessage from 'gmail-api-parse-message';
-import { htmlToText } from 'html-to-text';
-import { Email } from '../entities/email.entity';
-import { GoogleapisService } from './googleapis.service';
-import { RabbitMQService } from '@shared/services/rabbitmq.service';
-import { SettingService } from '@shared/setting/services/setting.service';
-import { SettingKey } from '@shared/setting/enums/setting-key.enum';
-import { SuperEmailSetting } from '../types/super-email-setting.type';
-import { Role } from '@shared/authorization/enums/role.enum';
 import { User } from '@authentication/entities/user.entity';
+import { Injectable, Logger } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Role } from '@authentication/enums/role.enum';
 import { EmailRoutingKey } from '@shared/enums/rabbitmq.enum';
+import { RabbitMQService } from '@shared/services/rabbitmq.service';
+import { SettingKey } from '@shared/setting/enums/setting-key.enum';
+import { SettingService } from '@shared/setting/services/setting.service';
+import * as parseMessage from 'gmail-api-parse-message';
+import { gmail_v1 } from 'googleapis';
+import { htmlToText } from 'html-to-text';
+import { Repository } from 'typeorm';
+import { Email } from '../entities/email.entity';
+import { SuperEmailSetting } from '../types/super-email-setting.type';
+import { GoogleapisService } from './googleapis.service';
 
 @Injectable()
 export class EmailSyncService {
@@ -144,10 +144,6 @@ export class EmailSyncService {
       threadId: data.threadId,
 
       subject: parsed.headers.subject,
-      // gmailLink:
-      //   'https://mail.google.com/mail/' +
-      //   '?authuser=<super_email>#search/' +
-      //   encodeURIComponent(`rfc822msgid:${parsed.headers['message-id']}`),
       labelIds: data.labelIds ?? [],
       sentAt: parsed.headers.date ? new Date(parsed.headers.date) : undefined,
 

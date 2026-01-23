@@ -1,25 +1,43 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { UsersService } from './services/users.service';
+import { JwtModule } from '@nestjs/jwt';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { APP_GUARD } from '@nestjs/core';
+import jwtConfig from '@shared/config/jwt.config';
+import { SharedModule } from '@shared/shared.module';
+import { AuthenticationGuard } from './guards/authentication.guard';
+import { AccessTokenGuard } from './guards/access-token.guard';
+import { RolesGuard } from './guards/roles.guard';
 import { UsersController } from './controllers/users.controller';
 import { AuthenticationController } from './controllers/auth.controller';
 import { GoogleController } from './controllers/google.controller';
+import { User } from './entities/user.entity';
+import { UsersService } from './services/users.service';
 import { GoogleService } from './services/google.service';
 import { AuthService } from './services/auth.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './entities/user.entity';
-import { SharedModule } from '@shared/shared.module';
-import jwtConfig from '@shared/config/jwt.config';
 
 @Module({
-  controllers: [UsersController, AuthenticationController, GoogleController],
-  providers: [UsersService, GoogleService, AuthService],
   imports: [
-    ConfigModule,
     ConfigModule.forFeature(jwtConfig),
+    JwtModule.registerAsync(jwtConfig.asProvider()),
     TypeOrmModule.forFeature([User]),
     SharedModule,
   ],
-  exports: [AuthService, TypeOrmModule],
+  controllers: [UsersController, AuthenticationController, GoogleController],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: AuthenticationGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+    AccessTokenGuard,
+    UsersService,
+    GoogleService,
+    AuthService,
+  ],
+  exports: [AuthService, TypeOrmModule, JwtModule],
 })
 export class AuthenticationModule {}

@@ -1,0 +1,76 @@
+{
+    "info": {
+        "name": "Labels",
+        "description": "API collection for Labels",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "auth": {
+        "type": "bearer",
+        "bearer": [
+            {
+                "key": "token",
+                "value": "{{accessToken}}",
+                "type": "string"
+            }
+        ]
+    },
+    "item": [
+        {
+            "name": "Get All Google Labels",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/email/labels/googleLabels",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["email", "labels", "googleLabels"]
+                }
+            }
+        },
+        {
+            "name": "Get All Labels",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/email/labels",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["email", "labels"]
+                }
+            }
+        },
+        {
+            "name": "Update Labels",
+            "request": {
+                "method": "PUT",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"ClassRegistration\": \"<gmail_label_id>\",\n    \"Administrative\": \"<gmail_label_id>\",\n    \"Department\": \"<gmail_label_id>\",\n    \"GraduationInquiry\": \"<gmail_label_id>\",\n    \"AcademicInquiry\": \"<gmail_label_id>\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/email/labels",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["email", "labels"]
+                }
+            }
+        },
+        {
+            "name": "Auto Create Labels",
+            "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/email/labels/autoCreate",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["email", "labels", "autoCreate"]
+                }
+            }
+        }
+    ]
+}

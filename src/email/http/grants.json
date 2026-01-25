@@ -1,0 +1,52 @@
+{
+    "info": {
+        "name": "Grants",
+        "description": "API collection for Grants",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "auth": {
+        "type": "bearer",
+        "bearer": [
+            {
+                "key": "token",
+                "value": "{{accessToken}}",
+                "type": "string"
+            }
+        ]
+    },
+    "item": [
+        {
+            "name": "Get Gmail Auth URL",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/email/grants",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["email", "grants"]
+                }
+            }
+        },
+        {
+            "name": "Grant Gmail Access",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"code\": \"<gmail_oauth_code>\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/email/grants",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["email", "grants"]
+                }
+            }
+        }
+    ]
+}

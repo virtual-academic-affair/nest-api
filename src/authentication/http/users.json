@@ -1,0 +1,107 @@
+{
+    "info": {
+        "name": "Users",
+        "description": "API collection for Users",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "auth": {
+        "type": "bearer",
+        "bearer": [
+            {
+                "key": "token",
+                "value": "{{accessToken}}",
+                "type": "string"
+            }
+        ]
+    },
+    "item": [
+        {
+            "name": "Get All Users",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/authentication/users?page=1&limit=10",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["authentication", "users"],
+                    "query": [
+                        {
+                            "key": "page",
+                            "value": "1"
+                        },
+                        {
+                            "key": "limit",
+                            "value": "10"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Get User by ID",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/authentication/users/:id",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["authentication", "users", ":id"],
+                    "variable": [
+                        {
+                            "key": "id",
+                            "value": ""
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Update User",
+            "request": {
+                "method": "PUT",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"email\": \"user@example.com\",\n    \"name\": \"Updated Name\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/authentication/users/:id",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["authentication", "users", ":id"],
+                    "variable": [
+                        {
+                            "key": "id",
+                            "value": ""
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Assign Role",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"email\": \"user@example.com\",\n    \"role\": \"Admin\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/authentication/users/assignRole",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["authentication", "users", "assignRole"]
+                }
+            }
+        }
+    ]
+}

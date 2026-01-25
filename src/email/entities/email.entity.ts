@@ -1,4 +1,3 @@
-import { EmailStatus } from '@email/enums/email-status.enum';
 import { SystemLabel } from '@shared/enums/system-label.enum';
 import { BaseEntity } from '@shared/resource/entities/base.entity';
 import { Column, Entity, Index, Unique } from 'typeorm';
@@ -33,14 +32,6 @@ export class Email extends BaseEntity {
   @Column('text', { array: true, nullable: true })
   @Index('idx_emails_system_labels', { synchronize: false })
   systemLabels: SystemLabel[];
-
-  @Column({
-    type: 'enum',
-    enum: EmailStatus,
-    default: EmailStatus.Labeling,
-  })
-  @Index('idx_emails_status')
-  status: EmailStatus;
 
   @Column({ type: 'jsonb', nullable: true })
   history?: Record<string, Date>;

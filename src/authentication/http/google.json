@@ -1,0 +1,61 @@
+{
+    "info": {
+        "name": "Google OAuth",
+        "description": "API collection for Google OAuth",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Get Google Auth URL",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/authentication/google",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["authentication", "google"]
+                }
+            }
+        },
+        {
+            "name": "Authenticate with Google",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "if (pm.response.code === 200) {",
+                            "    const jsonData = pm.response.json();",
+                            "    if (jsonData.accessToken) {",
+                            "        pm.environment.set('accessToken', jsonData.accessToken);",
+                            "    }",
+                            "    if (jsonData.refreshToken) {",
+                            "        pm.environment.set('refreshToken', jsonData.refreshToken);",
+                            "    }",
+                            "}"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"code\": \"<google_oauth_code>\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/authentication/google",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["authentication", "google"]
+                }
+            }
+        }
+    ]
+}

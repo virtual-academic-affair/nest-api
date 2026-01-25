@@ -1,0 +1,98 @@
+{
+    "info": {
+        "name": "Messages",
+        "description": "API collection for Messages",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "auth": {
+        "type": "bearer",
+        "bearer": [
+            {
+                "key": "token",
+                "value": "{{accessToken}}",
+                "type": "string"
+            }
+        ]
+    },
+    "item": [
+        {
+            "name": "Sync Emails",
+            "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/email/messages/sync",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["email", "messages", "sync"]
+                }
+            }
+        },
+        {
+            "name": "Get All Messages",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/email/messages?page=1&limit=10",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["email", "messages"],
+                    "query": [
+                        {
+                            "key": "page",
+                            "value": "1"
+                        },
+                        {
+                            "key": "limit",
+                            "value": "10"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Get Message by ID",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/email/messages/:id",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["email", "messages", ":id"],
+                    "variable": [
+                        {
+                            "key": "id",
+                            "value": ""
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Update Message",
+            "request": {
+                "method": "PUT",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"systemLabels\": []\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/email/messages/:id",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["email", "messages", ":id"],
+                    "variable": [
+                        {
+                            "key": "id",
+                            "value": ""
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

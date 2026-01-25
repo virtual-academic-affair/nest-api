@@ -47,6 +47,7 @@ npm run start:prod
 
 5. **Access:**
     - API: http://localhost:3000
+    - Postman: `src/*/http/`
 
 ## Email Processing Flow
 
@@ -78,12 +79,12 @@ npm run start:prod
     ↓                                     ↓
     
 6a. NlpLabeledService                6b. Business Modules (by SystemLabel)
-    - Update SystemLabels in DB          - ClassRegistration
-    - Apply labels to Gmail              - Administrative
-                                         - Department
-                                         - GraduationInquiry
-                                         - AcademicInquiry
+    - Update SystemLabels in DB          - Each module processes extracted data
+    - Apply labels to Gmail              and executes specific business logic
                                          
-                                       Each module processes extracted data
-                                       and executes specific business logic
+                                         
+                                         
+                                         
+                                          
+                                          
 ```

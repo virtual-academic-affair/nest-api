@@ -12,9 +12,9 @@ import { UpdateDto } from '../dto/labels/update.dto';
 export class LabelsController {
   constructor(private readonly labelsService: LabelsService) {}
 
-  @Get('googleLabels')
-  findAllGoogleLabels() {
-    return this.labelsService.findAllGoogleLabels();
+  @Get('gmailLabels')
+  findAllGmailLabels() {
+    return this.labelsService.findAllGmailLabels();
   }
 
   @Get()

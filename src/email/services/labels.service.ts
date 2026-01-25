@@ -12,7 +12,7 @@ export class LabelsService {
     private readonly googleapisService: GoogleapisService
   ) {}
 
-  async findAllGoogleLabels() {
+  async findAllGmailLabels() {
     const client = await this.googleapisService.getGmailClient();
     const { data } = await client.users.labels.list({ userId: 'me' });
     return (data.labels ?? [])

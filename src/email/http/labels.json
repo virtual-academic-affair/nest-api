@@ -16,14 +16,14 @@
     },
     "item": [
         {
-            "name": "Get All Google Labels",
+            "name": "Get All Gmail Labels",
             "request": {
                 "method": "GET",
                 "header": [],
                 "url": {
-                    "raw": "{{baseUrl}}/email/labels/googleLabels",
+                    "raw": "{{baseUrl}}/email/labels/gmailLabels",
                     "host": ["{{baseUrl}}"],
-                    "path": ["email", "labels", "googleLabels"]
+                    "path": ["email", "labels", "gmailLabels"]
                 }
             }
         },

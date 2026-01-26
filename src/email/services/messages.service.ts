@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { ResourceService } from '@shared/resource/services/resource.service';
-import { Email } from '../entities/email.entity';
-import { QueryDto } from '../dto/messages/query.dto';
+import { QueryDto } from '@email/dtos/messages/query.dto';
+import { Email } from '@email/entities/email.entity';
 import { ResourceQueryDto } from '@shared/resource/dtos/resource-query.dto';
 
 @Injectable()

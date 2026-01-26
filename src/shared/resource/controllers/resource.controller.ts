@@ -16,18 +16,21 @@ export abstract class ResourceController<T extends ObjectLiteral> {
   protected constructor(protected readonly service: ResourceService<T>) {}
 
   protected abstract getDtoClasses(): {
-    // query: new () => BaseQueryDto;
-    // create: new () => any;
-    // update: new () => any;
+    query?: new () => unknown;
+    create?: new () => unknown;
+    update?: new () => unknown;
   };
 
-  protected async dto(key: 'query' | 'create' | 'update', data: any) {
-    const DtoClass = this.getDtoClasses()[key] as new () => any;
+  protected async dto<TDto>(
+    key: 'query' | 'create' | 'update',
+    data: unknown
+  ): Promise<TDto> {
+    const DtoClass = this.getDtoClasses()[key] as new () => TDto;
     return validateDto(DtoClass, data, key !== 'query');
   }
 
   @Get()
-  async findAll(@Query() dto: any) {
+  async findAll(@Query() dto: unknown) {
     return this.service.findAll(await this.dto('query', dto));
   }
 
@@ -37,12 +40,12 @@ export abstract class ResourceController<T extends ObjectLiteral> {
   }
 
   @Post()
-  async create(@Body() dto: any) {
+  async create(@Body() dto: unknown) {
     return this.service.create(await this.dto('create', dto));
   }
 
   @Put(':id')
-  async update(@Param('id', ParseIntPipe) id: number, @Body() dto: any) {
+  async update(@Param('id', ParseIntPipe) id: number, @Body() dto: unknown) {
     return this.service.update(id, await this.dto('update', dto));
   }
 

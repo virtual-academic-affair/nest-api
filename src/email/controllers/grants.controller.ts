@@ -4,7 +4,7 @@ import { AuthType } from '@authentication/enums/auth-type.enum';
 import { Roles } from '@authentication/decorators/roles.decorator';
 import { Role } from '@authentication/enums/role.enum';
 import { GrantsService } from '../services/grants.service';
-import { CodeDto } from '../dto/grants/code.dto';
+import { CodeDto } from '@email/dtos/grants/code.dto';
 
 @Auth(AuthType.Bearer)
 @Roles(Role.Admin)

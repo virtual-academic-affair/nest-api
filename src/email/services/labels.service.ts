@@ -3,7 +3,7 @@ import { SettingService } from '@shared/setting/services/setting.service';
 import { GoogleapisService } from './googleapis.service';
 import { SystemLabel } from '@shared/enums/system-label.enum';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
-import { UpdateDto } from '../dto/labels/update.dto';
+import { UpdateDto } from '@email/dtos/labels/update.dto';
 
 @Injectable()
 export class LabelsService {

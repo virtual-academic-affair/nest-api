@@ -4,7 +4,7 @@ import { AuthType } from '@authentication/enums/auth-type.enum';
 import { Roles } from '@authentication/decorators/roles.decorator';
 import { Role } from '@authentication/enums/role.enum';
 import { MessageLabelsService } from '../services/message-labels.service';
-import { UpdateMessageLabelDto } from '../dto/message-labels/update.dto';
+import { UpdateMessageLabelDto } from '@email/dtos/message-labels/update.dto';
 
 @Auth(AuthType.Bearer)
 @Roles(Role.Admin)

@@ -55,13 +55,10 @@ npm run start:prod
 1. Gmail API
    ↓ (Auto-sync every 5 minutes or manual trigger)
    
-2. EmailSyncService
+2. EmailIngestedProducer
    - Fetch new emails from Gmail
    - Filter by policy (allowed admins/domains)
-   ↓
-   
-3. RabbitMQ (email.ingested)
-   - Publish message with email content
+   - Publish message with email content 
    ↓
    
 4. NLP Service (External - Python)
@@ -74,17 +71,9 @@ npm run start:prod
    │                             │                             │
    ↓                             ↓                             ↓
    
-5a. RabbitMQ (email.nlp.labeled)     5b. RabbitMQ (email.nlp.processed)
-    - Receive classification              - Receive extracted business data
-    ↓                                     ↓
-    
-6a. NlpLabeledService                6b. Business Modules (by SystemLabel)
-    - Update SystemLabels in DB          - Each module processes extracted data
-    - Apply labels to Gmail              and executes specific business logic
-                                         
-                                         
-                                         
-                                         
-                                          
-                                          
+5a. RabbitMQ (email.nlp.labeled)     5b. RabbitMQ (specific routing keys)
+    - Receive classification              - Route to appropriate business module
+    ↓                                       based on SystemLabel
+                                        ↓
+6a. NlpLabeledConsumer                6b. Business Module Consumers
 ```

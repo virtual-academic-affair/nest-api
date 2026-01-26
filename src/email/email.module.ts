@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ScheduleModule } from '@nestjs/schedule';
 import { Email } from './entities/email.entity';
 import { User } from '@authentication/entities/user.entity';
 import { GoogleapisService } from './services/googleapis.service';
@@ -18,11 +17,7 @@ import { MessagesService } from './services/messages.service';
 import { MessageLabelsService } from './services/message-labels.service';
 
 @Module({
-  imports: [
-    ConfigModule,
-    ScheduleModule.forRoot(),
-    TypeOrmModule.forFeature([Email, User]),
-  ],
+  imports: [ConfigModule, TypeOrmModule.forFeature([Email, User])],
   controllers: [
     GrantsController,
     LabelsController,
@@ -39,14 +34,6 @@ import { MessageLabelsService } from './services/message-labels.service';
     MessageLabelsService,
     EmailSyncScheduler,
   ],
-  exports: [
-    GoogleapisService,
-    LabelsService,
-    GrantsService,
-    NlpLabeledConsumer,
-    EmailIngestedProducer,
-    MessagesService,
-    MessageLabelsService,
-  ],
+  exports: [],
 })
 export class EmailModule {}

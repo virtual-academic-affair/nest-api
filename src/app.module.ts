@@ -6,7 +6,10 @@ import { ApiResponseModule } from '@zabih-dev/nest-api-response';
 import { DatabaseType } from 'typeorm';
 import { AuthenticationModule } from '@authentication/authentication.module';
 import { SharedModule } from '@shared/shared.module';
-import { EmailModule } from './email/email.module';
+import { EmailModule } from '@email/email.module';
+import { ClassRegistrationModule } from '@class-registration/class-registration.module';
+import { TaskModule } from '@task/task.module';
+import { InquiryModule } from '@inquiry/inquiry.module';
 
 @Module({
   imports: [
@@ -26,6 +29,9 @@ import { EmailModule } from './email/email.module';
     EmailModule,
     SharedModule,
     AuthenticationModule,
+    ClassRegistrationModule,
+    TaskModule,
+    InquiryModule,
   ],
 })
 export class AppModule {}

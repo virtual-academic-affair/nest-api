@@ -20,7 +20,10 @@
     "paths": {
       "@authentication/*": ["src/authentication/*"],
       "@email/*": ["src/email/*"],
-      "@shared/*": ["src/shared/*"]
+      "@shared/*": ["src/shared/*"],
+      "@class-registration/*": ["src/class-registration/*"],
+      "@task/*": ["src/task/*"],
+      "@inquiry/*": ["src/inquiry/*"]
     }
   }
 }

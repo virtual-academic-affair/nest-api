@@ -1,10 +1,9 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Email } from '@email/entities/email.entity';
 import { GoogleapisService } from './googleapis.service';
 import { SettingService } from '@shared/setting/services/setting.service';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
-import { UpdateDto } from '@email/dto/labels/update.dto';
+import { UpdateDto } from '@email/dtos/labels/update.dto';
 import { SystemLabel } from '@shared/enums/system-label.enum';
 import { throwIf, throwUnless } from '@shared/utils/throw.util';
 import { MessagesService } from '@email/services/messages.service';
@@ -12,7 +11,6 @@ import { MessagesService } from '@email/services/messages.service';
 @Injectable()
 export class MessageLabelsService {
   constructor(
-    @InjectRepository(Email)
     private readonly messageService: MessagesService,
     private readonly googleapisService: GoogleapisService,
     private readonly settingService: SettingService

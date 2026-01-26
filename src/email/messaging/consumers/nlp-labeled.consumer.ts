@@ -1,46 +1,42 @@
-import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, Repository } from 'typeorm';
 import { RabbitMQService } from '@shared/services/rabbitmq.service';
-import {
-  EmailRoutingKey,
-  QUEUE_NLP_LABELED,
-} from '@shared/enums/rabbitmq.enum';
+import { EmailRoutingKey, QUEUE_LABELED } from '@shared/enums/rabbitmq.enum';
 import { Email } from '../../entities/email.entity';
 import { SettingService } from '@shared/setting/services/setting.service';
 import { GoogleapisService } from '../../services/googleapis.service';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
-import { NlpLabeledDto } from '../../dto/nlp/nlp-labeled.dto';
-import { validateDto } from '@shared/resource/utils/validate-dto.util';
-import { UpdateDto } from '../../dto/labels/update.dto';
+import { NlpLabeledDto } from '@email/dtos/nlp/nlp-labeled.dto';
+import { UpdateDto } from '@email/dtos/labels/update.dto';
+import { BaseConsumer } from '@shared/messaging/consumers/base.consumer';
 
 @Injectable()
-export class NlpLabeledConsumer implements OnApplicationBootstrap {
+export class NlpLabeledConsumer extends BaseConsumer<NlpLabeledDto> {
+  protected readonly queueName = QUEUE_LABELED;
+
+  protected readonly routingKey = EmailRoutingKey.Labeled;
+
+  protected readonly payloadDtoClass = NlpLabeledDto;
+
   constructor(
-    private readonly rabbitmqService: RabbitMQService,
+    rabbitmqService: RabbitMQService,
     private readonly settingService: SettingService,
     private readonly googleapisService: GoogleapisService,
     @InjectRepository(Email)
     private readonly emailRepository: Repository<Email>
-  ) {}
-
-  async onApplicationBootstrap() {
-    await this.rabbitmqService.subscribe(
-      QUEUE_NLP_LABELED,
-      EmailRoutingKey.NlpLabeled,
-      async (data: unknown) => {
-        const payload = await validateDto(NlpLabeledDto, data);
-        await this.handleMessage(payload);
-      }
-    );
+  ) {
+    super(rabbitmqService);
   }
 
-  private async handleMessage(payload: NlpLabeledDto): Promise<void> {
+  protected async handleMessage(payload: NlpLabeledDto): Promise<void> {
     const { gmailMessageId, id: emailId } = payload.internal;
     const systemLabels = payload.labels;
 
-    const email = await this.emailRepository.findOne({
-      where: [{ gmailMessageId, systemLabels: IsNull(), id: emailId }],
+    const email = await this.emailRepository.findOneBy({
+      gmailMessageId,
+      systemLabels: IsNull(),
+      id: emailId,
     });
 
     if (!email) {

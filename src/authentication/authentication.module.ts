@@ -36,6 +36,6 @@ import { AuthService } from '@authentication/services/auth.service';
     GoogleService,
     AuthService,
   ],
-  exports: [AuthService, TypeOrmModule, JwtModule],
+  exports: [TypeOrmModule],
 })
 export class AuthenticationModule {}

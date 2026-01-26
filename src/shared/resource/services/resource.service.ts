@@ -2,6 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { ObjectLiteral, Repository, SelectQueryBuilder } from 'typeorm';
 import { ResourceQueryDto } from '@shared/resource/dtos/resource-query.dto';
 
+export interface PaginatedResult<T> {
+  items: T[];
+  pagination: {
+    total: number;
+    currentPage: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
 @Injectable()
 export abstract class ResourceService<T extends ObjectLiteral> {
   protected abstract repository: Repository<T>;
@@ -14,7 +24,7 @@ export abstract class ResourceService<T extends ObjectLiteral> {
     return this.repository.metadata.tableName;
   }
 
-  async findAll(queryDto: ResourceQueryDto) {
+  async findAll(queryDto: ResourceQueryDto): Promise<PaginatedResult<T>> {
     const page = Math.max(queryDto.page || 1);
     const limit = Math.min(Math.max(1, queryDto.limit), 20);
 
@@ -57,26 +67,26 @@ export abstract class ResourceService<T extends ObjectLiteral> {
     };
   }
 
-  async findOne(id: number) {
+  async findOne(id: number): Promise<T> {
     return await this.repository.findOneByOrFail({
       id: id as any,
     });
   }
 
-  async create(createDto: object) {
+  async create(createDto: object): Promise<T> {
     const entity = this.repository.create(createDto as any);
-    return await this.repository.save(entity);
+    return (await this.repository.save(entity)) as unknown as T;
   }
 
-  async update(id: number, updateDto: object) {
+  async update(id: number, updateDto: object): Promise<T> {
     const entity = await this.findOne(id);
     Object.assign(entity, updateDto);
-    return await this.repository.save(entity);
+    return (await this.repository.save(entity as any)) as unknown as T;
   }
 
-  async remove(id: number) {
+  async remove(id: number): Promise<T> {
     const entity = await this.findOne(id);
-    return await this.repository.remove(entity);
+    return (await this.repository.remove(entity)) as unknown as T;
   }
 
   protected applyCustomFilters(

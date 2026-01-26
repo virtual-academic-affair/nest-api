@@ -1,8 +1,6 @@
 export enum SystemLabel {
-  ClassRegistration = 'class_registration',
-  Administrative = 'administrative',
-  Department = 'department',
-  GraduationInquiry = 'graduation_inquiry',
-  AcademicInquiry = 'academic_inquiry',
+  ClassRegistration = 'classRegistration',
+  Task = 'task',
+  Inquiry = 'inquiry',
   Other = 'other',
 }

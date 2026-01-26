@@ -3,7 +3,7 @@ import { ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from '../entities/user.entity';
+import { User } from '@authentication/entities/user.entity';
 import jwtConfig from '@shared/config/jwt.config';
 import { ActiveUserData } from '@authentication/interfaces/active-user-data.interface';
 import { RedisService } from '@shared/services/redis.service';

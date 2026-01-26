@@ -49,8 +49,8 @@ AuthService (Verify & Generate New Tokens) → Frontend (Save & Retry)
 
 ### 2. JWT Token Management
 
-- **Access Token**: Thời gian sống ngắn (vài phút đến vài giờ), dùng để xác thực request
-- **Refresh Token**: Thời gian sống dài (vài ngày đến vài tuần), dùng để gia hạn access token
+- **Access Token**: Dùng để xác thực request
+- **Refresh Token**: Dùng để gia hạn access token
 - Tokens được sign và verify bằng JWT secret
 
 ### 3. Role-Based Access Control (RBAC)
@@ -71,11 +71,13 @@ AuthService (Verify & Generate New Tokens) → Frontend (Save & Retry)
 Module cung cấp các guards và decorators cho authentication và authorization:
 
 **Guards:**
+
 - **AuthenticationGuard**: Guard toàn cục kiểm tra xác thực người dùng
 - **AccessTokenGuard**: Xác thực access token (JWT)
 - **RolesGuard**: Phân quyền theo role (Admin, Student, Lecture)
 
 **Decorators:**
+
 - **@Auth(authType)**: Chỉ định loại xác thực (Bearer hoặc None)
 - **@Roles(...roles)**: Chỉ định role được phép truy cập
 - **@ActiveUser()**: Lấy thông tin user hiện tại từ request

@@ -8,19 +8,11 @@ export class UpdateDto {
 
   @IsOptional()
   @IsString()
-  [SystemLabel.Administrative]?: string | null;
+  [SystemLabel.Inquiry]?: string | null;
 
   @IsOptional()
   @IsString()
-  [SystemLabel.Department]?: string | null;
-
-  @IsOptional()
-  @IsString()
-  [SystemLabel.GraduationInquiry]?: string | null;
-
-  @IsOptional()
-  @IsString()
-  [SystemLabel.AcademicInquiry]?: string | null;
+  [SystemLabel.Task]?: string | null;
 
   @IsOptional()
   @IsString()

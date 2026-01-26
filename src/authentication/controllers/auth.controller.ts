@@ -4,7 +4,7 @@ import { AuthType } from '@authentication/enums/auth-type.enum';
 import { RefreshTokenDto } from '@authentication/dtos/auth/refresh-token.dto';
 import { ActiveUser } from '@authentication/decorators/active-user.decorator';
 import { ActiveUserData } from '@authentication/interfaces/active-user-data.interface';
-import { UsersService } from '../services/users.service';
+import { UsersService } from '@authentication/services/users.service';
 import { AuthService } from '@authentication/services/auth.service';
 
 @Controller('authentication/auth')

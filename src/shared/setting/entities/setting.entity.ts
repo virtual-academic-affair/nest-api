@@ -1,4 +1,4 @@
-import { BeforeInsert, BeforeUpdate, Column, Entity } from 'typeorm';
+import { Column, Entity } from 'typeorm';
 import { BaseEntity } from '@shared/resource/entities/base.entity';
 
 @Entity()
@@ -8,12 +8,4 @@ export class Setting extends BaseEntity {
 
   @Column({ type: 'jsonb', nullable: false })
   value: any;
-
-  @BeforeInsert()
-  @BeforeUpdate()
-  normalizeKey() {
-    if (this.key) {
-      this.key = this.key.toLowerCase();
-    }
-  }
 }

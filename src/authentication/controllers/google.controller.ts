@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
-import { GoogleService } from '../services/google.service';
+import { GoogleService } from '@authentication/services/google.service';
 import { CodeDto } from '@authentication/dtos/google/code.dto';
 
 @Controller('authentication/google')

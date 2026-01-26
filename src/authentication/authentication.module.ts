@@ -4,16 +4,16 @@ import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { APP_GUARD } from '@nestjs/core';
 import jwtConfig from '@shared/config/jwt.config';
-import { AuthenticationGuard } from './guards/authentication.guard';
-import { AccessTokenGuard } from './guards/access-token.guard';
-import { RolesGuard } from './guards/roles.guard';
-import { UsersController } from './controllers/users.controller';
-import { AuthenticationController } from './controllers/auth.controller';
-import { GoogleController } from './controllers/google.controller';
-import { User } from './entities/user.entity';
-import { UsersService } from './services/users.service';
-import { GoogleService } from './services/google.service';
-import { AuthService } from './services/auth.service';
+import { AuthenticationGuard } from '@authentication/guards/authentication.guard';
+import { AccessTokenGuard } from '@authentication/guards/access-token.guard';
+import { RolesGuard } from '@authentication/guards/roles.guard';
+import { UsersController } from '@authentication/controllers/users.controller';
+import { AuthenticationController } from '@authentication/controllers/auth.controller';
+import { GoogleController } from '@authentication/controllers/google.controller';
+import { User } from '@authentication/entities/user.entity';
+import { UsersService } from '@authentication/services/users.service';
+import { GoogleService } from '@authentication/services/google.service';
+import { AuthService } from '@authentication/services/auth.service';
 
 @Module({
   imports: [

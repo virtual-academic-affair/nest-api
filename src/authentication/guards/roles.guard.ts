@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Role } from '@authentication/enums/role.enum';
-import { ROLES_KEY } from '../decorators/roles.decorator';
+import { ROLES_KEY } from '@authentication/decorators/roles.decorator';
 import { ActiveUserData } from '@authentication/interfaces/active-user-data.interface';
 import { REQUEST_USER_KEY } from '@authentication/guards/access-token.guard';
 

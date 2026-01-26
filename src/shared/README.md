@@ -48,8 +48,7 @@ Các nhãn phân loại email tự động:
 | Giá trị              | Mô tả               |
 |----------------------|---------------------|
 | `class_registration` | Đăng ký lớp học     |
-| `administrative`     | Đơn từ              |
-| `department`         | Công tác khoa       |
+| `task`               | Công tác khoa       |
 | `graduation_inquiry` | Thắc mắc tốt nghiệp |
 | `academic_inquiry`   | Thắc mắc học vụ     |
 | `other`              | Khác                |

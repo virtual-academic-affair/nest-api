@@ -1,9 +1,9 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { UsersService } from '../services/users.service';
+import { UsersService } from '@authentication/services/users.service';
 import { Auth } from '@authentication/decorators/auth.decorator';
 import { AuthType } from '@authentication/enums/auth-type.enum';
 import { AssignRoleDto } from '@authentication/dtos/auth/assign-role.dto';
-import { User } from '../entities/user.entity';
+import { User } from '@authentication/entities/user.entity';
 import { QueryDto } from '@authentication/dtos/users/query.dto';
 import { UpdateDto } from '@authentication/dtos/users/update.dto';
 import { Roles } from '@authentication/decorators/roles.decorator';

@@ -13,7 +13,9 @@ import { EmailIngestedProducer } from './messaging/producers/email-ingested.prod
 import { GrantsController } from './controllers/grants.controller';
 import { LabelsController } from './controllers/labels.controller';
 import { MessagesController } from './controllers/messages.controller';
+import { MessageLabelsController } from './controllers/message-labels.controller';
 import { MessagesService } from './services/messages.service';
+import { MessageLabelsService } from './services/message-labels.service';
 
 @Module({
   imports: [
@@ -21,7 +23,12 @@ import { MessagesService } from './services/messages.service';
     ScheduleModule.forRoot(),
     TypeOrmModule.forFeature([Email, User]),
   ],
-  controllers: [GrantsController, LabelsController, MessagesController],
+  controllers: [
+    GrantsController,
+    LabelsController,
+    MessagesController,
+    MessageLabelsController,
+  ],
   providers: [
     GoogleapisService,
     LabelsService,
@@ -29,6 +36,7 @@ import { MessagesService } from './services/messages.service';
     NlpLabeledConsumer,
     EmailIngestedProducer,
     MessagesService,
+    MessageLabelsService,
     EmailSyncScheduler,
   ],
   exports: [
@@ -38,6 +46,7 @@ import { MessagesService } from './services/messages.service';
     NlpLabeledConsumer,
     EmailIngestedProducer,
     MessagesService,
+    MessageLabelsService,
   ],
 })
 export class EmailModule {}

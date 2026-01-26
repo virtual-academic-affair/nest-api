@@ -99,21 +99,18 @@ việc xử lý và phân loại email học vụ.
 
 ### Labels
 
-| Endpoint                     | Method | Role  | Chức năng                                           |
-|------------------------------|--------|-------|-----------------------------------------------------|
-| `/email/labels`              | GET    | Admin | Lấy danh sách system labels và mapping              |
+| Endpoint                    | Method | Role  | Chức năng                                           |
+|-----------------------------|--------|-------|-----------------------------------------------------|
+| `/email/labels`             | GET    | Admin | Lấy danh sách system labels và mapping              |
 | `/email/labels/gmailLabels` | GET    | Admin | Lấy tất cả Gmail labels từ tài khoản                |
-| `/email/labels`              | PUT    | Admin | Cập nhật mapping giữa SystemLabel và Gmail label ID |
-| `/email/labels/autoCreate`   | POST   | Admin | Tự động tạo labels trên Gmail theo SystemLabel      |
+| `/email/labels`             | PUT    | Admin | Cập nhật mapping giữa SystemLabel và Gmail label ID |
+| `/email/labels/autoCreate`  | POST   | Admin | Tự động tạo labels trên Gmail theo SystemLabel      |
 
 ### Messages (Emails)
 
-| Endpoint               | Method | Role  | Chức năng                                    |
-|------------------------|--------|-------|----------------------------------------------|
-| `/email/messages`      | GET    | Admin | Lấy danh sách emails (có pagination, filter) |
-| `/email/messages/:id`  | GET    | Admin | Lấy chi tiết một email                       |
-| `/email/messages/:id`  | PUT    | Admin | Cập nhật thông tin email                     |
-| `/email/messages/sync` | POST   | Admin | Trigger đồng bộ email thủ công               |
-
-> **Lưu ý**: Messages controller kế thừa `ResourceController` nên có CRUD chuẩn, nhưng bị giới hạn chỉ cho phép
-`FindAll`, `FindOne`, `Update` (không cho Create/Delete).
+| Endpoint                     | Method | Role  | Chức năng                                    |
+|------------------------------|--------|-------|----------------------------------------------|
+| `/email/messages`            | GET    | Admin | Lấy danh sách emails (có pagination, filter) |
+| `/email/messages/:id`        | GET    | Admin | Lấy chi tiết một email                       |
+| `/email/messages/sync`       | POST   | Admin | Trigger đồng bộ email thủ công               |
+| `/email/messages/:id/labels` | PUT    | Admin | Thêm/xóa label vào email (DB + Gmail) - body: { isRemove: boolean, systemLabel: "..." } |

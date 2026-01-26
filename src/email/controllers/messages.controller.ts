@@ -9,14 +9,13 @@ import { RestrictMethods } from '@shared/resource/decorators/restrict-methods.de
 import { Email } from '../entities/email.entity';
 import { MessagesService } from '../services/messages.service';
 import { QueryDto } from '../dto/messages/query.dto';
-import { UpdateDto } from '../dto/messages/update.dto';
 import { EmailIngestedProducer } from '../messaging/producers/email-ingested.producer';
 
 @Auth(AuthType.Bearer)
 @Roles(Role.Admin)
 @Controller('email/messages')
 @RestrictMethods({
-  only: [ResourceAction.FindAll, ResourceAction.FindOne, ResourceAction.Update],
+  only: [ResourceAction.FindAll, ResourceAction.FindOne],
 })
 export class MessagesController extends ResourceController<Email> {
   constructor(
@@ -27,7 +26,7 @@ export class MessagesController extends ResourceController<Email> {
   }
 
   protected getDtoClasses() {
-    return { query: QueryDto, update: UpdateDto };
+    return { query: QueryDto };
   }
 
   @Post('sync')

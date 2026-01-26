@@ -68,7 +68,7 @@
             }
         },
         {
-            "name": "Update Message",
+            "name": "Update Message Label",
             "request": {
                 "method": "PUT",
                 "header": [
@@ -79,12 +79,12 @@
                 ],
                 "body": {
                     "mode": "raw",
-                    "raw": "{\n    \"systemLabels\": [\"classRegistration\", \"task\", \"inquiry\", \"other\"]\n}"
+                    "raw": "{\n    \"isRemove\": false,\n    \"systemLabel\": \"classRegistration\"\n}"
                 },
                 "url": {
-                    "raw": "{{baseUrl}}/email/messages/:id",
+                    "raw": "{{baseUrl}}/email/messages/:id/labels",
                     "host": ["{{baseUrl}}"],
-                    "path": ["email", "messages", ":id"],
+                    "path": ["email", "messages", ":id", "labels"],
                     "variable": [
                         {
                             "key": "id",

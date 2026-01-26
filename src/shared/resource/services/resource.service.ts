@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ObjectLiteral, Repository, SelectQueryBuilder } from 'typeorm';
 import { ResourceQueryDto } from '@shared/resource/dtos/resource-query.dto';
 
@@ -58,9 +58,9 @@ export abstract class ResourceService<T extends ObjectLiteral> {
   }
 
   async findOne(id: number) {
-    const item = await this.repository.findOne({ where: { id } as any });
-    throwUnless(item, new NotFoundException('Resource not found'));
-    return item;
+    return await this.repository.findOneByOrFail({
+      id: id as any,
+    });
   }
 
   async create(createDto: object) {

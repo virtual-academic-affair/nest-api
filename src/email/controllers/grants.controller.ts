@@ -3,7 +3,7 @@ import { Auth } from '@authentication/decorators/auth.decorator';
 import { AuthType } from '@authentication/enums/auth-type.enum';
 import { Roles } from '@authentication/decorators/roles.decorator';
 import { Role } from '@authentication/enums/role.enum';
-import { GrantsService } from '../services/grants.service';
+import { GrantsService } from '@email/services/grants.service';
 import { CodeDto } from '@email/dtos/grants/code.dto';
 
 @Auth(AuthType.Bearer)

@@ -3,7 +3,7 @@ import { Auth } from '@authentication/decorators/auth.decorator';
 import { AuthType } from '@authentication/enums/auth-type.enum';
 import { Roles } from '@authentication/decorators/roles.decorator';
 import { Role } from '@authentication/enums/role.enum';
-import { MessageLabelsService } from '../services/message-labels.service';
+import { MessageLabelsService } from '@email/services/message-labels.service';
 import { UpdateMessageLabelDto } from '@email/dtos/message-labels/update.dto';
 
 @Auth(AuthType.Bearer)

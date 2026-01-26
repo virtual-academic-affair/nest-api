@@ -7,9 +7,9 @@ import { RestrictMethods } from '@shared/resource/decorators/restrict-methods.de
 import { ResourceController } from '@shared/resource/controllers/resource.controller';
 import { ResourceAction } from '@shared/resource/enums/resource-action.enum';
 import { Email } from '@email/entities/email.entity';
-import { MessagesService } from '../services/messages.service';
+import { MessagesService } from '@email/services/messages.service';
 import { QueryDto } from '@email/dtos/messages/query.dto';
-import { EmailIngestedProducer } from '../messaging/producers/email-ingested.producer';
+import { EmailIngestedProducer } from '@email/messaging/producers/email-ingested.producer';
 
 @Auth(AuthType.Bearer)
 @Roles(Role.Admin)

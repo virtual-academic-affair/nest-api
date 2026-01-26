@@ -45,12 +45,12 @@ Các controller khác có thể extend `ResourceController` để tự động c
 
 Các nhãn phân loại email tự động:
 
-| Giá trị              | Mô tả               |
-|----------------------|---------------------|
-| `classRegistration` | Đăng ký lớp học     |
-| `task`               | Công tác khoa       |
-| `inquiry`            | Thắc mắc            |
-| `other`              | Khác                |
+| Giá trị             | Mô tả           |
+|---------------------|-----------------|
+| `classRegistration` | Đăng ký lớp học |
+| `task`              | Công tác khoa   |
+| `inquiry`           | Tư vấn          | 
+| `other`             | Khác            |
 
 ### ResourceAction (CRUD Operations)
 

@@ -8,11 +8,11 @@ import rabbitmqConfig from '@shared/config/rabbitmq.config';
 import { RestrictMethodsGuard } from '@shared/resource/guards/restrict-methods.guard';
 import { RabbitMQService } from '@shared/services/rabbitmq.service';
 import { Setting } from '@shared/setting/entities/setting.entity';
-import redisConfig from './config/redis.config';
-import { BcryptService } from './hashing/bcrypt.service';
-import { HashingService } from './hashing/hashing.service';
-import { RedisService } from './services/redis.service';
-import { SettingService } from './setting/services/setting.service';
+import redisConfig from '@shared/config/redis.config';
+import { BcryptService } from '@shared/hashing/bcrypt.service';
+import { HashingService } from '@shared/hashing/hashing.service';
+import { RedisService } from '@shared/services/redis.service';
+import { SettingService } from '@shared/setting/services/setting.service';
 
 @Global()
 @Module({

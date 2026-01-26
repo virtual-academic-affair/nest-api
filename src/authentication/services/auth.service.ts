@@ -50,14 +50,9 @@ export class AuthService {
   }
 
   async refreshTokens(dto: RefreshTokenDto) {
-    const payload = await this.jwtService
-      .verifyAsync<{ refreshTokenId: string }>(
-        dto.refreshToken,
-        this.jwtConfiguration
-      )
-      .catch(() => {
-        return null;
-      });
+    const payload = await this.jwtService.verifyAsync<{
+      refreshTokenId: string;
+    }>(dto.refreshToken, this.jwtConfiguration);
     throwUnless(
       payload?.refreshTokenId,
       new UnauthorizedException('Refresh token is invalid')

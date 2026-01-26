@@ -1,4 +1,4 @@
-export enum EmailRoutingKey {
+export enum RoutingKey {
   Ingested = 'ingested',
   Labeled = 'labeled',
 
@@ -8,11 +8,9 @@ export enum EmailRoutingKey {
   Inquiry = 'processed.inquiry',
 }
 
-const PREFIX_QUEUE = 'queue.';
-
-// Queue names for consumers
-export const QUEUE_LABELED = PREFIX_QUEUE + EmailRoutingKey.Labeled;
-export const QUEUE_CLASS_REGISTRATION =
-  PREFIX_QUEUE + EmailRoutingKey.ClassRegistration;
-export const QUEUE_TASK = PREFIX_QUEUE + EmailRoutingKey.Task;
-export const QUEUE_INQUIRY = PREFIX_QUEUE + EmailRoutingKey.Inquiry;
+export enum QueueName {
+  Labeled = 'queue.labeled',
+  ClassRegistration = 'queue.processed.classRegistration',
+  Task = 'queue.processed.task',
+  Inquiry = 'queue.processed.inquiry',
+}

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, Repository } from 'typeorm';
 import { RabbitMQService } from '@shared/services/rabbitmq.service';
-import { EmailRoutingKey, QUEUE_LABELED } from '@shared/enums/rabbitmq.enum';
+import { RoutingKey, QueueName } from '@shared/enums/rabbitmq.enum';
 import { Email } from '../../entities/email.entity';
 import { SettingService } from '@shared/setting/services/setting.service';
 import { GoogleapisService } from '../../services/googleapis.service';
@@ -13,9 +13,9 @@ import { BaseConsumer } from '@shared/messaging/consumers/base.consumer';
 
 @Injectable()
 export class NlpLabeledConsumer extends BaseConsumer<LabeledDto> {
-  protected readonly queueName = QUEUE_LABELED;
+  protected readonly queueName = QueueName.Labeled;
 
-  protected readonly routingKey = EmailRoutingKey.Labeled;
+  protected readonly routingKey = RoutingKey.Labeled;
 
   protected readonly payloadDtoClass = LabeledDto;
 

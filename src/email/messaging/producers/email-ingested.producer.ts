@@ -2,7 +2,7 @@ import { User } from '@authentication/entities/user.entity';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Role } from '@authentication/enums/role.enum';
-import { EmailRoutingKey } from '@shared/enums/rabbitmq.enum';
+import { RoutingKey } from '@shared/enums/rabbitmq.enum';
 import { RabbitMQService } from '@shared/services/rabbitmq.service';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
 import { SettingService } from '@shared/setting/services/setting.service';
@@ -25,7 +25,7 @@ export interface EmailIngestedPayload {
 
 @Injectable()
 export class EmailIngestedProducer extends BaseProducer<EmailIngestedPayload> {
-  protected readonly routingKey = EmailRoutingKey.Ingested;
+  protected readonly routingKey = RoutingKey.Ingested;
 
   private readonly logger = new Logger(EmailIngestedProducer.name);
 

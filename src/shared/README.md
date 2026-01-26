@@ -64,25 +64,25 @@ Các action cơ bản trong CRUD:
 | `Update`  | Cập nhật              |
 | `Delete`  | Xóa                   |
 
-### EmailRoutingKey (RabbitMQ)
+### RoutingKey
 
 Routing keys cho message queue xử lý email:
 
-| Giá trị               | Mô tả                           |
-|-----------------------|---------------------------------|
-| `email.ingested`      | Email mới được đồng bộ từ Gmail |
-| `email.nlp.labeled`   | Email đã được NLP phân loại     |
-| `email.nlp.processed` | Email đã xử lý xong             |
+| Giá trị       | Mô tả                           |
+|---------------|---------------------------------|
+| `ingested`    | Email mới được đồng bộ từ Gmail |
+| `labeled`     | Email đã được NLP phân loại     |
+| `processed.*` | Email đã xử lý xong             |
 
 ### SettingKey (Dynamic Configuration)
 
 Các key cấu hình động trong database:
 
-| Key                           | Mô tả                                      |
-|-------------------------------|--------------------------------------------|
-| `email/labels`                | Mapping giữa SystemLabel và Gmail label ID |
-| `email/lang-labels`           | Nhãn đa ngôn ngữ                           |
-| `email/super-email`           | Email chính để sync Gmail                  |
-| `email/last-pull-at`          | Thời điểm sync email lần cuối              |
-| `email/allowed-domains`       | Danh sách domain email được phép           |
-| `authentication/admin-emails` | Danh sách email admin                      |
+| Key                          | Mô tả                                      |
+|------------------------------|--------------------------------------------|
+| `email/labels`               | Mapping giữa SystemLabel và Gmail label ID |
+| `email/langLabels`           | Nhãn đa ngôn ngữ cho SystemLabel           |
+| `email/superEmail`           | Email chính để sync Gmail                  |
+| `email/lastPullAt`           | Thời điểm sync email lần cuối              |
+| `email/allowedDomains`       | Danh sách domain email được phép           |
+| `authentication/adminEmails` | Danh sách email admin                      |

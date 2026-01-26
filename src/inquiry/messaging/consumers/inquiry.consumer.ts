@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { BaseConsumer } from '@shared/messaging/consumers/base.consumer';
 import { RabbitMQService } from '@shared/services/rabbitmq.service';
-import { EmailRoutingKey, QUEUE_INQUIRY } from '@shared/enums/rabbitmq.enum';
+import { RoutingKey, QueueName } from '@shared/enums/rabbitmq.enum';
 import { InquiryDto } from '@inquiry/dtos/messaging/inquiry.dto';
 
 @Injectable()
 export class InquiryConsumer extends BaseConsumer<InquiryDto> {
-  protected readonly queueName = QUEUE_INQUIRY;
+  protected readonly queueName = QueueName.Inquiry;
 
-  protected readonly routingKey = EmailRoutingKey.Inquiry;
+  protected readonly routingKey = RoutingKey.Inquiry;
 
   protected readonly payloadDtoClass = InquiryDto;
 

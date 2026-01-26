@@ -79,7 +79,7 @@
                 ],
                 "body": {
                     "mode": "raw",
-                    "raw": "{\n    \"systemLabels\": []\n}"
+                    "raw": "{\n    \"systemLabels\": [\"classRegistration\", \"task\", \"inquiry\", \"other\"]\n}"
                 },
                 "url": {
                     "raw": "{{baseUrl}}/email/messages/:id",

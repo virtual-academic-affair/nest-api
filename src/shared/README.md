@@ -47,10 +47,9 @@ Các nhãn phân loại email tự động:
 
 | Giá trị              | Mô tả               |
 |----------------------|---------------------|
-| `class_registration` | Đăng ký lớp học     |
+| `classRegistration` | Đăng ký lớp học     |
 | `task`               | Công tác khoa       |
-| `graduation_inquiry` | Thắc mắc tốt nghiệp |
-| `academic_inquiry`   | Thắc mắc học vụ     |
+| `inquiry`            | Thắc mắc            |
 | `other`              | Khác                |
 
 ### ResourceAction (CRUD Operations)

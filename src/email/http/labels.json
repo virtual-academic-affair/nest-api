@@ -51,7 +51,7 @@
                 ],
                 "body": {
                     "mode": "raw",
-                    "raw": "{\n    \"ClassRegistration\": \"<gmail_label_id>\",\n    \"Administrative\": \"<gmail_label_id>\",\n    \"Department\": \"<gmail_label_id>\",\n    \"GraduationInquiry\": \"<gmail_label_id>\",\n    \"AcademicInquiry\": \"<gmail_label_id>\"\n}"
+                    "raw": "{\n    \"classRegistration\": \"<gmail_label_id>\",\n    \"task\": \"<gmail_label_id>\",\n    \"inquiry\": \"<gmail_label_id>\",\n    \"other\": \"<gmail_label_id>\"\n}"
                 },
                 "url": {
                     "raw": "{{baseUrl}}/email/labels",

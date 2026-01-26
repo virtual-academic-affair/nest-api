@@ -102,7 +102,7 @@ việc xử lý và phân loại email học vụ.
 | Endpoint                     | Method | Role  | Chức năng                                           |
 |------------------------------|--------|-------|-----------------------------------------------------|
 | `/email/labels`              | GET    | Admin | Lấy danh sách system labels và mapping              |
-| `/email/labels/googleLabels` | GET    | Admin | Lấy tất cả Gmail labels từ tài khoản                |
+| `/email/labels/gmailLabels` | GET    | Admin | Lấy tất cả Gmail labels từ tài khoản                |
 | `/email/labels`              | PUT    | Admin | Cập nhật mapping giữa SystemLabel và Gmail label ID |
 | `/email/labels/autoCreate`   | POST   | Admin | Tự động tạo labels trên Gmail theo SystemLabel      |
 

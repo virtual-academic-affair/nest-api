@@ -6,16 +6,16 @@ import {
   EmailRoutingKey,
   QUEUE_NLP_LABELED,
 } from '@shared/enums/rabbitmq.enum';
-import { Email } from '../entities/email.entity';
+import { Email } from '../../entities/email.entity';
 import { SettingService } from '@shared/setting/services/setting.service';
-import { GoogleapisService } from './googleapis.service';
+import { GoogleapisService } from '../../services/googleapis.service';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
-import { NlpLabeledDto } from '../dto/nlp/nlp-labeled.dto';
+import { NlpLabeledDto } from '../../dto/nlp/nlp-labeled.dto';
 import { validateDto } from '@shared/resource/utils/validate-dto.util';
-import { UpdateDto } from '../dto/labels/update.dto';
+import { UpdateDto } from '../../dto/labels/update.dto';
 
 @Injectable()
-export class NlpLabeledService implements OnApplicationBootstrap {
+export class NlpLabeledConsumer implements OnApplicationBootstrap {
   constructor(
     private readonly rabbitmqService: RabbitMQService,
     private readonly settingService: SettingService,

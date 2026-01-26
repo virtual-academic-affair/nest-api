@@ -10,7 +10,7 @@ import { Email } from '../entities/email.entity';
 import { MessagesService } from '../services/messages.service';
 import { QueryDto } from '../dto/messages/query.dto';
 import { UpdateDto } from '../dto/messages/update.dto';
-import { EmailSyncService } from '../services/email-sync.service';
+import { EmailIngestedProducer } from '../messaging/producers/email-ingested.producer';
 
 @Auth(AuthType.Bearer)
 @Roles(Role.Admin)
@@ -21,7 +21,7 @@ import { EmailSyncService } from '../services/email-sync.service';
 export class MessagesController extends ResourceController<Email> {
   constructor(
     private readonly messagesService: MessagesService,
-    private readonly emailSyncService: EmailSyncService
+    private readonly emailIngestedProducer: EmailIngestedProducer
   ) {
     super(messagesService);
   }
@@ -32,6 +32,6 @@ export class MessagesController extends ResourceController<Email> {
 
   @Post('sync')
   protected async sync() {
-    return await this.emailSyncService.sync();
+    return await this.emailIngestedProducer.sync();
   }
 }

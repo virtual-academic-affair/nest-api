@@ -7,9 +7,9 @@ import { User } from '@authentication/entities/user.entity';
 import { GoogleapisService } from './services/googleapis.service';
 import { LabelsService } from './services/labels.service';
 import { GrantsService } from './services/grants.service';
-import { EmailSyncService } from './services/email-sync.service';
 import { EmailSyncScheduler } from './scheduler/email-sync.scheduler';
-import { NlpLabeledService } from './services/nlp-labeled.service';
+import { NlpLabeledConsumer } from './messaging/consumers/nlp-labeled.consumer';
+import { EmailIngestedProducer } from './messaging/producers/email-ingested.producer';
 import { GrantsController } from './controllers/grants.controller';
 import { LabelsController } from './controllers/labels.controller';
 import { MessagesController } from './controllers/messages.controller';
@@ -26,8 +26,8 @@ import { MessagesService } from './services/messages.service';
     GoogleapisService,
     LabelsService,
     GrantsService,
-    EmailSyncService,
-    NlpLabeledService,
+    NlpLabeledConsumer,
+    EmailIngestedProducer,
     MessagesService,
     EmailSyncScheduler,
   ],
@@ -35,8 +35,8 @@ import { MessagesService } from './services/messages.service';
     GoogleapisService,
     LabelsService,
     GrantsService,
-    EmailSyncService,
-    NlpLabeledService,
+    NlpLabeledConsumer,
+    EmailIngestedProducer,
     MessagesService,
   ],
 })

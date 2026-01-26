@@ -6,17 +6,25 @@ import { EmailRoutingKey } from '@shared/enums/rabbitmq.enum';
 import { RabbitMQService } from '@shared/services/rabbitmq.service';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
 import { SettingService } from '@shared/setting/services/setting.service';
+import { Repository } from 'typeorm';
+import { Email } from '../../entities/email.entity';
+import { SuperEmailSetting } from '../../types/super-email-setting.type';
+import { GoogleapisService } from '../../services/googleapis.service';
 import * as parseMessage from 'gmail-api-parse-message';
 import { gmail_v1 } from 'googleapis';
 import { htmlToText } from 'html-to-text';
-import { Repository } from 'typeorm';
-import { Email } from '../entities/email.entity';
-import { SuperEmailSetting } from '../types/super-email-setting.type';
-import { GoogleapisService } from './googleapis.service';
+
+export interface EmailIngestedPayload {
+  internal: { id: number; gmailMessageId: string };
+  subject?: string;
+  senderEmail?: string;
+  senderName?: string;
+  content: string;
+}
 
 @Injectable()
-export class EmailSyncService {
-  private readonly logger = new Logger(EmailSyncService.name);
+export class EmailIngestedProducer {
+  private readonly logger = new Logger(EmailIngestedProducer.name);
 
   private adminEmails = new Set<string>();
 
@@ -25,14 +33,66 @@ export class EmailSyncService {
   private allowedDomains: string[] = [];
 
   constructor(
+    private readonly rabbitmqService: RabbitMQService,
     private readonly googleapisService: GoogleapisService,
     private readonly settingService: SettingService,
-    private readonly rabbitmqService: RabbitMQService,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
     @InjectRepository(Email)
-    private readonly emailRepository: Repository<Email>
+    private readonly emailRepository: Repository<Email>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>
   ) {}
+
+  private async handleAndPublish(
+    gmail: gmail_v1.Gmail,
+    gmailMessageId: string,
+    shouldIgnoreSender: (email?: string) => boolean
+  ): Promise<void> {
+    const exists = await this.emailRepository.findOne({
+      where: { gmailMessageId },
+    });
+
+    if (exists) {
+      return;
+    }
+
+    const { data } = await gmail.users.messages.get({
+      userId: 'me',
+      id: gmailMessageId,
+      format: 'full',
+    });
+
+    const parsed = parseMessage(data);
+
+    const senderEmail = parsed.headers.from?.match(/<(.+)>/)?.[1];
+    if (shouldIgnoreSender(senderEmail)) {
+      return;
+    }
+
+    const email = await this.emailRepository.save({
+      gmailMessageId,
+      headerMessageId: parsed.headers['message-id'],
+      threadId: data.threadId,
+      subject: parsed.headers.subject,
+      labelIds: data.labelIds ?? [],
+      sentAt: parsed.headers.date ? new Date(parsed.headers.date) : undefined,
+      senderEmail,
+      senderName: parsed.headers.from,
+    });
+
+    await this.publish({
+      internal: { id: email.id, gmailMessageId },
+      subject: email.subject,
+      senderEmail: email.senderEmail,
+      senderName: email.senderName,
+      content: htmlToText(parsed.textHtml ?? parsed.textPlain ?? '', {
+        wordwrap: false,
+      }),
+    });
+  }
+
+  private async publish(payload: EmailIngestedPayload): Promise<void> {
+    await this.rabbitmqService.publish(EmailRoutingKey.Ingested, payload);
+  }
 
   private async loadEmailPolicies() {
     const [admins, superEmailSetting, allowedDomainsSetting] =
@@ -117,49 +177,9 @@ export class EmailSyncService {
   }
 
   private async handleMessage(gmail: gmail_v1.Gmail, id: string) {
-    const exists = await this.emailRepository.findOne({
-      where: { gmailMessageId: id },
-    });
-
-    if (exists) {
-      return;
-    }
-
-    const { data } = await gmail.users.messages.get({
-      userId: 'me',
-      id,
-      format: 'full',
-    });
-
-    const parsed = parseMessage(data);
-
-    const senderEmail = parsed.headers.from?.match(/<(.+)>/)?.[1];
-    if (this.shouldIgnoreSender(senderEmail)) {
-      return;
-    }
-
-    const email = await this.emailRepository.save({
-      gmailMessageId: id,
-      headerMessageId: parsed.headers['message-id'],
-      threadId: data.threadId,
-
-      subject: parsed.headers.subject,
-      labelIds: data.labelIds ?? [],
-      sentAt: parsed.headers.date ? new Date(parsed.headers.date) : undefined,
-
-      senderEmail,
-      senderName: parsed.headers.from,
-    });
-
-    await this.rabbitmqService.publish(EmailRoutingKey.Ingested, {
-      internal: { id: email.id, gmailMessageId: id },
-      subject: email.subject,
-      senderEmail: email.senderEmail,
-      senderName: email.senderName,
-      content: htmlToText(parsed.textHtml ?? parsed.textPlain ?? '', {
-        wordwrap: false,
-      }),
-    });
+    await this.handleAndPublish(gmail, id, (email) =>
+      this.shouldIgnoreSender(email)
+    );
   }
 
   private async updateLastPull() {

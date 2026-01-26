@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { NlpTaskConsumer } from './messaging/consumers/nlp-task.consumer';
+import { TaskConsumer } from './messaging/consumers/task.consumer';
 
 @Module({
-  providers: [NlpTaskConsumer],
+  providers: [TaskConsumer],
   exports: [],
 })
 export class TaskModule {}

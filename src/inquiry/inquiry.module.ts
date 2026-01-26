@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { NlpInquiryConsumer } from './messaging/consumers/nlp-inquiry.consumer';
+import { InquiryConsumer } from './messaging/consumers/inquiry.consumer';
 
 @Module({
-  providers: [NlpInquiryConsumer],
+  providers: [InquiryConsumer],
   exports: [],
 })
 export class InquiryModule {}

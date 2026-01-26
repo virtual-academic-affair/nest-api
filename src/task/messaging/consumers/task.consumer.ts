@@ -2,26 +2,26 @@ import { Injectable } from '@nestjs/common';
 import { BaseConsumer } from '@shared/messaging/consumers/base.consumer';
 import { RabbitMQService } from '@shared/services/rabbitmq.service';
 import { EmailRoutingKey, QUEUE_TASK } from '@shared/enums/rabbitmq.enum';
-import { NlpProcessedDto } from '@email/dtos/nlp/nlp-processed.dto';
+import { TaskDto } from '@task/dtos/messaging/task.dto';
 
 @Injectable()
-export class NlpTaskConsumer extends BaseConsumer<NlpProcessedDto> {
+export class TaskConsumer extends BaseConsumer<TaskDto> {
   protected readonly queueName = QUEUE_TASK;
 
   protected readonly routingKey = EmailRoutingKey.Task;
 
-  protected readonly payloadDtoClass = NlpProcessedDto;
+  protected readonly payloadDtoClass = TaskDto;
 
   constructor(rabbitmqService: RabbitMQService) {
     super(rabbitmqService);
   }
 
-  protected async handleMessage(payload: NlpProcessedDto): Promise<void> {
-    this.logger.log('Received department task email', {
+  protected async handleMessage(payload: TaskDto): Promise<void> {
+    this.logger.log('Received task email', {
       emailId: payload.internal.id,
       gmailMessageId: payload.internal.gmailMessageId,
-      systemLabel: payload.systemLabel,
-      businessData: payload.businessData,
     });
+
+    // TODO:
   }
 }

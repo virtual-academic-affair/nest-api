@@ -7,17 +7,17 @@ import { Email } from '../../entities/email.entity';
 import { SettingService } from '@shared/setting/services/setting.service';
 import { GoogleapisService } from '../../services/googleapis.service';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
-import { NlpLabeledDto } from '@email/dtos/nlp/nlp-labeled.dto';
+import { LabeledDto } from '@email/dtos/messaging/labeled.dto';
 import { UpdateDto } from '@email/dtos/labels/update.dto';
 import { BaseConsumer } from '@shared/messaging/consumers/base.consumer';
 
 @Injectable()
-export class NlpLabeledConsumer extends BaseConsumer<NlpLabeledDto> {
+export class NlpLabeledConsumer extends BaseConsumer<LabeledDto> {
   protected readonly queueName = QUEUE_LABELED;
 
   protected readonly routingKey = EmailRoutingKey.Labeled;
 
-  protected readonly payloadDtoClass = NlpLabeledDto;
+  protected readonly payloadDtoClass = LabeledDto;
 
   constructor(
     rabbitmqService: RabbitMQService,
@@ -29,7 +29,7 @@ export class NlpLabeledConsumer extends BaseConsumer<NlpLabeledDto> {
     super(rabbitmqService);
   }
 
-  protected async handleMessage(payload: NlpLabeledDto): Promise<void> {
+  protected async handleMessage(payload: LabeledDto): Promise<void> {
     const { gmailMessageId, id: emailId } = payload.internal;
     const systemLabels = payload.labels;
 

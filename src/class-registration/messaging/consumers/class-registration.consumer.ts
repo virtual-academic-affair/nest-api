@@ -5,26 +5,26 @@ import {
   EmailRoutingKey,
   QUEUE_CLASS_REGISTRATION,
 } from '@shared/enums/rabbitmq.enum';
-import { NlpProcessedDto } from '@email/dtos/nlp/nlp-processed.dto';
+import { ClassRegistrationDto } from '@class-registration/dtos/messaging/class-registraion.dto';
 
 @Injectable()
-export class NlpClassRegistrationConsumer extends BaseConsumer<NlpProcessedDto> {
+export class ClassRegistrationConsumer extends BaseConsumer<ClassRegistrationDto> {
   protected readonly queueName = QUEUE_CLASS_REGISTRATION;
 
   protected readonly routingKey = EmailRoutingKey.ClassRegistration;
 
-  protected readonly payloadDtoClass = NlpProcessedDto;
+  protected readonly payloadDtoClass = ClassRegistrationDto;
 
   constructor(rabbitmqService: RabbitMQService) {
     super(rabbitmqService);
   }
 
-  protected async handleMessage(payload: NlpProcessedDto): Promise<void> {
+  protected async handleMessage(payload: ClassRegistrationDto): Promise<void> {
     this.logger.log('Received class registration email', {
       emailId: payload.internal.id,
       gmailMessageId: payload.internal.gmailMessageId,
-      systemLabel: payload.systemLabel,
-      businessData: payload.businessData,
     });
+
+    // TODO:
   }
 }

@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { NlpClassRegistrationConsumer } from './messaging/consumers/nlp-class-registration.consumer';
+import { ClassRegistrationConsumer } from './messaging/consumers/class-registration.consumer';
 
 @Module({
-  providers: [NlpClassRegistrationConsumer],
+  providers: [ClassRegistrationConsumer],
   exports: [],
 })
 export class ClassRegistrationModule {}

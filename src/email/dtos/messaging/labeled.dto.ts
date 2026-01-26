@@ -10,7 +10,7 @@ import {
 import { Type } from 'class-transformer';
 import { SystemLabel } from '@shared/enums/system-label.enum';
 
-export class NlpLabeledInternalDto {
+export class InternalDto {
   @IsDefined()
   @IsNumber()
   id!: number;
@@ -20,12 +20,14 @@ export class NlpLabeledInternalDto {
   gmailMessageId!: string;
 }
 
-export class NlpLabeledDto {
+export class NlpDto {
   @IsDefined()
   @ValidateNested()
-  @Type(() => NlpLabeledInternalDto)
-  internal!: NlpLabeledInternalDto;
+  @Type(() => InternalDto)
+  internal!: InternalDto;
+}
 
+export class LabeledDto extends NlpDto {
   @IsDefined()
   @IsArray()
   @ArrayUnique()

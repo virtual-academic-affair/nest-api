@@ -1,31 +1,6 @@
-import {
-  ArrayUnique,
-  IsArray,
-  IsDefined,
-  IsEnum,
-  IsNumber,
-  IsString,
-  ValidateNested,
-} from 'class-validator';
-import { Type } from 'class-transformer';
+import { ArrayUnique, IsArray, IsDefined, IsEnum } from 'class-validator';
 import { SystemLabel } from '@shared/enums/system-label.enum';
-
-export class InternalDto {
-  @IsDefined()
-  @IsNumber()
-  id!: number;
-
-  @IsDefined()
-  @IsString()
-  gmailMessageId!: string;
-}
-
-export class NlpDto {
-  @IsDefined()
-  @ValidateNested()
-  @Type(() => InternalDto)
-  internal!: InternalDto;
-}
+import { NlpDto } from '@email/dtos/messaging/nlp.dto';
 
 export class LabeledDto extends NlpDto {
   @IsDefined()

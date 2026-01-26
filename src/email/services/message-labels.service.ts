@@ -25,7 +25,6 @@ export class MessageLabelsService {
   ): Promise<Email> {
     const email = await this.messageService.findOne(messageId);
     const currentSystemLabels = email.systemLabels ?? [];
-
     const hasLabel = currentSystemLabels.includes(systemLabel);
 
     throwIf(

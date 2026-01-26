@@ -21,7 +21,7 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                    "raw": "{{baseUrl}}/authentication/users?page=1&limit=10",
+                    "raw": "{{baseUrl}}/authentication/users?page=1&limit=10&search=&role=&orderBy=id&orderDir=DESC",
                     "host": ["{{baseUrl}}"],
                     "path": ["authentication", "users"],
                     "query": [
@@ -32,6 +32,27 @@
                         {
                             "key": "limit",
                             "value": "10"
+                        },
+                        {
+                            "key": "keyword",
+                            "value": "",
+                            "disabled": true
+                        },
+                        {
+                            "key": "role",
+                            "value": "",
+                            "description": "Filter by role: student | lecture | admin",
+                            "disabled": true
+                        },
+                        {
+                            "key": "orderCol",
+                            "value": "id",
+                            "description": "Sort by: id | email | name | role | isActive"
+                        },
+                        {
+                            "key": "orderDir",
+                            "value": "DESC",
+                            "description": "Sort direction: ASC | DESC"
                         }
                     ]
                 }

@@ -25,15 +25,15 @@ export class MessageLabelsService {
     const currentSystemLabels = email.systemLabels ?? [];
     const hasLabel = currentSystemLabels.includes(systemLabel);
 
-    throwIf(
+    throwUnless(
       hasLabel === isRemove,
       new BadRequestException(
         `Label ${systemLabel} ${isRemove ? 'does not exist' : 'already exists'}`
       )
     );
 
-    const gmailLabelId = await this.settingService.get<UpdateDto>(
-      SettingKey.EmailLabels
+    const gmailLabelId = (
+      await this.settingService.get<UpdateDto>(SettingKey.EmailLabels)
     )[systemLabel];
 
     throwUnless(

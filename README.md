@@ -47,7 +47,7 @@ npm run start:prod
 
 5. **Access:**
     - API: http://localhost:3000
-    - Postman: `src/*/http/`
+    - Postman Collections: `http/` (root directory)
 
 ## Email Processing Flow
 

@@ -11,7 +11,7 @@ việc xử lý và phân loại email học vụ.
 ┌─────────────┐
 │  Gmail API  │
 └──────┬──────┘
-       │ Sync mỗi 5 phút (hoặc thủ công)
+       │
        ↓
 ┌──────────────────┐
 │ EmailSyncService │ Lọc theo policy (admin/domain)
@@ -113,4 +113,5 @@ việc xử lý và phân loại email học vụ.
 | `/email/messages`            | GET    | Admin | Lấy danh sách emails (có pagination, filter) |
 | `/email/messages/:id`        | GET    | Admin | Lấy chi tiết một email                       |
 | `/email/messages/sync`       | POST   | Admin | Trigger đồng bộ email thủ công               |
-| `/email/messages/:id/labels` | PUT    | Admin | Thêm/xóa label vào email (DB + Gmail) - body: { isRemove: boolean, systemLabel: "..." } |
+| `/email/messages/:id/labels` | PUT    | Admin | Thêm/xóa label vào email                     |
+  

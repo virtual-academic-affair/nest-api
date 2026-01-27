@@ -1,6 +1,6 @@
 {
     "id": "shared-environment",
-    "name": "Virtual Academic Affair API - Environment",
+    "name": "VAA - Environment",
     "values": [
         {
             "key": "baseUrl",

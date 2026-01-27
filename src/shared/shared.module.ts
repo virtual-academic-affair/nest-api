@@ -13,6 +13,7 @@ import { BcryptService } from '@shared/hashing/bcrypt.service';
 import { HashingService } from '@shared/hashing/hashing.service';
 import { RedisService } from '@shared/services/redis.service';
 import { SettingService } from '@shared/setting/services/setting.service';
+import { RabbitMQController } from '@shared/messaging/controllers/rabbitmq.controller';
 
 @Global()
 @Module({
@@ -23,6 +24,7 @@ import { SettingService } from '@shared/setting/services/setting.service';
     ConfigModule.forFeature(rabbitmqConfig),
     ConfigModule.forFeature(googleConfig),
   ],
+  controllers: [RabbitMQController],
   providers: [
     {
       provide: HashingService,

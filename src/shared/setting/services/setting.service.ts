@@ -16,9 +16,7 @@ export class SettingService {
   }
 
   async set<T>(key: string, value: T, isPartial = false): Promise<Setting> {
-    const existing = isPartial
-      ? await this.settingRepository.findOneBy({ key })
-      : null;
+    const existing = await this.settingRepository.findOneBy({ key });
 
     const newValue =
       isPartial && typeof existing?.value === 'object'

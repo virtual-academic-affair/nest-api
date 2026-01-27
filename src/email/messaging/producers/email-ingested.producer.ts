@@ -44,6 +44,7 @@ export class EmailIngestedProducer extends BaseProducer<IngestedDto> {
 
     for (const messageId of messageIds) {
       try {
+        this.logger.log(`Processing message ${messageId}`);
         await this.processAndPublishMessage(gmail, messageId);
       } catch (error) {
         this.logger.warn(`Skip message ${messageId}`, error);
@@ -66,8 +67,8 @@ export class EmailIngestedProducer extends BaseProducer<IngestedDto> {
       const { data } = await gmail.users.messages.list({
         userId: 'me',
         q: `after:${afterTimestamp} -from:me (${allowedDomains
-          .map((d) => `from:*@${d}`)
-          .join(' OR ')})`,
+          ?.map((d) => `from:*@${d}`)
+          ?.join(' OR ')})`,
         includeSpamTrash: false,
         pageToken,
       });
@@ -78,6 +79,9 @@ export class EmailIngestedProducer extends BaseProducer<IngestedDto> {
       pageToken = data.nextPageToken ?? undefined;
     } while (pageToken);
 
+    this.logger.log(
+      `Fetched ${messageIds.length} message IDs since ${since.toISOString()}`
+    );
     return messageIds;
   }
 
@@ -142,7 +146,7 @@ export class EmailIngestedProducer extends BaseProducer<IngestedDto> {
   private async updateLastPullTimestamp(): Promise<void> {
     await this.settingService.set(
       SettingKey.EmailLastPullAt,
-      new Date().toISOString()
+      new Date(Date.now() - 30000).toISOString() // 30s ago
     );
   }
 }

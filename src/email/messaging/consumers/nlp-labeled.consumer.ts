@@ -30,6 +30,11 @@ export class NlpLabeledConsumer extends BaseConsumer<LabeledDto> {
   }
 
   protected async handleMessage(payload: LabeledDto): Promise<void> {
+    this.logger.log('Received labels', {
+      emailId: payload.internal.id,
+      gmailMessageId: payload.internal.gmailMessageId,
+    });
+
     const { gmailMessageId, id: emailId } = payload.internal;
     const systemLabels = payload.labels;
 
@@ -50,7 +55,7 @@ export class NlpLabeledConsumer extends BaseConsumer<LabeledDto> {
     );
 
     const gmailLabelIds = systemLabels
-      .map((label) => gmailLabels[label])
+      .map((label) => gmailLabels?.[label])
       .filter((id): id is string => Boolean(id));
 
     await this.syncGmailLabels(gmailMessageId, gmailLabelIds);

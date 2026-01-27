@@ -8,7 +8,7 @@ export class EmailSyncScheduler {
 
   constructor(private readonly emailIngestedProducer: EmailIngestedProducer) {}
 
-  @Cron(CronExpression.EVERY_5_MINUTES)
+  @Cron(CronExpression.EVERY_10_SECONDS)
   public async handleSyncJob() {
     this.logger.log('Email sync job started');
 

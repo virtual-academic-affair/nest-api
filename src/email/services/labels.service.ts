@@ -55,7 +55,7 @@ export class LabelsService {
     const newEntries = await Promise.all(
       missingKeys.map(async (key) => [
         key,
-        await this.createGmailLabel(getLangLabel[key]),
+        await this.createGmailLabel(getLangLabel(key)),
       ])
     );
     Object.assign(labels, Object.fromEntries(newEntries));

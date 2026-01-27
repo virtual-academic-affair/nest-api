@@ -35,7 +35,4 @@ export class Email extends BaseEntity {
   @Column('text', { array: true, nullable: true })
   @Index('idx_emails_system_labels', { synchronize: false })
   systemLabels: SystemLabel[];
-
-  @Column({ type: 'jsonb', nullable: true })
-  history?: Record<string, Date>;
 }

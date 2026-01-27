@@ -86,3 +86,12 @@ Các key cấu hình động trong database:
 | `email/lastPullAt`           | Thời điểm sync email lần cuối              |
 | `email/allowedDomains`       | Danh sách domain email được phép           |
 | `authentication/adminEmails` | Danh sách email admin                      |
+
+## API Endpoints
+
+### RabbitMQ Messaging (Authenticated)
+
+| Endpoint                | Method | Role          | Chức năng                                         |
+|-------------------------|--------|---------------|---------------------------------------------------|
+| `/rabbitmq/:routingKey` | POST   | Authenticated | Publish message vào RabbitMQ với routing key động |
+

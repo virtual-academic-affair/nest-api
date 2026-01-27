@@ -1,66 +1,46 @@
-import { User } from '@authentication/entities/user.entity';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Role } from '@authentication/enums/role.enum';
 import { RoutingKey } from '@shared/enums/rabbitmq.enum';
 import { RabbitMQService } from '@shared/services/rabbitmq.service';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
 import { SettingService } from '@shared/setting/services/setting.service';
 import { Repository } from 'typeorm';
 import { Email } from '@email/entities/email.entity';
-import { SuperEmailSetting } from '@email/types/super-email-setting.type';
 import { GoogleapisService } from '@email/services/googleapis.service';
 import * as parseMessage from 'gmail-api-parse-message';
 import { gmail_v1 } from 'googleapis';
 import { htmlToText } from 'html-to-text';
 import { BaseProducer } from '@shared/messaging/producers/base.producer';
-
-export interface EmailIngestedPayload {
-  internal: { id: number; gmailMessageId: string };
-  subject?: string;
-  senderEmail?: string;
-  senderName?: string;
-  content: string;
-}
+import { IngestedDto } from '@email/dtos/messaging/ingested.dto';
 
 @Injectable()
-export class EmailIngestedProducer extends BaseProducer<EmailIngestedPayload> {
+export class EmailIngestedProducer extends BaseProducer<IngestedDto> {
   protected readonly routingKey = RoutingKey.Ingested;
 
   private readonly logger = new Logger(EmailIngestedProducer.name);
-
-  private adminEmails = new Set<string>();
-
-  private superEmail?: string;
-
-  private allowedDomains: string[] = [];
 
   constructor(
     rabbitmqService: RabbitMQService,
     private readonly googleapisService: GoogleapisService,
     private readonly settingService: SettingService,
     @InjectRepository(Email)
-    private readonly emailRepository: Repository<Email>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>
+    private readonly emailRepository: Repository<Email>
   ) {
     super(rabbitmqService);
   }
 
   public async sync(): Promise<void> {
-    await this.loadEmailPolicies();
+    const [lastPullTimestamp, allowedDomains, gmail] = await Promise.all([
+      this.getLastPullTimestamp(),
+      this.settingService.get<string[]>(SettingKey.EmailAllowedDomains),
+      this.googleapisService.getGmailClient(),
+    ]);
 
-    const lastPullTimestamp = await this.getLastPullTimestamp();
-    const gmail = await this.googleapisService.getGmailClient();
     const messageIds = await this.fetchMessageIdsSince(
       gmail,
-      lastPullTimestamp
+      lastPullTimestamp,
+      allowedDomains
     );
-
-    if (messageIds.length === 0) {
-      await this.updateLastPullTimestamp();
-      return;
-    }
 
     for (const messageId of messageIds) {
       try {
@@ -73,27 +53,10 @@ export class EmailIngestedProducer extends BaseProducer<EmailIngestedPayload> {
     await this.updateLastPullTimestamp();
   }
 
-  private async loadEmailPolicies(): Promise<void> {
-    const [admins, superEmailSetting, allowedDomainsSetting] =
-      await Promise.all([
-        this.userRepository.find({
-          where: { role: Role.Admin, isActive: true },
-          select: ['email'],
-        }),
-        this.settingService.get<SuperEmailSetting>(SettingKey.EmailSuperEmail),
-        this.settingService.get<string[]>(SettingKey.EmailAllowedDomains),
-      ]);
-
-    this.adminEmails = new Set(
-      admins.map((u) => u.email).filter((email): email is string => !!email)
-    );
-    this.superEmail = superEmailSetting?.email ?? undefined;
-    this.allowedDomains = (allowedDomainsSetting ?? []).filter(Boolean);
-  }
-
   private async fetchMessageIdsSince(
     gmail: gmail_v1.Gmail,
-    since: Date
+    since: Date,
+    allowedDomains: string[]
   ): Promise<string[]> {
     const afterTimestamp = Math.floor(since.getTime() / 1000);
     const messageIds: string[] = [];
@@ -102,7 +65,9 @@ export class EmailIngestedProducer extends BaseProducer<EmailIngestedPayload> {
     do {
       const { data } = await gmail.users.messages.list({
         userId: 'me',
-        q: `after:${afterTimestamp}`,
+        q: `after:${afterTimestamp} -from:me (${allowedDomains
+          .map((d) => `from:*@${d}`)
+          .join(' OR ')})`,
         includeSpamTrash: false,
         pageToken,
       });
@@ -136,10 +101,6 @@ export class EmailIngestedProducer extends BaseProducer<EmailIngestedPayload> {
     const parsedMessage = parseMessage(gmailMessage);
     const senderEmail = parsedMessage.headers.from?.match(/<(.+)>/)?.[1];
 
-    if (!this.isAllowedSender(senderEmail)) {
-      return;
-    }
-
     const email = await this.emailRepository.save({
       gmailMessageId,
       headerMessageId: parsedMessage.headers['message-id'],
@@ -163,18 +124,6 @@ export class EmailIngestedProducer extends BaseProducer<EmailIngestedPayload> {
       senderName: email.senderName,
       content: plainTextContent,
     });
-  }
-
-  private isAllowedSender(senderEmail?: string): boolean {
-    if (!senderEmail) {
-      return false;
-    }
-
-    return (
-      this.adminEmails.has(senderEmail) ||
-      senderEmail === this.superEmail ||
-      this.allowedDomains.some((domain) => senderEmail.endsWith(domain))
-    );
   }
 
   private async getLastPullTimestamp(): Promise<Date> {

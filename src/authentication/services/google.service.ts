@@ -9,7 +9,7 @@ import { AuthService } from './auth.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '@authentication/entities/user.entity';
-import { Role } from '@shared/authorization/enums/role.enum';
+import { Role } from '@authentication/enums/role.enum';
 import { SettingService } from '@shared/setting/services/setting.service';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
 import { CodeDto } from '@authentication/dtos/google/code.dto';
@@ -53,23 +53,13 @@ export class GoogleService implements OnModuleInit {
       payload?.email,
       new UnauthorizedException('Google email is missing')
     );
-    const email = payload.email.toLowerCase();
 
-    const adminEmails =
-      (await this.settingService.get<string[]>(
-        SettingKey.AuthenticationAdminEmails
-      )) ?? [];
-    const normalizedAdminEmails = adminEmails
-      .filter(Boolean)
-      .map((item) => item.toLowerCase());
-    const isAdmin = normalizedAdminEmails.includes(email);
-
+    const email = payload.email;
     let user = await this.userRepository.findOneBy({ email });
     const userData = {
       googleId: payload.sub,
       name: payload.name,
       picture: payload.picture,
-      role: isAdmin ? Role.Admin : user?.role ?? Role.Student,
       email,
     };
 

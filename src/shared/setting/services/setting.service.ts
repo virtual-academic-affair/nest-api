@@ -10,37 +10,23 @@ export class SettingService {
     private readonly settingRepository: Repository<Setting>
   ) {}
 
-  async get<T = any>(key: string): Promise<T | null> {
-    const normalizedKey = key.toLowerCase();
-    const setting = await this.settingRepository.findOne({
-      where: { key: normalizedKey },
-    });
+  async get<T = unknown>(key: string): Promise<T | null> {
+    const setting = await this.settingRepository.findOneBy({ key });
     return setting ? (setting.value as T) : null;
   }
 
-  async set(key: string, value: any, isPartial?: true): Promise<Setting> {
-    const normalizedKey = key.toLowerCase();
-    let setting = await this.settingRepository.findOne({
-      where: { key: normalizedKey },
-    });
+  async set<T>(key: string, value: T, isPartial = false): Promise<Setting> {
+    const existing = await this.settingRepository.findOneBy({ key });
 
-    if (!setting) {
-      setting = this.settingRepository.create({
-        key: normalizedKey,
-        value: null,
-      });
-    }
+    const newValue =
+      isPartial && typeof existing?.value === 'object'
+        ? { ...existing.value, ...(value as object) }
+        : value;
 
-    if (
-      isPartial &&
-      typeof setting.value === 'object' &&
-      setting.value !== null
-    ) {
-      setting.value = { ...setting.value, ...value };
-    } else {
-      setting.value = value;
-    }
-
-    return await this.settingRepository.save(setting);
+    return this.settingRepository.save({
+      ...existing,
+      key,
+      value: newValue,
+    } as Setting);
   }
 }

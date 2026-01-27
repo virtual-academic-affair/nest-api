@@ -3,19 +3,19 @@ import { google } from 'googleapis';
 import { GoogleapisService } from './googleapis.service';
 import { SettingService } from '@shared/setting/services/setting.service';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
-import { CodeDto } from '../dto/grants/code.dto';
-import { EmailSyncService } from './email-sync.service';
+import { CodeDto } from '@email/dtos/grants/code.dto';
+import { EmailIngestedProducer } from '../messaging/producers/email-ingested.producer';
 
 @Injectable()
 export class GrantsService {
   constructor(
     private readonly googleapisService: GoogleapisService,
     private readonly settingService: SettingService,
-    private readonly emailSyncService: EmailSyncService
+    private readonly emailIngestedProducer: EmailIngestedProducer
   ) {}
 
-  generateAuthUrl() {
-    const options: any = {
+  generateAuthUrl(): string {
+    const options = {
       access_type: 'offline',
       scope: [
         'openid',
@@ -54,6 +54,6 @@ export class GrantsService {
       refreshToken: tokens.refresh_token,
     });
 
-    await this.emailSyncService.sync();
+    await this.emailIngestedProducer.sync();
   }
 }

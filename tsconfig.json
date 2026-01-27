@@ -19,7 +19,11 @@
     "noFallthroughCasesInSwitch": false,
     "paths": {
       "@authentication/*": ["src/authentication/*"],
-      "@shared/*": ["src/shared/*"]
+      "@email/*": ["src/email/*"],
+      "@shared/*": ["src/shared/*"],
+      "@class-registration/*": ["src/class-registration/*"],
+      "@task/*": ["src/task/*"],
+      "@inquiry/*": ["src/inquiry/*"]
     }
   }
 }

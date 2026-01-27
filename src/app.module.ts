@@ -1,12 +1,15 @@
 import { Module } from '@nestjs/common';
-import { ScheduleModule } from '@nestjs/schedule';
-import { AuthenticationModule } from '@authentication/authentication.module';
-import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { SharedModule } from '@shared/shared.module';
 import { ConfigModule } from '@nestjs/config';
-import { EmailModule } from './email/email.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ApiResponseModule } from '@zabih-dev/nest-api-response';
 import { DatabaseType } from 'typeorm';
+import { AuthenticationModule } from '@authentication/authentication.module';
+import { SharedModule } from '@shared/shared.module';
+import { EmailModule } from '@email/email.module';
+import { ClassRegistrationModule } from '@class-registration/class-registration.module';
+import { TaskModule } from '@task/task.module';
+import { InquiryModule } from '@inquiry/inquiry.module';
 
 @Module({
   imports: [
@@ -26,6 +29,9 @@ import { DatabaseType } from 'typeorm';
     EmailModule,
     SharedModule,
     AuthenticationModule,
+    ClassRegistrationModule,
+    TaskModule,
+    InquiryModule,
   ],
 })
 export class AppModule {}

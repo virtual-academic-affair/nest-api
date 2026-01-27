@@ -1,5 +1,5 @@
 import { IsBoolean, IsEnum, IsOptional, IsString } from 'class-validator';
-import { Role } from '@shared/authorization/enums/role.enum';
+import { Role } from '@authentication/enums/role.enum';
 
 export class UpdateDto {
   @IsOptional()

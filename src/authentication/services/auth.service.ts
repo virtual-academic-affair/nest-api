@@ -3,9 +3,9 @@ import { ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from '../entities/user.entity';
+import { User } from '@authentication/entities/user.entity';
 import jwtConfig from '@shared/config/jwt.config';
-import { ActiveUserData } from '@shared/authentication/interfaces/active-user-data.interface';
+import { ActiveUserData } from '@authentication/interfaces/active-user-data.interface';
 import { RedisService } from '@shared/services/redis.service';
 import { randomUUID } from 'crypto';
 import { RefreshTokenDto } from '@authentication/dtos/auth/refresh-token.dto';
@@ -50,14 +50,9 @@ export class AuthService {
   }
 
   async refreshTokens(dto: RefreshTokenDto) {
-    const payload = await this.jwtService
-      .verifyAsync<{ refreshTokenId: string }>(
-        dto.refreshToken,
-        this.jwtConfiguration
-      )
-      .catch(() => {
-        return null;
-      });
+    const payload = await this.jwtService.verifyAsync<{
+      refreshTokenId: string;
+    }>(dto.refreshToken, this.jwtConfiguration);
     throwUnless(
       payload?.refreshTokenId,
       new UnauthorizedException('Refresh token is invalid')

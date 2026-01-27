@@ -1,45 +1,39 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ScheduleModule } from '@nestjs/schedule';
-import { SharedModule } from '@shared/shared.module';
 import { Email } from './entities/email.entity';
 import { User } from '@authentication/entities/user.entity';
 import { GoogleapisService } from './services/googleapis.service';
 import { LabelsService } from './services/labels.service';
 import { GrantsService } from './services/grants.service';
-import { EmailSyncService } from './services/email-sync.service';
 import { EmailSyncScheduler } from './scheduler/email-sync.scheduler';
-import { NlpLabeledService } from './services/nlp-labeled.service';
+import { NlpLabeledConsumer } from './messaging/consumers/nlp-labeled.consumer';
+import { EmailIngestedProducer } from './messaging/producers/email-ingested.producer';
 import { GrantsController } from './controllers/grants.controller';
 import { LabelsController } from './controllers/labels.controller';
 import { MessagesController } from './controllers/messages.controller';
+import { MessageLabelsController } from './controllers/message-labels.controller';
 import { MessagesService } from './services/messages.service';
+import { MessageLabelsService } from './services/message-labels.service';
 
 @Module({
-  imports: [
-    ConfigModule,
-    ScheduleModule.forRoot(),
-    SharedModule,
-    TypeOrmModule.forFeature([Email, User]),
+  imports: [ConfigModule, TypeOrmModule.forFeature([Email, User])],
+  controllers: [
+    GrantsController,
+    LabelsController,
+    MessagesController,
+    MessageLabelsController,
   ],
-  controllers: [GrantsController, LabelsController, MessagesController],
   providers: [
     GoogleapisService,
     LabelsService,
     GrantsService,
-    EmailSyncService,
-    NlpLabeledService,
+    NlpLabeledConsumer,
+    EmailIngestedProducer,
     MessagesService,
+    MessageLabelsService,
     EmailSyncScheduler,
   ],
-  exports: [
-    GoogleapisService,
-    LabelsService,
-    GrantsService,
-    EmailSyncService,
-    NlpLabeledService,
-    MessagesService,
-  ],
+  exports: [],
 })
 export class EmailModule {}

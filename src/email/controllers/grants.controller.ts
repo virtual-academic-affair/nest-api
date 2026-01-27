@@ -1,13 +1,11 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
-import { Auth } from '@shared/authentication/decorators/auth.decorator';
-import { AuthType } from '@shared/authentication/enums/auth-type.enum';
-import { Roles } from '@shared/authorization/decorators/roles.decorator';
-import { Role } from '@shared/authorization/enums/role.enum';
-import { GrantsService } from '../services/grants.service';
-import { CodeDto } from '../dto/grants/code.dto';
+import { Auth } from '@authentication/decorators/auth.decorator';
+import { AuthType } from '@authentication/enums/auth-type.enum';
+import { Roles } from '@authentication/decorators/roles.decorator';
+import { Role } from '@authentication/enums/role.enum';
+import { GrantsService } from '@email/services/grants.service';
+import { CodeDto } from '@email/dtos/grants/code.dto';
 
-@ApiTags('Email - Grant')
 @Auth(AuthType.Bearer)
 @Roles(Role.Admin)
 @Controller('email/grants')

@@ -1,0 +1,208 @@
+{
+    "info": {
+        "name": "Email",
+        "description": "API collection for Email",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "auth": {
+        "type": "bearer",
+        "bearer": [
+            {
+                "key": "token",
+                "value": "{{accessToken}}",
+                "type": "string"
+            }
+        ]
+    },
+    "item": [
+        {
+            "name": "Messages",
+            "item": [
+                {
+                    "name": "Sync Emails",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/email/messages/sync",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["email", "messages", "sync"]
+                        }
+                    }
+                },
+                {
+                    "name": "Get All Messages",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/email/messages?page=1&limit=10",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["email", "messages"],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "1"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "10"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Message by ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/email/messages/:id",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["email", "messages", ":id"],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": ""
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Message Labels",
+            "item": [
+                {
+                    "name": "Update Message Label",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"isRemove\": false,\n    \"systemLabel\": \"classRegistration\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/email/messages/:id/labels",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["email", "messages", ":id", "labels"],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": ""
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Labels",
+            "item": [
+                {
+                    "name": "Get All Gmail Labels",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/email/labels/gmailLabels",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["email", "labels", "gmailLabels"]
+                        }
+                    }
+                },
+                {
+                    "name": "Get All Labels",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/email/labels",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["email", "labels"]
+                        }
+                    }
+                },
+                {
+                    "name": "Update Labels",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"classRegistration\": \"<gmail_label_id>\",\n    \"task\": \"<gmail_label_id>\",\n    \"inquiry\": \"<gmail_label_id>\",\n    \"other\": \"<gmail_label_id>\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/email/labels",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["email", "labels"]
+                        }
+                    }
+                },
+                {
+                    "name": "Auto Create Labels",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/email/labels/autoCreate",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["email", "labels", "autoCreate"]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Grants",
+            "item": [
+                {
+                    "name": "Get Gmail Auth URL",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/email/grants",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["email", "grants"]
+                        }
+                    }
+                },
+                {
+                    "name": "Grant Gmail Access",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"code\": \"<gmail_oauth_code>\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/email/grants",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["email", "grants"]
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

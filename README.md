@@ -1,107 +1,79 @@
-## Description
+# Virtual Academic Affair API
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+![Node.js](https://img.shields.io/badge/Node.js-18+-339933?style=flat&logo=node.js&logoColor=white)
+![NestJS](https://img.shields.io/badge/NestJS-9-E0234E?style=flat&logo=nestjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-4.7-3178C6?style=flat&logo=typescript&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?style=flat&logo=postgresql&logoColor=white)
+![RabbitMQ](https://img.shields.io/badge/RabbitMQ-3.12-FF6600?style=flat&logo=rabbitmq&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis-7-DC382D?style=flat&logo=redis&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-24-2496ED?style=flat&logo=docker&logoColor=white)
 
-Additionally this projects adds the following functionality:
+## Introduction
 
-- User authentication with JWT
-- User registration with Google
-- Custom decorator for role-based authorization
-- Custom decorator to make resources public/private
-- Custom user context decorator
+A system to support academic affairs management through automated email processing. The system:
 
-## Project Structure
-
-The project is organized into two main modules:
-
-- **`authentication/`**: Contains authentication-related functionality
-  - `controllers/`: Authentication controllers (Google OAuth, User)
-  - `services/`: Authentication services (AuthenticationService, GoogleAuthenticationService, UserService)
-  - `entities/`: User entity
-  - `dto/`: Data transfer objects for authentication
-
-- **`shared/`**: Contains shared utilities and common functionality
-  - `authentication/`: Authentication guards and decorators
-  - `authorization/`: Authorization guards, decorators, and role enums
-  - `config/`: JWT configuration
-  - `decorators/`: Common decorators (ActiveUser)
-  - `hashing/`: Password hashing services
-  - `interfaces/`: Shared interfaces (ActiveUserData)
-
-## Tech stack
-
-- [NestJS](https://nestjs.com/) as framework
-- [TypeORM](https://typeorm.io/#/) as ORM
-- [Docker](https://www.docker.com/) for containerization
-- [PostgreSQL](https://www.postgresql.org/) as database
-- [JWT](https://jwt.io/) for authorization
-
-## How to
-
-### Enforce auth on a route
-
-You can use the `@Auth()` decorator to enforce authentication on a route. This will check if the user is authenticated
-and if the user has a valid JWT token. If the user is not authenticated or the JWT token is invalid, a
-`401 Unauthorized` response will be returned.
-
--`AuthType.None`: Makes a route public
-
--`AuthType.Bearer`: Required the `Authorization: Bearer <token>` header
-
-```typescript
-@Auth(AuthType.Bearer)
-@Auth(AuthType.None)
-```
-
-### Role based authorization
-
-You can use the `Roles()` decorator to enforce role based authorization on a route. This will check if the user has the
-required role. If the user does not have the required role, a `403 Forbidden` response will be returned.
-
-Three roles are supported: `Role.Student`, `Role.Admin`, and `Role.Lecture`. You can use the decorator multiple times to require multiple
-roles. You can add more roles in the `src/shared/authorization/enums/role.enum.ts` file.
-
-```typescript
-@Roles(Role.Student)
-@Roles(Role.Admin)
-@Roles(Role.Lecture)
-```
-
-### Accessing the active user
-
-You can use the `@ActiveUser()` decorator to access the active user. This will return the user object of the
-authenticated user.
-
-```typescript
-@ActiveUser() activeUser: ActiveUserData
-```
-
-### General
-
-- Both the `@Auth()` and `@Roles()` decorators can be used on the same route.
-- Both decorators can be used on a controller or route level. You can also make the whole controller private and
-  override one route to make it public.
+- Syncs emails from Gmail to database
+- Automatically classifies emails using NLP (Natural Language Processing)
+- Auto-applies labels to emails on Gmail based on classification
+- Routes emails to appropriate business modules for handling academic affairs
 
 ## Installation
 
-```bash
-$ npm install
-$ docker-compose up -d
-```
-
-## Running the app
+1. **Install dependencies:**
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm install
 ```
 
-## Documentation
+2. **Start services (PostgreSQL, RabbitMQ, Redis):**
 
-- **[Services Documentation](./SERVICES.md)** - RabbitMQ, Redis, Settings, ... usage guide
+```bash
+docker-compose up -d
+```
+
+3. **Configure environment variables:**
+    - Create `.env` file based on `.env.example`
+    - Configure database, RabbitMQ, Google OAuth credentials
+
+4. **Run application:**
+
+```bash
+# Development mode
+npm run start:dev
+
+# Production mode
+npm run start:prod
+```
+
+5. **Access:**
+    - API: http://localhost:3000
+    - Postman Collections: `http/` (root directory)
+
+## Email Processing Flow
+
+```
+1. Gmail API
+   ↓ (Auto-sync every 5 minutes or manual trigger)
+   
+2. EmailIngestedProducer
+   - Fetch new emails from Gmail
+   - Filter by policy (allowed admins/domains)
+   - Publish message with email content 
+   ↓
+   
+4. NLP Service (External - Python)
+   - Analyze email content
+   - Classify and return SystemLabels + extracted business data
+   ↓
+   ├─────────────────────────────┬─────────────────────────────┐
+   │                             │                             │
+   │ Path A: Labeling            │ Path B: Business Processing │
+   │                             │                             │
+   ↓                             ↓                             ↓
+   
+5a. RabbitMQ (email.nlp.labeled)     5b. RabbitMQ (specific routing keys)
+    - Receive classification              - Route to appropriate business module
+    ↓                                       based on SystemLabel
+                                        ↓
+6a. NlpLabeledConsumer                6b. Business Module Consumers
+```

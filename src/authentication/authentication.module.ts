@@ -1,25 +1,41 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { UsersService } from './services/users.service';
-import { UsersController } from './controllers/users.controller';
-import { AuthenticationController } from './controllers/auth.controller';
-import { GoogleController } from './controllers/google.controller';
-import { GoogleService } from './services/google.service';
-import { AuthService } from './services/auth.service';
+import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './entities/user.entity';
-import { SharedModule } from '@shared/shared.module';
+import { APP_GUARD } from '@nestjs/core';
 import jwtConfig from '@shared/config/jwt.config';
+import { AuthenticationGuard } from '@authentication/guards/authentication.guard';
+import { AccessTokenGuard } from '@authentication/guards/access-token.guard';
+import { RolesGuard } from '@authentication/guards/roles.guard';
+import { UsersController } from '@authentication/controllers/users.controller';
+import { AuthenticationController } from '@authentication/controllers/auth.controller';
+import { GoogleController } from '@authentication/controllers/google.controller';
+import { User } from '@authentication/entities/user.entity';
+import { UsersService } from '@authentication/services/users.service';
+import { GoogleService } from '@authentication/services/google.service';
+import { AuthService } from '@authentication/services/auth.service';
 
 @Module({
-  controllers: [UsersController, AuthenticationController, GoogleController],
-  providers: [UsersService, GoogleService, AuthService],
   imports: [
-    ConfigModule,
     ConfigModule.forFeature(jwtConfig),
+    JwtModule.registerAsync(jwtConfig.asProvider()),
     TypeOrmModule.forFeature([User]),
-    SharedModule,
   ],
-  exports: [AuthService, TypeOrmModule],
+  controllers: [UsersController, AuthenticationController, GoogleController],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: AuthenticationGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+    AccessTokenGuard,
+    UsersService,
+    GoogleService,
+    AuthService,
+  ],
+  exports: [TypeOrmModule],
 })
 export class AuthenticationModule {}

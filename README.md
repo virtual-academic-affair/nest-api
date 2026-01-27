@@ -53,11 +53,11 @@ npm run start:prod
 
 ```
 1. Gmail API
-   ↓ (Auto-sync every 5 minutes or manual trigger)
+   ↓ (Auto-sync or manual trigger)
    
 2. EmailIngestedProducer
    - Fetch new emails from Gmail
-   - Filter by policy (allowed admins/domains)
+   - Filter by policy
    - Publish message with email content 
    ↓
    

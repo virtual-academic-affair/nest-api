@@ -53,23 +53,13 @@ export class GoogleService implements OnModuleInit {
       payload?.email,
       new UnauthorizedException('Google email is missing')
     );
-    const email = payload.email.toLowerCase();
 
-    const adminEmails =
-      (await this.settingService.get<string[]>(
-        SettingKey.AuthenticationAdminEmails
-      )) ?? [];
-    const normalizedAdminEmails = adminEmails
-      .filter(Boolean)
-      .map((item) => item.toLowerCase());
-    const isAdmin = normalizedAdminEmails.includes(email);
-
+    const email = payload.email;
     let user = await this.userRepository.findOneBy({ email });
     const userData = {
       googleId: payload.sub,
       name: payload.name,
       picture: payload.picture,
-      role: isAdmin ? Role.Admin : user?.role ?? Role.Student,
       email,
     };
 

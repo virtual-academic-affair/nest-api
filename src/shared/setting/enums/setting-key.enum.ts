@@ -4,5 +4,4 @@ export enum SettingKey {
   EmailSuperEmail = 'email/superEmail',
   EmailLastPullAt = 'email/lastPullAt',
   EmailAllowedDomains = 'email/allowedDomains',
-  AuthenticationAdminEmails = 'authentication/adminEmails',
 }

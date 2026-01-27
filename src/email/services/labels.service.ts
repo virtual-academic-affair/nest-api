@@ -1,7 +1,7 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { SettingService } from '@shared/setting/services/setting.service';
 import { GoogleapisService } from './googleapis.service';
-import { SystemLabel } from '@shared/enums/system-label.enum';
+import { getLangLabel, SystemLabel } from '@shared/enums/system-label.enum';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
 import { UpdateDto } from '@email/dtos/labels/update.dto';
 
@@ -48,20 +48,17 @@ export class LabelsService {
 
   async autoCreateLabels(): Promise<UpdateDto> {
     const labels = (await this.findAll()) || ({} as UpdateDto);
-    const lang =
-      (await this.settingService.get<UpdateDto>(SettingKey.EmailLangLabels)) ||
-      {};
+    const missingKeys = Object.values(SystemLabel).filter(
+      (key) => !labels[key]
+    );
 
-    for (const enumValue of Object.values(SystemLabel)) {
-      const labelName = lang[enumValue];
-      throwUnless(
-        labelName,
-        new InternalServerErrorException(
-          `Missing label config for ${enumValue}`
-        )
-      );
-      labels[enumValue] ??= await this.createGmailLabel(labelName);
-    }
+    const newEntries = await Promise.all(
+      missingKeys.map(async (key) => [
+        key,
+        await this.createGmailLabel(getLangLabel[key]),
+      ])
+    );
+    Object.assign(labels, Object.fromEntries(newEntries));
 
     await this.update(labels);
     return labels;

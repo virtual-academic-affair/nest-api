@@ -2,7 +2,7 @@ import { Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { gmail_v1, google } from 'googleapis';
 import { OAuth2Client } from 'googleapis-common';
-import { SuperEmailSetting } from '../types/super-email-setting.type';
+import { SuperEmailSetting } from '@email/interfaces/super-email-setting.type';
 import { SettingService } from '@shared/setting/services/setting.service';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
 

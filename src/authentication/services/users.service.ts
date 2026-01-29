@@ -15,16 +15,15 @@ export class UsersService extends ResourceService<User> {
 
   protected orderableColumns = ['id', 'email', 'name', 'role', 'isActive'];
 
-  constructor(@InjectRepository(User) userRepository: Repository<User>) {
-    super();
-    this.repository = userRepository;
+  constructor(@InjectRepository(User) repository: Repository<User>) {
+    super(repository);
   }
 
   protected applyCustomFilters(
     queryBuilder: SelectQueryBuilder<User>,
-    queryDto: ResourceQueryDto
+    queryDto: QueryDto
   ): void {
-    const { role } = queryDto as QueryDto;
+    const { role } = queryDto;
     role && queryBuilder.andWhere(`${this.entityName}.role = :role`, { role });
   }
 

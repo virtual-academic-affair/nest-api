@@ -6,10 +6,10 @@ import { Controller, Post } from '@nestjs/common';
 import { RestrictMethods } from '@shared/resource/decorators/restrict-methods.decorator';
 import { ResourceController } from '@shared/resource/controllers/resource.controller';
 import { ResourceAction } from '@shared/resource/enums/resource-action.enum';
-import { Email } from '@email/entities/email.entity';
+import { Message } from '@email/entities/message.entity';
 import { MessagesService } from '@email/services/messages.service';
 import { QueryDto } from '@email/dtos/messages/query.dto';
-import { EmailIngestedProducer } from '@email/messaging/producers/email-ingested.producer';
+import { EmailSyncService } from '@email/services/email-sync.service';
 
 @Auth(AuthType.Bearer)
 @Roles(Role.Admin)
@@ -17,10 +17,10 @@ import { EmailIngestedProducer } from '@email/messaging/producers/email-ingested
 @RestrictMethods({
   only: [ResourceAction.FindAll, ResourceAction.FindOne],
 })
-export class MessagesController extends ResourceController<Email> {
+export class MessagesController extends ResourceController<Message> {
   constructor(
     private readonly messagesService: MessagesService,
-    private readonly emailIngestedProducer: EmailIngestedProducer
+    private readonly emailSyncService: EmailSyncService
   ) {
     super(messagesService);
   }
@@ -31,6 +31,6 @@ export class MessagesController extends ResourceController<Email> {
 
   @Post('sync')
   protected async sync() {
-    return await this.emailIngestedProducer.sync();
+    return await this.emailSyncService.run();
   }
 }

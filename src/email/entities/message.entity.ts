@@ -11,7 +11,7 @@ export class Message extends BaseEntity {
   @Column({ type: 'text', nullable: true })
   headerMessageId?: string;
 
-  @Index('idx_emails_thread_id')
+  @Index()
   @Column({ nullable: true })
   threadId?: string;
 
@@ -21,11 +21,11 @@ export class Message extends BaseEntity {
   @Column({ nullable: true })
   senderName?: string;
 
-  @Index('idx_emails_sender_email')
+  @Index()
   @Column({ nullable: true })
   senderEmail?: string;
 
-  @Index('idx_emails_sent_at')
+  @Index()
   @Column({ type: 'timestamp', nullable: true })
   sentAt?: Date;
 

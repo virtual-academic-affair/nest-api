@@ -26,11 +26,13 @@ import rabbitmqConfig from '@shared/config/rabbitmq.config';
     ConfigModule.forFeature(googleConfig),
     ClientsModule.registerAsync([
       {
+        imports: [ConfigModule],
         name: 'RABBITMQ',
         inject: [ConfigService],
         useFactory: (config: ConfigService) => config.get('rabbitmq'),
       },
       {
+        imports: [ConfigModule],
         name: 'GRPC',
         inject: [ConfigService],
         useFactory: (config: ConfigService) => config.get('grpc'),
@@ -50,6 +52,12 @@ import rabbitmqConfig from '@shared/config/rabbitmq.config';
     SettingService,
     RedisService,
   ],
-  exports: [TypeOrmModule, HashingService, SettingService, RedisService],
+  exports: [
+    TypeOrmModule,
+    HashingService,
+    SettingService,
+    RedisService,
+    ClientsModule,
+  ],
 })
 export class SharedModule {}

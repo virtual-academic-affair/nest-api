@@ -1,14 +1,13 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Email } from './entities/email.entity';
+import { Message } from './entities/message.entity';
 import { User } from '@authentication/entities/user.entity';
 import { GoogleapisService } from './services/googleapis.service';
 import { LabelsService } from './services/labels.service';
 import { GrantsService } from './services/grants.service';
 import { EmailSyncScheduler } from './scheduler/email-sync.scheduler';
-import { NlpLabeledConsumer } from './messaging/consumers/nlp-labeled.consumer';
-import { EmailIngestedProducer } from './messaging/producers/email-ingested.producer';
+import { EmailSyncService } from './services/email-sync.service';
 import { GrantsController } from './controllers/grants.controller';
 import { LabelsController } from './controllers/labels.controller';
 import { MessagesController } from './controllers/messages.controller';
@@ -17,7 +16,7 @@ import { MessagesService } from './services/messages.service';
 import { MessageLabelsService } from './services/message-labels.service';
 
 @Module({
-  imports: [ConfigModule, TypeOrmModule.forFeature([Email, User])],
+  imports: [ConfigModule, TypeOrmModule.forFeature([Message, User])],
   controllers: [
     GrantsController,
     LabelsController,
@@ -28,12 +27,11 @@ import { MessageLabelsService } from './services/message-labels.service';
     GoogleapisService,
     LabelsService,
     GrantsService,
-    NlpLabeledConsumer,
-    EmailIngestedProducer,
+    EmailSyncService,
     MessagesService,
     MessageLabelsService,
     EmailSyncScheduler,
   ],
-  exports: [],
+  exports: [MessagesService],
 })
 export class EmailModule {}

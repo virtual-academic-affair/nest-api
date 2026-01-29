@@ -6,6 +6,6 @@ export default registerAs('grpc', () => ({
   options: {
     url: process.env.GRPC_URL ?? '0.0.0.0:50051',
     package: process.env.GRPC_PACKAGE ?? 'grpc',
-    protoPath: process.env.GRPC_PROTO_PATH,
+    protoPath: process.env.GRPC_PROTO_PATH ?? 'src/proto/grpc.proto',
   },
 }));

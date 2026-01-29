@@ -4,7 +4,7 @@ import { BaseEntity } from '@shared/resource/entities/base.entity';
 
 @Entity()
 export class User extends BaseEntity {
-  @Index('idx_users_email')
+  @Index()
   @Column({ unique: true, nullable: false })
   email: string;
 

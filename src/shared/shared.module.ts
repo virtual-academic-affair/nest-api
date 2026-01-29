@@ -1,19 +1,19 @@
 import { Global, Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
+import { ClientsModule } from '@nestjs/microservices';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import googleConfig from '@shared/config/google.config';
+import grpcConfig from '@shared/config/grpc.config';
 import jwtConfig from '@shared/config/jwt.config';
-import rabbitmqConfig from '@shared/config/rabbitmq.config';
-import { RestrictMethodsGuard } from '@shared/resource/guards/restrict-methods.guard';
-import { RabbitMQService } from '@shared/services/rabbitmq.service';
-import { Setting } from '@shared/setting/entities/setting.entity';
 import redisConfig from '@shared/config/redis.config';
 import { BcryptService } from '@shared/hashing/bcrypt.service';
 import { HashingService } from '@shared/hashing/hashing.service';
+import { RestrictMethodsGuard } from '@shared/resource/guards/restrict-methods.guard';
 import { RedisService } from '@shared/services/redis.service';
+import { Setting } from '@shared/setting/entities/setting.entity';
 import { SettingService } from '@shared/setting/services/setting.service';
-import { RabbitMQController } from '@shared/messaging/controllers/rabbitmq.controller';
+import rabbitmqConfig from '@shared/config/rabbitmq.config';
 
 @Global()
 @Module({
@@ -22,9 +22,22 @@ import { RabbitMQController } from '@shared/messaging/controllers/rabbitmq.contr
     ConfigModule.forFeature(jwtConfig),
     ConfigModule.forFeature(redisConfig),
     ConfigModule.forFeature(rabbitmqConfig),
+    ConfigModule.forFeature(grpcConfig),
     ConfigModule.forFeature(googleConfig),
+    ClientsModule.registerAsync([
+      {
+        name: 'RABBITMQ',
+        inject: [ConfigService],
+        useFactory: (config: ConfigService) => config.get('rabbitmq'),
+      },
+      {
+        name: 'GRPC',
+        inject: [ConfigService],
+        useFactory: (config: ConfigService) => config.get('grpc'),
+      },
+    ]),
   ],
-  controllers: [RabbitMQController],
+  controllers: [],
   providers: [
     {
       provide: HashingService,
@@ -36,14 +49,7 @@ import { RabbitMQController } from '@shared/messaging/controllers/rabbitmq.contr
     },
     SettingService,
     RedisService,
-    RabbitMQService,
   ],
-  exports: [
-    TypeOrmModule,
-    HashingService,
-    SettingService,
-    RedisService,
-    RabbitMQService,
-  ],
+  exports: [TypeOrmModule, HashingService, SettingService, RedisService],
 })
 export class SharedModule {}

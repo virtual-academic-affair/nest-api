@@ -14,12 +14,12 @@ việc xử lý và phân loại email học vụ.
        │
        ↓
 ┌──────────────────┐
-│ EmailSyncService │ Lọc theo policy (admin/domain)
+│ EmailSyncService │ Lọc theo policy (domain)
 └──────┬───────────┘
        │ Lưu DB + Publish message
        ↓
 ┌──────────────────┐
-│ RabbitMQ         │ Routing key: email.ingested
+│ RabbitMQ         │ Routing key: ingested
 │ (Ingested)       │
 └──────┬───────────┘
        │
@@ -28,18 +28,12 @@ việc xử lý và phân loại email học vụ.
 │  NLP Service     │ (External - Python service)
 │  Phân loại email │
 └──────┬───────────┘
-       │
-       ↓
-┌──────────────────┐
-│ RabbitMQ         │ Routing key: email.nlp.labeled
-│ (NlpLabeled)     │
-└──────┬───────────┘
-       │
+       │ gRPC: LabelService.UpdateLabel
        ↓
 ┌──────────────────────┐
-│ NlpLabeledService    │ Cập nhật SystemLabels
+│ MessageLabelsService │ Cập nhật SystemLabels
 └──────┬───────────────┘
-       │
+       │ Modify labels
        ↓
 ┌──────────────────────┐
 │ Gmail API            │ Gắn label vào email
@@ -51,18 +45,16 @@ việc xử lý và phân loại email học vụ.
 
 ### 1. Đồng Bộ Email (Email Sync)
 
-- **Scheduler**: Tự động chạy mỗi 5 phút (`EmailSyncScheduler`)
+- **Scheduler**: Tự động chạy mỗi 10 giây (`EmailSyncScheduler`)
 - **Sync thủ công**: Có thể trigger qua API endpoint `/email/messages/sync`
 - **Policy**: Chỉ sync email từ:
-    - Admin có role `admin` và `isActive = true`
-    - Super email (email chính được cấu hình)
-    - Các domain được phép trong setting `email/allowed-domains`
+    - Các domain được phép trong setting `email/allowedDomains`
 
 ### 2. OAuth & Permissions
 
 - Cần grant quyền Gmail API qua OAuth 2.0
-- Admin tạo auth URL và xác thực để lấy access token
-- Token được lưu an toàn và dùng để truy cập Gmail API
+- Admin tạo auth URL và xác thực để lấy refresh token
+- Refresh token được lưu trong setting `email/superEmail` và dùng để truy cập Gmail API
 
 ### 3. Quản Lý Labels
 
@@ -74,28 +66,28 @@ việc xử lý và phân loại email học vụ.
 ### 4. Phân Loại Tự Động (NLP)
 
 - Email sau khi sync được gửi qua RabbitMQ cho NLP service
-- NLP service phân tích nội dung và trả về `SystemLabel[]`
+- NLP service phân tích nội dung và gọi gRPC `LabelService.UpdateLabel` để cập nhật `SystemLabel`
 - Hệ thống tự động gắn Gmail labels tương ứng
 
 ## Services
 
-| Service               | Chức năng                                          |
-|-----------------------|----------------------------------------------------|
-| **GoogleapisService** | Kết nối Gmail API, tạo OAuth client                |
-| **EmailSyncService**  | Đồng bộ email mới từ Gmail về database             |
-| **GrantsService**     | Xác thực OAuth cho Gmail API                       |
-| **LabelsService**     | Quản lý Gmail labels và mapping với system labels  |
-| **MessagesService**   | CRUD các email đã đồng bộ                          |
-| **NlpLabeledService** | Nhận kết quả phân loại từ NLP service qua RabbitMQ |
+| Service                  | Chức năng                                         |
+|--------------------------|---------------------------------------------------|
+| **GoogleapisService**    | Kết nối Gmail API, tạo OAuth client               |
+| **EmailSyncService**     | Đồng bộ email mới từ Gmail về database            |
+| **GrantsService**        | Xác thực OAuth cho Gmail API                      |
+| **LabelsService**        | Quản lý Gmail labels và mapping với system labels |
+| **MessagesService**      | CRUD các email đã đồng bộ                         |
+| **MessageLabelsService** | Thêm/xóa labels cho email, đồng bộ Gmail + DB     |
 
 ## API Endpoints
 
 ### Grants (OAuth)
 
-| Endpoint        | Method | Role  | Chức năng                           |
-|-----------------|--------|-------|-------------------------------------|
-| `/email/grants` | GET    | Admin | Lấy Google OAuth URL để grant quyền |
-| `/email/grants` | POST   | Admin | Xác thực OAuth code và lưu token    |
+| Endpoint        | Method | Role  | Chức năng                                |
+|-----------------|--------|-------|------------------------------------------|
+| `/email/grants` | GET    | Admin | Lấy Google OAuth URL để grant quyền      |
+| `/email/grants` | POST   | Admin | Xác thực OAuth code và lưu refresh token |
 
 ### Labels
 
@@ -108,10 +100,9 @@ việc xử lý và phân loại email học vụ.
 
 ### Messages (Emails)
 
-| Endpoint                     | Method | Role  | Chức năng                                    |
-|------------------------------|--------|-------|----------------------------------------------|
-| `/email/messages`            | GET    | Admin | Lấy danh sách emails (có pagination, filter) |
-| `/email/messages/:id`        | GET    | Admin | Lấy chi tiết một email                       |
-| `/email/messages/sync`       | POST   | Admin | Trigger đồng bộ email thủ công               |
-| `/email/messages/:id/labels` | PUT    | Admin | Thêm/xóa label vào email                     |
-  
+| Endpoint               | Method | Role  | Chức năng                                    |
+|------------------------|--------|-------|----------------------------------------------|
+| `/email/messages`      | GET    | Admin | Lấy danh sách emails (có pagination, filter) |
+| `/email/messages/:id`  | GET    | Admin | Lấy chi tiết một email                       |
+| `/email/messages/sync` | POST   | Admin | Trigger đồng bộ email thủ công               |
+| `/email/messageLabels` | PUT    | Admin | Thêm/xóa label vào email                     |

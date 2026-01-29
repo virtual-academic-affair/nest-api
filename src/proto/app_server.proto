@@ -8,7 +8,7 @@ message Response {
   string message = 2;
 }
 
-// NLP Labeled Service Messages
+// Label Service Messages
 message UpdateLabelRequest {
   int32 messageId = 1;
   string systemLabel = 2;
@@ -46,7 +46,7 @@ message ClassRegistration {
 }
 
 // Service Definitions
-service NlpLabeledService {
+service LabelService {
   rpc UpdateLabel(UpdateLabelRequest) returns (Response);
 }
 

@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { EmailSyncService } from '../services/email-sync.service';
+import { EmailSyncService } from '@email/services/email-sync.service';
 
 @Injectable()
 export class EmailSyncScheduler {

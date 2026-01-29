@@ -14,6 +14,7 @@ import { RedisService } from '@shared/services/redis.service';
 import { Setting } from '@shared/setting/entities/setting.entity';
 import { SettingService } from '@shared/setting/services/setting.service';
 import rabbitmqConfig from '@shared/config/rabbitmq.config';
+import { GRPC_SERVICE, RABBIT_SERVICE } from '@shared/config/constants';
 
 @Global()
 @Module({
@@ -27,13 +28,13 @@ import rabbitmqConfig from '@shared/config/rabbitmq.config';
     ClientsModule.registerAsync([
       {
         imports: [ConfigModule],
-        name: 'RABBITMQ',
+        name: RABBIT_SERVICE,
         inject: [ConfigService],
         useFactory: (config: ConfigService) => config.get('rabbitmq'),
       },
       {
         imports: [ConfigModule],
-        name: 'GRPC',
+        name: GRPC_SERVICE,
         inject: [ConfigService],
         useFactory: (config: ConfigService) => config.get('grpc'),
       },

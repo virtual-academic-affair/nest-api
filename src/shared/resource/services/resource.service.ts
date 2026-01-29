@@ -16,7 +16,7 @@ export interface PaginatedResult<T> {
 export abstract class ResourceService<T extends ObjectLiteral> {
   protected readonly searchableColumns: string[] = [];
 
-  protected readonly orderableColumns: string[] = ['id'];
+  protected readonly orderableColumns: string[] = ['createdAt', 'updatedAt'];
 
   protected constructor(protected readonly repository: Repository<T>) {}
 

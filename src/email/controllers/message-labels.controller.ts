@@ -14,7 +14,7 @@ export class MessageLabelsController {
   constructor(private readonly messageLabelsService: MessageLabelsService) {}
 
   @Put()
-  @GrpcMethod('NlpLabeledService', 'UpdateLabel')
+  @GrpcMethod('LabelService', 'UpdateLabel')
   async updateLabel(@Body() data: UpdateDto) {
     return await this.messageLabelsService.run(
       data.messageId,

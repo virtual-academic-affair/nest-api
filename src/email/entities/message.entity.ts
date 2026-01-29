@@ -32,7 +32,7 @@ export class Message extends BaseEntity {
   @Column('text', { array: true, default: '{}' })
   labelIds: string[];
 
+  @Index()
   @Column('text', { array: true, nullable: true })
-  @Index('idx_emails_system_labels', { synchronize: false })
   systemLabels: SystemLabel[];
 }

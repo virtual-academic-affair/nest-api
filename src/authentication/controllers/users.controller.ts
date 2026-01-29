@@ -17,8 +17,8 @@ import { RestrictMethods } from '@shared/resource/decorators/restrict-methods.de
 @Controller('authentication/users')
 @RestrictMethods({ except: [ResourceAction.Create, ResourceAction.Delete] })
 export class UsersController extends ResourceController<User> {
-  constructor(private readonly usersService: UsersService) {
-    super(usersService);
+  constructor(protected readonly service: UsersService) {
+    super(service);
   }
 
   protected getDtoClasses() {
@@ -27,6 +27,6 @@ export class UsersController extends ResourceController<User> {
 
   @Post('assignRole')
   assignRole(@Body() dto: AssignRoleDto) {
-    return this.usersService.assignRole(dto);
+    return this.service.assignRole(dto);
   }
 }

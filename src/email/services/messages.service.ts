@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { In, Repository, SelectQueryBuilder } from 'typeorm';
 import { ResourceService } from '@shared/resource/services/resource.service';
 import { QueryDto } from '@email/dtos/messages/query.dto';
 import { Message } from '@email/entities/message.entity';
@@ -19,13 +19,7 @@ export class MessagesService extends ResourceService<Message> {
     queryBuilder: SelectQueryBuilder<Message>,
     queryDto: QueryDto
   ): void {
-    const { systemLabels } = queryDto as QueryDto;
-    systemLabels &&
-      queryBuilder.andWhere(
-        `${this.entityName}.systemLabels @> :systemLabels`,
-        {
-          systemLabels,
-        }
-      );
+    const { systemLabels } = queryDto;
+    systemLabels && queryBuilder.andWhere({ systemLabels: In(systemLabels) });
   }
 }

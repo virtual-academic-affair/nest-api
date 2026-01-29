@@ -19,10 +19,10 @@ import { EmailSyncService } from '@email/services/email-sync.service';
 })
 export class MessagesController extends ResourceController<Message> {
   constructor(
-    private readonly messagesService: MessagesService,
+    protected readonly service: MessagesService,
     private readonly emailSyncService: EmailSyncService
   ) {
-    super(messagesService);
+    super(service);
   }
 
   protected getDtoClasses() {

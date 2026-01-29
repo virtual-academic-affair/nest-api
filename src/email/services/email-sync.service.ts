@@ -9,6 +9,7 @@ import { GoogleapisService } from '@email/services/googleapis.service';
 import * as parseMessage from 'gmail-api-parse-message';
 import { gmail_v1 } from 'googleapis';
 import { htmlToText } from 'html-to-text';
+import { RABBIT_SERVICE } from '@shared/config/constants';
 
 export const INGESTED = 'ingested';
 
@@ -17,7 +18,7 @@ export class EmailSyncService {
   private readonly logger = new Logger(EmailSyncService.name);
 
   constructor(
-    @Inject('RABBITMQ') private readonly client: ClientProxy,
+    @Inject(RABBIT_SERVICE) private readonly client: ClientProxy,
     private readonly googleapisService: GoogleapisService,
     private readonly settingService: SettingService,
     @InjectRepository(Message)

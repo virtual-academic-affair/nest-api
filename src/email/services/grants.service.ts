@@ -1,10 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { google } from 'googleapis';
-import { GoogleapisService } from './googleapis.service';
+import { GoogleapisService } from '@email/services/googleapis.service';
 import { SettingService } from '@shared/setting/services/setting.service';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
 import { CodeDto } from '@email/dtos/grants/code.dto';
-import { EmailSyncService } from './email-sync.service';
+import { EmailSyncService } from '@email/services/email-sync.service';
 
 @Injectable()
 export class GrantsService {

@@ -1,8 +1,13 @@
 import { Module } from '@nestjs/common';
-import { ClassRegistrationConsumer } from './messaging/consumers/class-registration.consumer';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ClassRegistration } from '@class-registration/entities/class-registration.entity';
+import { ClassRegistrationsController } from '@class-registration/controllers/class-registrations.controller';
+import { ClassRegistrationsService } from '@class-registration/services/class-registrations.service';
 
 @Module({
-  providers: [ClassRegistrationConsumer],
+  imports: [TypeOrmModule.forFeature([ClassRegistration])],
+  controllers: [ClassRegistrationsController],
+  providers: [ClassRegistrationsService],
   exports: [],
 })
 export class ClassRegistrationModule {}

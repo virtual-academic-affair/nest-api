@@ -1,33 +1,31 @@
 import {
+  Inject,
   Injectable,
   OnModuleInit,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { ConfigService, ConfigType } from '@nestjs/config';
 import { OAuth2Client } from 'google-auth-library';
 import { AuthService } from './auth.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '@authentication/entities/user.entity';
-import { Role } from '@authentication/enums/role.enum';
-import { SettingService } from '@shared/setting/services/setting.service';
-import { SettingKey } from '@shared/setting/enums/setting-key.enum';
 import { CodeDto } from '@authentication/dtos/google/code.dto';
+import googleConfig from '@shared/config/google.config';
 
 @Injectable()
 export class GoogleService implements OnModuleInit {
   private oAuthClient: OAuth2Client;
 
   constructor(
-    private readonly configService: ConfigService,
+    @Inject(googleConfig.KEY)
+    private readonly googleConfiguration: ConfigType<typeof googleConfig>,
     private readonly authService: AuthService,
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
-    private readonly settingService: SettingService
+    @InjectRepository(User) private readonly userRepository: Repository<User>
   ) {}
 
   onModuleInit() {
-    const googleConfig = this.configService.get('google');
-    this.oAuthClient = new OAuth2Client(googleConfig);
+    this.oAuthClient = new OAuth2Client(this.googleConfiguration);
   }
 
   generateAuthUrl() {
@@ -56,17 +54,13 @@ export class GoogleService implements OnModuleInit {
 
     const email = payload.email;
     let user = await this.userRepository.findOneBy({ email });
-    const userData = {
-      googleId: payload.sub,
-      name: payload.name,
-      picture: payload.picture,
-      email,
-    };
 
     user = await this.userRepository.save({
       ...user,
-      ...userData,
-      isActive: user?.isActive ?? true,
+      email,
+      googleId: payload.sub,
+      name: payload.name,
+      picture: payload.picture,
     });
 
     return this.authService.generateTokens(user);

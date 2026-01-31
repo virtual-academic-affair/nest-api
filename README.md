@@ -32,6 +32,7 @@ docker-compose up -d
 ```
 
 3. **Configure environment variables:**
+
     - Create `.env` file based on `.env.example`
     - Configure database, RabbitMQ, Google OAuth credentials
 
@@ -49,31 +50,6 @@ npm run start:prod
     - API: http://localhost:3000
     - Postman Collections: `http/` (root directory)
 
-## Email Processing Flow
+##      
 
-```
-1. Gmail API
-   ↓ (Auto-sync or manual trigger)
-   
-2. EmailIngestedProducer
-   - Fetch new emails from Gmail
-   - Filter by policy
-   - Publish message with email content 
-   ↓
-   
-4. NLP Service (External - Python)
-   - Analyze email content
-   - Classify and return SystemLabels + extracted business data
-   ↓
-   ├─────────────────────────────┬─────────────────────────────┐
-   │                             │                             │
-   │ Path A: Labeling            │ Path B: Business Processing │
-   │                             │                             │
-   ↓                             ↓                             ↓
-   
-5a. RabbitMQ (email.nlp.labeled)     5b. RabbitMQ (specific routing keys)
-    - Receive classification              - Route to appropriate business module
-    ↓                                       based on SystemLabel
-                                        ↓
-6a. NlpLabeledConsumer                6b. Business Module Consumers
-```
+![Flowchart](./public/flowchart.svg)

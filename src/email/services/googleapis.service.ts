@@ -1,23 +1,29 @@
-import { Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import {
+  Inject,
+  Injectable,
+  NotFoundException,
+  OnModuleInit,
+} from '@nestjs/common';
+import { ConfigType } from '@nestjs/config';
 import { gmail_v1, google } from 'googleapis';
 import { OAuth2Client } from 'googleapis-common';
-import { SuperEmailSetting } from '../types/super-email-setting.type';
+import { SuperEmailSetting } from '@email/interfaces/super-email-setting.type';
 import { SettingService } from '@shared/setting/services/setting.service';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
+import googleConfig from '@shared/config/google.config';
 
 @Injectable()
 export class GoogleapisService implements OnModuleInit {
   public oAuthClient: OAuth2Client;
 
   constructor(
-    private readonly configService: ConfigService,
+    @Inject(googleConfig.KEY)
+    private readonly googleConfiguration: ConfigType<typeof googleConfig>,
     private readonly settingService: SettingService
   ) {}
 
   onModuleInit() {
-    const googleConfig = this.configService.get('google');
-    this.oAuthClient = new google.auth.OAuth2(googleConfig);
+    this.oAuthClient = new google.auth.OAuth2(this.googleConfiguration);
   }
 
   async getGmailClient(): Promise<gmail_v1.Gmail> {

@@ -1,23 +1,26 @@
+import { User } from '@authentication/entities/user.entity';
+import { GrantsController } from '@email/controllers/grants.controller';
+import { LabelsController } from '@email/controllers/labels.controller';
+import { MessageLabelsController } from '@email/controllers/message-labels.controller';
+import { MessagesController } from '@email/controllers/messages.controller';
+import { Message } from '@email/entities/message.entity';
+import { EmailSyncScheduler } from '@email/scheduler/email-sync.scheduler';
+import { EmailSyncService } from '@email/services/email-sync.service';
+import { GoogleapisService } from '@email/services/googleapis.service';
+import { GrantsService } from '@email/services/grants.service';
+import { LabelsService } from '@email/services/labels.service';
+import { MessageLabelsService } from '@email/services/message-labels.service';
+import { MessagesService } from '@email/services/messages.service';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Email } from './entities/email.entity';
-import { User } from '@authentication/entities/user.entity';
-import { GoogleapisService } from './services/googleapis.service';
-import { LabelsService } from './services/labels.service';
-import { GrantsService } from './services/grants.service';
-import { EmailSyncScheduler } from './scheduler/email-sync.scheduler';
-import { NlpLabeledConsumer } from './messaging/consumers/nlp-labeled.consumer';
-import { EmailIngestedProducer } from './messaging/producers/email-ingested.producer';
-import { GrantsController } from './controllers/grants.controller';
-import { LabelsController } from './controllers/labels.controller';
-import { MessagesController } from './controllers/messages.controller';
-import { MessageLabelsController } from './controllers/message-labels.controller';
-import { MessagesService } from './services/messages.service';
-import { MessageLabelsService } from './services/message-labels.service';
+import googleConfig from '@shared/config/google.config';
 
 @Module({
-  imports: [ConfigModule, TypeOrmModule.forFeature([Email, User])],
+  imports: [
+    TypeOrmModule.forFeature([Message, User]),
+    ConfigModule.forFeature(googleConfig),
+  ],
   controllers: [
     GrantsController,
     LabelsController,
@@ -28,12 +31,11 @@ import { MessageLabelsService } from './services/message-labels.service';
     GoogleapisService,
     LabelsService,
     GrantsService,
-    NlpLabeledConsumer,
-    EmailIngestedProducer,
+    EmailSyncService,
     MessagesService,
     MessageLabelsService,
     EmailSyncScheduler,
   ],
-  exports: [],
+  exports: [MessagesService],
 })
 export class EmailModule {}

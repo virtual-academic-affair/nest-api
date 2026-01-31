@@ -1,0 +1,2 @@
+export const RABBIT_SERVICE = 'RABBITMQ_CLIENT';
+export const GRPC_SERVICE = 'GRPC_CLIENT';

@@ -1,17 +1,17 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { google } from 'googleapis';
-import { GoogleapisService } from './googleapis.service';
+import { GoogleapisService } from '@email/services/googleapis.service';
 import { SettingService } from '@shared/setting/services/setting.service';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
 import { CodeDto } from '@email/dtos/grants/code.dto';
-import { EmailIngestedProducer } from '../messaging/producers/email-ingested.producer';
+import { EmailSyncService } from '@email/services/email-sync.service';
 
 @Injectable()
 export class GrantsService {
   constructor(
     private readonly googleapisService: GoogleapisService,
     private readonly settingService: SettingService,
-    private readonly emailIngestedProducer: EmailIngestedProducer
+    private readonly emailSyncService: EmailSyncService
   ) {}
 
   generateAuthUrl(): string {
@@ -54,6 +54,6 @@ export class GrantsService {
       refreshToken: tokens.refresh_token,
     });
 
-    await this.emailIngestedProducer.sync();
+    this.emailSyncService.run().then(() => 1);
   }
 }

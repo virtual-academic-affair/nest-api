@@ -1,13 +1,4 @@
-import {
-  Body,
-  Delete,
-  Get,
-  Param,
-  ParseIntPipe,
-  Post,
-  Put,
-  Query,
-} from '@nestjs/common';
+import { Body, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { ResourceService } from '../services/resource.service';
 import { ObjectLiteral } from 'typeorm';
 import { validateDto } from '@shared/resource/utils/validate-dto.util';
@@ -35,8 +26,8 @@ export abstract class ResourceController<T extends ObjectLiteral> {
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.service.findOne(id);
+  findOne(@Param('id') id: string) {
+    return this.service.findOne(+id);
   }
 
   @Post()
@@ -45,12 +36,12 @@ export abstract class ResourceController<T extends ObjectLiteral> {
   }
 
   @Put(':id')
-  async update(@Param('id', ParseIntPipe) id: number, @Body() dto: unknown) {
-    return this.service.update(id, await this.dto('update', dto));
+  async update(@Param('id') id: string, @Body() dto: unknown) {
+    return this.service.update(+id, await this.dto('update', dto));
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.service.remove(id);
+  remove(@Param('id') id: string) {
+    return this.service.remove(+id);
   }
 }

@@ -2,9 +2,9 @@ import { Column, Entity, Index } from 'typeorm';
 import { Role } from '@authentication/enums/role.enum';
 import { BaseEntity } from '@shared/resource/entities/base.entity';
 
-@Entity('users')
+@Entity()
 export class User extends BaseEntity {
-  @Index('idx_users_email')
+  @Index()
   @Column({ unique: true, nullable: false })
   email: string;
 

@@ -14,14 +14,14 @@ export interface PaginatedResult<T> {
 
 @Injectable()
 export abstract class ResourceService<T extends ObjectLiteral> {
-  protected abstract repository: Repository<T>;
+  protected readonly searchableColumns: string[] = [];
 
-  protected abstract searchableColumns: string[];
+  protected readonly orderableColumns: string[] = ['createdAt', 'updatedAt'];
 
-  protected abstract orderableColumns: string[];
+  protected constructor(protected readonly repository: Repository<T>) {}
 
   protected get entityName(): string {
-    return this.repository.metadata.tableName;
+    return this.repository.metadata.name;
   }
 
   async findAll(queryDto: ResourceQueryDto): Promise<PaginatedResult<T>> {
@@ -32,6 +32,7 @@ export abstract class ResourceService<T extends ObjectLiteral> {
     const skip = (page - 1) * Math.min(limit, 20);
 
     const queryBuilder = this.repository.createQueryBuilder(this.entityName);
+    this.withAll(queryBuilder);
 
     if (keyword && this.searchableColumns.length > 0) {
       const conditions = this.searchableColumns
@@ -49,12 +50,11 @@ export abstract class ResourceService<T extends ObjectLiteral> {
       : 'id';
     const orderDirection = orderDir === 'DESC' ? 'DESC' : 'ASC';
 
-    queryBuilder
+    const [items, total] = await queryBuilder
       .orderBy(`${this.entityName}.${orderColumn}`, orderDirection)
       .skip(skip)
-      .take(limit);
-
-    const [items, total] = await queryBuilder.getManyAndCount();
+      .take(limit)
+      .getManyAndCount();
 
     return {
       items,
@@ -68,9 +68,12 @@ export abstract class ResourceService<T extends ObjectLiteral> {
   }
 
   async findOne(id: number): Promise<T> {
-    return await this.repository.findOneByOrFail({
-      id: id as any,
-    });
+    const queryBuilder = this.repository.createQueryBuilder(this.entityName);
+    this.withOne(queryBuilder);
+
+    return await queryBuilder
+      .where(`${this.entityName}.id = :id`, { id })
+      .getOneOrFail();
   }
 
   async create(createDto: object): Promise<T> {
@@ -90,11 +93,11 @@ export abstract class ResourceService<T extends ObjectLiteral> {
   }
 
   protected applyCustomFilters(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    queryBuilder: SelectQueryBuilder<T>,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    queryDto: ResourceQueryDto
-  ): void {
-    return;
-  }
+    _queryBuilder: SelectQueryBuilder<T>,
+    _queryDto: ResourceQueryDto
+  ): void {}
+
+  protected withAll(_queryBuilder: SelectQueryBuilder<T>): void {}
+
+  protected withOne(_queryBuilder: SelectQueryBuilder<T>): void {}
 }

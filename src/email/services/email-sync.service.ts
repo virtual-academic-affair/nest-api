@@ -118,7 +118,7 @@ export class EmailSyncService {
     const plainTextContent = htmlToText(textContent, { wordwrap: false });
 
     this.client.emit(INGESTED, {
-      gmailMessageId: message.gmailMessageId,
+      emailId: message.id,
       subject: message.subject,
       senderEmail: message.senderEmail,
       senderName: message.senderName,

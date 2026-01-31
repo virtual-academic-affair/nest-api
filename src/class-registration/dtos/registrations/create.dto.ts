@@ -7,12 +7,12 @@ import {
   ValidateNested,
   IsEnum,
   IsBoolean,
+  ArrayMinSize,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { NlpDto } from '@email/dtos/messaging/nlp.dto';
 import { RegistrationAction } from '@class-registration/enums/registration-action.enum';
 
-export class RegistrationItemDto {
+export class CreateRegistrationItemDto {
   @IsDefined()
   @IsEnum(RegistrationAction)
   action!: RegistrationAction;
@@ -38,29 +38,28 @@ export class RegistrationItemDto {
   isInCurriculum?: boolean;
 }
 
-export class ClassRegistrationPayloadDto {
+export class CreateClassRegistrationDto {
   @IsDefined()
   @IsString()
-  studentCode!: string;
+  emailId!: string; // Liên kết với Message-ID của Email
+
+  @IsDefined()
+  @IsString()
+  studentCode!: string; // MSSV
 
   @IsDefined()
   @IsInt()
-  academicYear!: number;
+  @Type(() => Number)
+  academicYear!: number; // Khóa học
 
   @IsOptional()
   @IsString()
-  studentName?: string;
+  studentName?: string; // Tên sinh viên
 
   @IsDefined()
   @IsArray()
+  @ArrayMinSize(1, { message: 'At least one item is required' })
   @ValidateNested({ each: true })
-  @Type(() => RegistrationItemDto)
-  items!: RegistrationItemDto[];
-}
-
-export class ClassRegistrationDto extends NlpDto {
-  @IsDefined()
-  @ValidateNested()
-  @Type(() => ClassRegistrationPayloadDto)
-  data!: ClassRegistrationPayloadDto;
+  @Type(() => CreateRegistrationItemDto)
+  items!: CreateRegistrationItemDto[];
 }

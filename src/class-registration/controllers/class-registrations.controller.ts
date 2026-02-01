@@ -19,10 +19,8 @@ import { ClassRegistrationsService } from '@class-registration/services/class-re
   only: [ResourceAction.FindAll, ResourceAction.FindOne, ResourceAction.Create],
 })
 export class ClassRegistrationsController extends ResourceController<ClassRegistration> {
-  constructor(
-    private readonly classRegistrationsService: ClassRegistrationsService
-  ) {
-    super(classRegistrationsService);
+  constructor(protected readonly service: ClassRegistrationsService) {
+    super(service);
   }
 
   protected getDtoClasses() {
@@ -36,4 +34,3 @@ export class ClassRegistrationsController extends ResourceController<ClassRegist
     return this.service.create(await this.dto('create', dto));
   }
 }
-

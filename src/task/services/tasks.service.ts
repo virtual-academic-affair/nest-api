@@ -6,6 +6,8 @@ import { Task } from '@task/entities/task.entity';
 
 @Injectable()
 export class TasksService extends ResourceService<Task> {
+  protected orderableColumns = ['id', 'messageId', 'createdAt', 'updatedAt'];
+
   constructor(@InjectRepository(Task) repository: Repository<Task>) {
     super(repository);
   }

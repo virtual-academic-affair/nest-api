@@ -1,4 +1,4 @@
-import { Body, Controller, Put } from '@nestjs/common';
+import { Body, Controller, Put, UseFilters } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 import { Auth } from '@authentication/decorators/auth.decorator';
 import { AuthType } from '@authentication/enums/auth-type.enum';
@@ -6,9 +6,11 @@ import { Roles } from '@authentication/decorators/roles.decorator';
 import { Role } from '@authentication/enums/role.enum';
 import { MessageLabelsService } from '@email/services/message-labels.service';
 import { UpdateDto } from '@email/dtos/message-labels/update.dto';
+import { GrpcExceptionFilter } from '@shared/filters/grpc-exception.filter';
 
 @Auth(AuthType.Bearer)
 @Roles(Role.Admin)
+@UseFilters(GrpcExceptionFilter)
 @Controller('email/messageLabels')
 export class MessageLabelsController {
   constructor(private readonly messageLabelsService: MessageLabelsService) {}

@@ -6,8 +6,6 @@ import { ClassRegistration } from '@class-registration/entities/class-registrati
 
 @Injectable()
 export class ClassRegistrationsService extends ResourceService<ClassRegistration> {
-  protected searchableColumns: string[] = [];
-
   protected orderableColumns = ['id', 'messageId', 'createdAt', 'updatedAt'];
 
   constructor(

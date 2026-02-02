@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, UseFilters } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 import { Auth } from '@authentication/decorators/auth.decorator';
 import { Roles } from '@authentication/decorators/roles.decorator';
@@ -9,10 +9,12 @@ import { Task } from '@task/entities/task.entity';
 import { QueryDto } from '@task/dtos/tasks/query.dto';
 import { CreateDto } from '@task/dtos/tasks/create.dto';
 import { TasksService } from '@task/services/tasks.service';
+import { GrpcExceptionFilter } from '@shared/filters/grpc-exception.filter';
 
 @Auth(AuthType.Bearer)
 @Roles(Role.Admin)
-@Controller('task-module/task')
+@UseFilters(GrpcExceptionFilter)
+@Controller('taskModule/tasks')
 export class TasksController extends ResourceController<Task> {
   constructor(protected readonly service: TasksService) {
     super(service);

@@ -7,8 +7,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import { Role } from '@authentication/enums/role.enum';
 import { ROLES_KEY } from '@authentication/decorators/roles.decorator';
-import { ActiveUserData } from '@authentication/interfaces/active-user-data.interface';
-import { REQUEST_USER_KEY } from '@authentication/guards/access-token.guard';
+import { getActiveUser } from '@authentication/decorators/active-user.decorator';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -24,11 +23,9 @@ export class RolesGuard implements CanActivate {
       return true;
     }
 
-    const user: ActiveUserData = context.switchToHttp().getRequest()[
-      REQUEST_USER_KEY
-    ];
+    const currentRole = getActiveUser('role', context) as string;
 
-    const hasRole = contextRoles.some((role) => user.role === role);
+    const hasRole = contextRoles.some((role) => currentRole === role);
     throwUnless(hasRole, new ForbiddenException('Forbidden resource'));
 
     return true;

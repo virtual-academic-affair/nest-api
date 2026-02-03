@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ApiResponseModule } from '@zabih-dev/nest-api-response';
-import { AppModule } from './app.module';
+import { AppModule } from '../app.module';
 
 @Module({
   imports: [ApiResponseModule, AppModule],

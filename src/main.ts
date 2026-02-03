@@ -2,10 +2,9 @@ import { INestApplication, Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions } from '@nestjs/microservices';
-import { GrpcExceptionFilter } from '@shared/filters/grpc-exception.filter';
 import '@shared/utils/throw.util';
-import { AppModule } from './app.module';
-import { HttpAppModule } from './http-app.module';
+import { GrpcAppModule } from './app/grpc/grpc-app.module';
+import { HttpAppModule } from './app/http/http-app.module';
 
 async function setupHttpApp(): Promise<INestApplication> {
   const app = await NestFactory.create(HttpAppModule);
@@ -18,8 +17,10 @@ async function setupGrpcApp(
   config: ConfigService
 ): Promise<{ app: any; url: string }> {
   const grpcConfig = config.get<MicroserviceOptions>('grpc');
-  const grpcApp = await NestFactory.createMicroservice(AppModule, grpcConfig);
-  grpcApp.useGlobalFilters(new GrpcExceptionFilter());
+  const grpcApp = await NestFactory.createMicroservice(
+    GrpcAppModule,
+    grpcConfig
+  );
   grpcApp.useGlobalPipes(
     new ValidationPipe({ transform: true, whitelist: true })
   );

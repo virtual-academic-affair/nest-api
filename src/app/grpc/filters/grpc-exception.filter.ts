@@ -1,3 +1,4 @@
+import { status as GrpcStatus } from '@grpc/grpc-js';
 import {
   ArgumentsHost,
   Catch,
@@ -7,7 +8,6 @@ import {
 } from '@nestjs/common';
 import { BaseRpcExceptionFilter, RpcException } from '@nestjs/microservices';
 import { Observable, throwError } from 'rxjs';
-import { status as GrpcStatus } from '@grpc/grpc-js';
 
 const httpToGrpcStatus: Record<number, GrpcStatus> = {
   [HttpStatus.BAD_REQUEST]: GrpcStatus.INVALID_ARGUMENT,

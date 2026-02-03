@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { ApiResponseModule } from '@zabih-dev/nest-api-response';
 import { DatabaseType } from 'typeorm';
 import { AuthenticationModule } from '@authentication/authentication.module';
 import { SharedModule } from '@shared/shared.module';
@@ -13,7 +12,6 @@ import { InquiryModule } from '@inquiry/inquiry.module';
 
 @Module({
   imports: [
-    ApiResponseModule,
     ConfigModule.forRoot(),
     ScheduleModule.forRoot(),
     TypeOrmModule.forRoot({

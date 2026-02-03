@@ -6,6 +6,7 @@ import { ActiveUser } from '@authentication/decorators/active-user.decorator';
 import { ActiveUserData } from '@authentication/interfaces/active-user-data.interface';
 import { UsersService } from '@authentication/services/users.service';
 import { AuthService } from '@authentication/services/auth.service';
+import { GrpcMethod } from '@nestjs/microservices';
 
 @Controller('authentication/auth')
 export class AuthenticationController {
@@ -21,6 +22,7 @@ export class AuthenticationController {
 
   @Get('me')
   @Auth(AuthType.Bearer)
+  @GrpcMethod('AuthService', 'Me')
   async findOne(@ActiveUser('sub') sub: ActiveUserData['sub']) {
     return this.userService.findOne(sub);
   }

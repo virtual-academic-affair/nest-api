@@ -1,26 +1,55 @@
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { INestApplication, Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions } from '@nestjs/microservices';
-import { AppModule } from './app.module';
 import '@shared/utils/throw.util';
+import { GrpcAppModule } from './app/grpc/grpc-app.module';
+import { HttpAppModule } from './app/http/http-app.module';
+
+async function setupHttpApp(): Promise<INestApplication> {
+  const app = await NestFactory.create(HttpAppModule);
+  app.enableCors();
+  app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
+  return app;
+}
+
+async function setupGrpcApp(
+  config: ConfigService
+): Promise<{ app: any; url: string }> {
+  const grpcConfig = config.get<MicroserviceOptions>('grpc');
+  const grpcApp = await NestFactory.createMicroservice(
+    GrpcAppModule,
+    grpcConfig
+  );
+  grpcApp.useGlobalPipes(
+    new ValidationPipe({ transform: true, whitelist: true })
+  );
+  const grpcUrl = (grpcConfig as any)?.options?.url;
+  return { app: grpcApp, url: grpcUrl };
+}
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
-  const app = await NestFactory.create(AppModule);
+  const HTTP_PORT = process.env.HTTP_PORT || 3000;
 
-  // Connect microservice
-  const config = app.get(ConfigService);
-  const grpc = config.get<MicroserviceOptions>('grpc');
-  app.connectMicroservice<MicroserviceOptions>(grpc);
+  try {
+    // Setup HTTP application
+    const httpApp = await setupHttpApp();
+    const config = httpApp.get(ConfigService);
 
-  app.useGlobalPipes(new ValidationPipe());
-  app.enableCors();
+    // Setup gRPC microservice
+    const { app: grpcApp, url: grpcUrl } = await setupGrpcApp(config);
 
-  await app.startAllMicroservices();
-  await app.listen(3000);
-  logger.log('Running on http://localhost:3000');
-  logger.log(`gRPC running on ${(grpc as any)?.options?.url ?? ''}`);
+    // Start both applications
+    await grpcApp.listen();
+    await httpApp.listen(HTTP_PORT);
+
+    logger.log(`HTTP server running on http://localhost:${HTTP_PORT}`);
+    logger.log(`gRPC server running on ${grpcUrl}`);
+  } catch (error) {
+    logger.error('Failed to start application', error);
+    process.exit(1);
+  }
 }
 
 bootstrap();

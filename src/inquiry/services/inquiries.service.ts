@@ -6,8 +6,6 @@ import { Inquiry } from '@inquiry/entities/inquiry.entity';
 
 @Injectable()
 export class InquiriesService extends ResourceService<Inquiry> {
-  protected searchableColumns: string[] = [];
-
   protected orderableColumns = ['id', 'messageId', 'createdAt', 'updatedAt'];
 
   constructor(@InjectRepository(Inquiry) repository: Repository<Inquiry>) {

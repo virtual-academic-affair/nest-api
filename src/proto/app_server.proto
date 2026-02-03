@@ -1,63 +1,62 @@
 syntax = "proto3";
-
 package app_server;
+import "google/protobuf/empty.proto";
 
-// Common message types
-message Response {
+message SuccessResponse {
   bool success = 1;
-  string message = 2;
 }
 
-// Label Service Messages
+// --- Message Label Domain ---
 message UpdateLabelRequest {
   int32 messageId = 1;
   string systemLabel = 2;
   bool isRemove = 3;
 }
 
-// Task Service Messages
-message TaskRequest {
-  int32 messageId = 1;
+service MessageLabelService {
+  rpc UpdateLabel(UpdateLabelRequest) returns (SuccessResponse);
 }
 
-message Task {
+// --- Auth Domain ---
+message UserResponse {
   int32 id = 1;
-  int32 messageId = 2;
+  string email = 2;
+  string name = 3;
+  string role = 4;
+  string picture = 5;
+  bool isActive = 6;
+
+  string createdAt = 7;
+  string updatedAt = 8;
 }
 
-// Inquiry Service Messages
-message InquiryRequest {
+service AuthService {
+  rpc Me(google.protobuf.Empty) returns (UserResponse);
+}
+
+// --- Task Domain ---
+message CreateTaskRequest {
   int32 messageId = 1;
-}
-
-message Inquiry {
-  int32 id = 1;
-  int32 messageId = 2;
-}
-
-// Class Registration Service Messages
-message ClassRegistrationRequest {
-  int32 messageId = 1;
-}
-
-message ClassRegistration {
-  int32 id = 1;
-  int32 messageId = 2;
-}
-
-// Service Definitions
-service LabelService {
-  rpc UpdateLabel(UpdateLabelRequest) returns (Response);
 }
 
 service TaskService {
-  rpc Create(TaskRequest) returns (Task);
+  rpc Create(CreateTaskRequest) returns (SuccessResponse);
+}
+
+// --- Inquiry Domain ---
+message CreateInquiryRequest {
+  int32 messageId = 1;
 }
 
 service InquiryService {
-  rpc Create(InquiryRequest) returns (Inquiry);
+  rpc Create(CreateInquiryRequest) returns (SuccessResponse);
+}
+
+// --- Class Registration Domain ---
+message CreateRegistrationRequest {
+  int32 messageId = 1;
 }
 
 service ClassRegistrationService {
-  rpc Create(ClassRegistrationRequest) returns (ClassRegistration);
+  rpc Create(CreateRegistrationRequest) returns (SuccessResponse);
 }

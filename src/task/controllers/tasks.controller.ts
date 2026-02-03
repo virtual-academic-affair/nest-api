@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, UseFilters } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 import { Auth } from '@authentication/decorators/auth.decorator';
 import { Roles } from '@authentication/decorators/roles.decorator';
@@ -12,7 +12,7 @@ import { TasksService } from '@task/services/tasks.service';
 
 @Auth(AuthType.Bearer)
 @Roles(Role.Admin)
-@Controller('task-module/task')
+@Controller('taskModule/tasks')
 export class TasksController extends ResourceController<Task> {
   constructor(protected readonly service: TasksService) {
     super(service);

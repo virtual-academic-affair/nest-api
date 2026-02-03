@@ -9,11 +9,9 @@ import { Task } from '@task/entities/task.entity';
 import { QueryDto } from '@task/dtos/tasks/query.dto';
 import { CreateDto } from '@task/dtos/tasks/create.dto';
 import { TasksService } from '@task/services/tasks.service';
-import { GrpcExceptionFilter } from '@shared/filters/grpc-exception.filter';
 
 @Auth(AuthType.Bearer)
 @Roles(Role.Admin)
-@UseFilters(GrpcExceptionFilter)
 @Controller('taskModule/tasks')
 export class TasksController extends ResourceController<Task> {
   constructor(protected readonly service: TasksService) {

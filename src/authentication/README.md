@@ -7,12 +7,12 @@ JWT tokens (access & refresh) để bảo mật các API endpoints.
 
 ## Flow
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────────┐
 │                          1. LOGIN (First Time)                   │
 └──────────────────────────────────────────────────────────────────┘
 
-Frontend → Google OAuth URL → Google Login → OAuth Code 
+Frontend → Google OAuth URL → Google Login → OAuth Code
     ↓
 GoogleService → Get User Info → UsersService (Create/Update User)
     ↓
@@ -34,7 +34,7 @@ Controller/Service (Process Request)
 │                    3. TOKEN EXPIRED (Refresh)                    │
 └──────────────────────────────────────────────────────────────────┘
 
-Frontend (401 Error) → POST /auth/refresh {refreshToken}
+Frontend (401 Error) → POST /authentication/auth/refresh {refreshToken}
     ↓
 AuthService (Verify & Generate New Tokens) → Frontend (Save & Retry)
 ```
@@ -85,7 +85,7 @@ Module cung cấp các guards và decorators cho authentication và authorizatio
 ## Services
 
 | Service           | Chức năng                                        |
-|-------------------|--------------------------------------------------|
+| ----------------- | ------------------------------------------------ |
 | **GoogleService** | Xử lý Google OAuth flow, lấy user info từ Google |
 | **AuthService**   | Generate và verify JWT tokens (access & refresh) |
 | **UsersService**  | CRUD users, assign roles, quản lý user data      |
@@ -95,21 +95,21 @@ Module cung cấp các guards và decorators cho authentication và authorizatio
 ### Google OAuth (Public)
 
 | Endpoint                 | Method | Role   | Chức năng                             |
-|--------------------------|--------|--------|---------------------------------------|
+| ------------------------ | ------ | ------ | ------------------------------------- |
 | `/authentication/google` | GET    | Public | Lấy Google OAuth URL để redirect user |
 | `/authentication/google` | POST   | Public | Login bằng OAuth code, trả về tokens  |
 
 ### Auth Management (Public/Authenticated)
 
 | Endpoint                       | Method | Role          | Chức năng                               |
-|--------------------------------|--------|---------------|-----------------------------------------|
+| ------------------------------ | ------ | ------------- | --------------------------------------- |
 | `/authentication/auth/refresh` | POST   | Public        | Refresh access token bằng refresh token |
 | `/authentication/auth/me`      | GET    | Authenticated | Lấy thông tin user hiện tại             |
 
 ### User Management (Admin Only)
 
 | Endpoint                           | Method | Role  | Chức năng                                   |
-|------------------------------------|--------|-------|---------------------------------------------|
+| ---------------------------------- | ------ | ----- | ------------------------------------------- |
 | `/authentication/users`            | GET    | Admin | Lấy danh sách users (có pagination, filter) |
 | `/authentication/users/:id`        | GET    | Admin | Lấy chi tiết một user                       |
 | `/authentication/users/:id`        | PUT    | Admin | Cập nhật thông tin user                     |

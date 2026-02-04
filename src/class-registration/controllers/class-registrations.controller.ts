@@ -72,4 +72,11 @@ export class ClassRegistrationsController extends ResourceController<ClassRegist
   async findOneWithItems(@Param('id', ParseIntPipe) id: number) {
     return await this.classRegistrationsService.findOneWithItems(id);
   }
+
+
+  @Post()
+  @GrpcMethod('ClassRegistrationService', 'Create')
+  async create(@Body() dto: unknown) {
+    return super.create(dto);
+  }
 }

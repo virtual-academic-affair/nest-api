@@ -1,9 +1,9 @@
 import { Column, Entity, Index, OneToMany } from 'typeorm';
-import { BaseEntity } from '@shared/resource/entities/base.entity';
+import { BelongsToMessage } from '@email/entities/belongs-to-message.entity';
 import { RegistrationItemDetail } from './registration-item-detail.entity';
 
 @Entity('class_registrations')
-export class ClassRegistration extends BaseEntity {
+export class ClassRegistration extends BelongsToMessage {
   @Index('idx_class_registrations_email_id')
   @Column()
   emailId: string; // Liên kết với Message-ID của Email

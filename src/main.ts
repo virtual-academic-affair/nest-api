@@ -1,17 +1,27 @@
-import { Logger, ValidationPipe } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import './shared/utils/throw.util';
+import { Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import '@shared/utils/throw.util';
+import { setupGrpcApp } from './app/grpc/setup';
+import { setupHttpApp } from './app/http/setup';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
-  const app = await NestFactory.create(AppModule);
 
-  app.useGlobalPipes(new ValidationPipe());
-  app.enableCors();
+  try {
+    const { app: httpApp, port: httpPort, url: httpUrl } = await setupHttpApp();
+    const config = httpApp.get(ConfigService);
 
-  await app.listen(3000);
-  logger.log('Running on http://localhost:3000');
+    const { app: grpcApp, url: grpcUrl } = await setupGrpcApp(config);
+
+    await grpcApp.listen();
+    await httpApp.listen(httpPort);
+
+    logger.log(`HTTP server running on ${httpUrl}`);
+    logger.log(`gRPC server running on ${grpcUrl}`);
+  } catch (error) {
+    logger.error('Failed to start application', error);
+    process.exit(1);
+  }
 }
 
 bootstrap();

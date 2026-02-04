@@ -12,20 +12,17 @@ import { RegistrationAction } from '@class-registration/enums/registration-actio
 
 @Injectable()
 export class ClassRegistrationsService extends ResourceService<ClassRegistration> {
-  protected repository: Repository<ClassRegistration>;
-
   protected searchableColumns = ['studentCode', 'studentName', 'emailId'];
-
-  protected orderableColumns = ['id', 'academicYear', 'createdAt'];
+  
+  protected orderableColumns = ['id', 'academicYear', 'messageId', 'createdAt', 'updatedAt'];
 
   constructor(
     @InjectRepository(ClassRegistration)
-    classRegistrationRepository: Repository<ClassRegistration>,
+    repository: Repository<ClassRegistration>,
     @InjectRepository(RegistrationItemDetail)
     private readonly itemDetailRepository: Repository<RegistrationItemDetail>
   ) {
-    super();
-    this.repository = classRegistrationRepository;
+    super(repository);
   }
 
   protected applyCustomFilters(
@@ -47,7 +44,6 @@ export class ClassRegistrationsService extends ResourceService<ClassRegistration
       });
     }
 
-    // Filter by item status
     if (status || action) {
       queryBuilder.innerJoin(`${this.entityName}.items`, 'items');
 
@@ -60,20 +56,14 @@ export class ClassRegistrationsService extends ResourceService<ClassRegistration
       }
     }
 
-    // Sắp xếp theo thứ tự ưu tiên
     if (orderBy === 'priority') {
       queryBuilder
-        .orderBy(`${this.entityName}.academicYear`, 'ASC') // Khóa cũ hơn (năm nhỏ hơn) ưu tiên trước
-        .addOrderBy(`${this.entityName}.createdAt`, 'ASC'); // Ai gửi trước xử lý trước
+        .orderBy(`${this.entityName}.academicYear`, 'ASC')
+        .addOrderBy(`${this.entityName}.createdAt`, 'ASC');
     }
   }
 
-  /**
-   * Tạo class registration (dùng cho cả client và consumer)
-   * Nếu emailId đã tồn tại, throw ConflictException
-   */
   async createRegistration(dto: CreateClassRegistrationDto): Promise<ClassRegistration> {
-    // Kiểm tra xem email này đã được xử lý chưa
     const existing = await this.repository.findOne({
       where: { emailId: dto.emailId },
     });
@@ -105,43 +95,31 @@ export class ClassRegistrationsService extends ResourceService<ClassRegistration
     return detail;
   }
 
-  /**
-   * Lấy chi tiết registration với items
-   */
   async findOneWithItems(id: number): Promise<ClassRegistration> {
     const registration = await this.repository.findOne({
       where: { id },
       relations: ['items'],
     });
 
-    throwIf(
-      !registration,
-      new NotFoundException('Registration not found')
-    );
-    return registration!;
+    if (!registration) {
+      throw new NotFoundException('Registration not found');
+    }
+    return registration;
   }
 
-  /**
-   * Lấy danh sách registrations với items, sắp xếp theo ưu tiên
-   */
   async findAllWithPriority(queryDto: RegistrationQueryDto) {
     const queryBuilder = this.repository
       .createQueryBuilder(this.entityName)
       .leftJoinAndSelect(`${this.entityName}.items`, 'items');
 
-    // Apply filters
     const { studentCode, academicYear, status, action } = queryDto;
 
     if (studentCode) {
-      queryBuilder.andWhere(`${this.entityName}.studentCode = :studentCode`, {
-        studentCode,
-      });
+      queryBuilder.andWhere(`${this.entityName}.studentCode = :studentCode`, { studentCode });
     }
 
     if (academicYear) {
-      queryBuilder.andWhere(`${this.entityName}.academicYear = :academicYear`, {
-        academicYear,
-      });
+      queryBuilder.andWhere(`${this.entityName}.academicYear = :academicYear`, { academicYear });
     }
 
     if (status) {
@@ -152,10 +130,6 @@ export class ClassRegistrationsService extends ResourceService<ClassRegistration
       queryBuilder.andWhere('items.action = :action', { action });
     }
 
-    // Sắp xếp theo thứ tự ưu tiên:
-    // 1. Khóa học (năm nhỏ hơn  = ưu tiên cao hơn)
-    // 2. Tính hợp lệ CTDT (isInCurriculum = true ưu tiên hơn)
-    // 3. Thời gian tạo (createdAt ASC = tạo trước xử lý trước)
     queryBuilder
       .orderBy(`${this.entityName}.academicYear`, 'ASC')
       .addOrderBy('items.isInCurriculum', 'DESC')
@@ -181,11 +155,8 @@ export class ClassRegistrationsService extends ResourceService<ClassRegistration
     };
   }
 
-  /**
-   * Thống kê số lượng môn muốn mở (REQUEST_OPEN)
-   */
   async getOpenRequestStats() {
-    const stats = await this.itemDetailRepository
+    return await this.itemDetailRepository
       .createQueryBuilder('item')
       .select('item.subjectName', 'subjectName')
       .addSelect('COUNT(*)', 'requestCount')
@@ -193,26 +164,15 @@ export class ClassRegistrationsService extends ResourceService<ClassRegistration
       .groupBy('item.subjectName')
       .orderBy('COUNT(*)', 'DESC')
       .getRawMany();
-
-    return stats;
   }
 
-  /**
-   * Thống kê tổng quan
-   */
   async getOverviewStats() {
     const [totalRegistrations, pendingCount, approvedCount, rejectedCount] =
       await Promise.all([
         this.repository.count(),
-        this.itemDetailRepository.count({
-          where: { status: RegistrationStatus.PENDING },
-        }),
-        this.itemDetailRepository.count({
-          where: { status: RegistrationStatus.APPROVED },
-        }),
-        this.itemDetailRepository.count({
-          where: { status: RegistrationStatus.REJECTED },
-        }),
+        this.itemDetailRepository.count({ where: { status: RegistrationStatus.PENDING } }),
+        this.itemDetailRepository.count({ where: { status: RegistrationStatus.APPROVED } }),
+        this.itemDetailRepository.count({ where: { status: RegistrationStatus.REJECTED } }),
       ]);
 
     return {

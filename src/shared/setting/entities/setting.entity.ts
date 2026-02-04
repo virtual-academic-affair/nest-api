@@ -1,7 +1,7 @@
 import { Column, Entity } from 'typeorm';
 import { BaseEntity } from '@shared/resource/entities/base.entity';
 
-@Entity('settings')
+@Entity()
 export class Setting extends BaseEntity {
   @Column({ unique: true, nullable: false })
   key: string;

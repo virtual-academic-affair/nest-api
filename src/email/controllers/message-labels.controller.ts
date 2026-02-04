@@ -1,26 +1,25 @@
-import { Body, Controller, Param, ParseIntPipe, Put } from '@nestjs/common';
+import { Body, Controller, Put } from '@nestjs/common';
+import { GrpcMethod } from '@nestjs/microservices';
 import { Auth } from '@authentication/decorators/auth.decorator';
 import { AuthType } from '@authentication/enums/auth-type.enum';
 import { Roles } from '@authentication/decorators/roles.decorator';
 import { Role } from '@authentication/enums/role.enum';
 import { MessageLabelsService } from '@email/services/message-labels.service';
-import { UpdateMessageLabelDto } from '@email/dtos/message-labels/update.dto';
+import { UpdateDto } from '@email/dtos/message-labels/update.dto';
 
 @Auth(AuthType.Bearer)
 @Roles(Role.Admin)
-@Controller('email/messages/:id/labels')
+@Controller('email/messageLabels')
 export class MessageLabelsController {
   constructor(private readonly messageLabelsService: MessageLabelsService) {}
 
   @Put()
-  async updateLabel(
-    @Param('id', ParseIntPipe) messageId: number,
-    @Body() dto: UpdateMessageLabelDto
-  ) {
-    return await this.messageLabelsService.updateLabel(
-      messageId,
-      dto.systemLabel,
-      dto.isRemove
+  @GrpcMethod('MessageLabelService', 'UpdateLabel')
+  async updateLabel(@Body() data: UpdateDto) {
+    return await this.messageLabelsService.run(
+      data.messageId,
+      data.systemLabel,
+      data.isRemove
     );
   }
 }

@@ -15,6 +15,8 @@ import { Setting } from '@shared/setting/entities/setting.entity';
 import { SettingService } from '@shared/setting/services/setting.service';
 import rabbitmqConfig from '@shared/config/rabbitmq.config';
 import { GRPC_SERVICE, RABBIT_SERVICE } from '@shared/config/constants';
+import { DynamicDataController } from '@shared/controllers/dynamic-data.controller';
+import { DynamicDataService } from '@shared/services/dynamic-data.service';
 
 @Global()
 @Module({
@@ -40,7 +42,7 @@ import { GRPC_SERVICE, RABBIT_SERVICE } from '@shared/config/constants';
       },
     ]),
   ],
-  controllers: [],
+  controllers: [DynamicDataController],
   providers: [
     {
       provide: HashingService,
@@ -52,6 +54,7 @@ import { GRPC_SERVICE, RABBIT_SERVICE } from '@shared/config/constants';
     },
     SettingService,
     RedisService,
+    DynamicDataService,
   ],
   exports: [
     TypeOrmModule,

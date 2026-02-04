@@ -39,19 +39,22 @@ export class GrantsService {
     );
 
     this.googleapisService.oAuthClient.setCredentials(tokens);
-    const gmail = google.gmail({
-      version: 'v1',
+
+    const oauth2 = google.oauth2({
+      version: 'v2',
       auth: this.googleapisService.oAuthClient,
     });
-    const { data } = await gmail.users.getProfile({ userId: 'me' });
+    const { data: profile } = await oauth2.userinfo.get();
     throwUnless(
-      data?.emailAddress,
+      profile?.email,
       new BadRequestException('Missing email address')
     );
 
     await this.settingService.set(SettingKey.EmailSuperEmail, {
-      email: data.emailAddress,
+      email: profile.email,
       refreshToken: tokens.refresh_token,
+      name: profile.name,
+      picture: profile.picture,
     });
 
     this.emailSyncService.run().then(() => 1);

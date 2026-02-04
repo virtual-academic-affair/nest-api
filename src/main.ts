@@ -1,50 +1,22 @@
-import { INestApplication, Logger, ValidationPipe } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { NestFactory } from '@nestjs/core';
-import { MicroserviceOptions } from '@nestjs/microservices';
 import '@shared/utils/throw.util';
-import { GrpcAppModule } from './app/grpc/grpc-app.module';
-import { HttpAppModule } from './app/http/http-app.module';
-
-async function setupHttpApp(): Promise<INestApplication> {
-  const app = await NestFactory.create(HttpAppModule);
-  app.enableCors();
-  app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
-  return app;
-}
-
-async function setupGrpcApp(
-  config: ConfigService
-): Promise<{ app: any; url: string }> {
-  const grpcConfig = config.get<MicroserviceOptions>('grpc');
-  const grpcApp = await NestFactory.createMicroservice(
-    GrpcAppModule,
-    grpcConfig
-  );
-  grpcApp.useGlobalPipes(
-    new ValidationPipe({ transform: true, whitelist: true })
-  );
-  const grpcUrl = (grpcConfig as any)?.options?.url;
-  return { app: grpcApp, url: grpcUrl };
-}
+import { setupGrpcApp } from './app/grpc/setup';
+import { setupHttpApp } from './app/http/setup';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
-  const HTTP_PORT = process.env.HTTP_PORT || 3000;
 
   try {
-    // Setup HTTP application
-    const httpApp = await setupHttpApp();
+    const { app: httpApp, port: httpPort, url: httpUrl } = await setupHttpApp();
     const config = httpApp.get(ConfigService);
 
-    // Setup gRPC microservice
     const { app: grpcApp, url: grpcUrl } = await setupGrpcApp(config);
 
-    // Start both applications
     await grpcApp.listen();
-    await httpApp.listen(HTTP_PORT);
+    await httpApp.listen(httpPort);
 
-    logger.log(`HTTP server running on http://localhost:${HTTP_PORT}`);
+    logger.log(`HTTP server running on ${httpUrl}`);
     logger.log(`gRPC server running on ${grpcUrl}`);
   } catch (error) {
     logger.error('Failed to start application', error);

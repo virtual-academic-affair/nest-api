@@ -1,4 +1,5 @@
 import { User } from '@authentication/entities/user.entity';
+import { AllowedDomainsController } from '@email/controllers/allowed-domains.controller';
 import { GrantsController } from '@email/controllers/grants.controller';
 import { LabelsController } from '@email/controllers/labels.controller';
 import { MessageLabelsController } from '@email/controllers/message-labels.controller';
@@ -22,6 +23,7 @@ import googleConfig from '@shared/config/google.config';
     ConfigModule.forFeature(googleConfig),
   ],
   controllers: [
+    AllowedDomainsController,
     GrantsController,
     LabelsController,
     MessagesController,

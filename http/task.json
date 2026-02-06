@@ -1,0 +1,217 @@
+{
+    "info": {
+        "_postman_id": "ee91982a-d838-4084-a3ad-d622bd8b4c5b",
+        "name": "Task Module API",
+        "description": "Collection for testing Task Module CRUD operations",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "1. Create Task",
+            "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"name\": \"Dự án Website mới\",\n    \"description\": \"Thiết kế và lập trình frontend cho website\",\n    \"deadline\": \"2023-12-31T23:59:59Z\",\n    \"priority\": \"HIGH\",\n    \"status\": \"TODO\",\n    \"assignedAt\": \"2023-10-27T10:00:00Z\",\n    \"assigners\": [\"Khoa CNTT\"],\n    \"taskAssignees\": [\n        {\n            \"name\": \"Nguyễn Văn A\"\n        }\n    ]\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "{{base_url}}/taskModule/tasks",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "taskModule",
+                        "tasks"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "2. Get List Tasks",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{base_url}}/taskModule/tasks",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "taskModule",
+                        "tasks"
+                    ],
+                    "query": [
+                        {
+                            "key": "page",
+                            "value": "1",
+                            "disabled": true
+                        },
+                        {
+                            "key": "limit",
+                            "value": "10",
+                            "disabled": true
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "3. Get Task Detail",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{base_url}}/taskModule/tasks/{{task_id}}",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "taskModule",
+                        "tasks",
+                        "{{task_id}}"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "4. Update Task",
+            "request": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"status\": \"IN_PROGRESS\",\n    \"priority\": \"URGENT\",\n       \"taskAssignees\": [\n        {\n            \"name\": \"Trần Thị B\"\n        }\n    ]\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "{{base_url}}/taskModule/tasks/{{task_id}}",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "taskModule",
+                        "tasks",
+                        "{{task_id}}"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "4.1 Update Task - Update Existing Assignee",
+            "request": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"taskAssignees\": [\n        {\n            \"id\": 1,\n            \"name\": \"Tên A Đã Sửa\",\n                   }\n    ]\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "{{base_url}}/taskModule/tasks/{{task_id}}",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "taskModule",
+                        "tasks",
+                        "{{task_id}}"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "4.3 Update Task - Link User (Assign User)",
+            "request": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"taskAssignees\": [\n        {\n            \"name\": \"Sếp Mới\",\n            \"assigneeId\": 1,\n            \"assignedAt\": \"2023-11-05T09:00:00Z\"\n        }\n    ]\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "{{base_url}}/taskModule/tasks/{{task_id}}",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "taskModule",
+                        "tasks",
+                        "{{task_id}}"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "5. Delete Task",
+            "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                    "raw": "{{base_url}}/taskModule/tasks/{{task_id}}",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "taskModule",
+                        "tasks",
+                        "{{task_id}}"
+                    ]
+                }
+            },
+            "response": []
+        }
+    ],
+    "auth": {
+        "type": "bearer",
+        "bearer": [
+            {
+                "key": "token",
+                "value": "{{access_token}}",
+                "type": "string"
+            }
+        ]
+    },
+    "event": [],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:3000",
+            "type": "string"
+        },
+        {
+            "key": "access_token",
+            "value": "PASTE_YOUR_TOKEN_HERE",
+            "type": "string"
+        },
+        {
+            "key": "task_id",
+            "value": "1",
+            "type": "string"
+        }
+    ]
+}

@@ -8,6 +8,7 @@ import { ResourceController } from '@shared/resource/controllers/resource.contro
 import { Task } from '@task/entities/task.entity';
 import { QueryDto } from '@task/dtos/tasks/query.dto';
 import { CreateDto } from '@task/dtos/tasks/create.dto';
+import { UpdateDto } from '@task/dtos/tasks/update.dto';
 import { TasksService } from '@task/services/tasks.service';
 
 @Auth(AuthType.Bearer)
@@ -19,7 +20,7 @@ export class TasksController extends ResourceController<Task> {
   }
 
   protected getDtoClasses() {
-    return { query: QueryDto, create: CreateDto };
+    return { query: QueryDto, create: CreateDto, update: UpdateDto };
   }
 
   @Post()

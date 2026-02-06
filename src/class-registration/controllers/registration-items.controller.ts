@@ -8,7 +8,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
-  Patch,
+  Put,
   Post,
 } from '@nestjs/common';
 import { RegistrationItemsService } from '@class-registration/services/registration-items.service';
@@ -45,10 +45,10 @@ export class RegistrationItemsController {
   }
 
   /**
-   * PATCH /registration-items/:id/process
-   * Xử lý một item (Approve/Reject)
+   * PUT /registration-items/:id/process
+   * Xử lý một item (Approve/Reject) - full update
    */
-  @Patch(':id/process')
+  @Put(':id/process')
   async processItem(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: ProcessItemDto

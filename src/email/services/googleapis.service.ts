@@ -39,4 +39,52 @@ export class GoogleapisService implements OnModuleInit {
     oauthClient.setCredentials({ refresh_token: account.refreshToken });
     return google.gmail({ version: 'v1', auth: oauthClient });
   }
+
+  /**
+   * Send an email reply via Gmail API
+   * @param to Recipient email address
+   * @param subject Email subject
+   * @param body Email body (plain text)
+   * @param inReplyTo Original Message-ID header for threading
+   */
+  async sendReply(
+    to: string,
+    subject: string,
+    body: string,
+    inReplyTo?: string
+  ): Promise<void> {
+    const gmail = await this.getGmailClient();
+    const account = await this.settingService.get<SuperEmailSetting>(
+      SettingKey.EmailSuperEmail
+    );
+
+    // Build email with proper headers for threading
+    const headers = [
+      `To: ${to}`,
+      `From: ${account!.email}`,
+      `Subject: ${subject.startsWith('Re:') ? subject : `Re: ${subject}`}`,
+      'Content-Type: text/plain; charset=utf-8',
+    ];
+
+    if (inReplyTo) {
+      headers.push(`In-Reply-To: ${inReplyTo}`);
+      headers.push(`References: ${inReplyTo}`);
+    }
+
+    const email = [...headers, '', body].join('\r\n');
+
+    // Encode to base64url
+    const encodedEmail = Buffer.from(email)
+      .toString('base64')
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, '');
+
+    await gmail.users.messages.send({
+      userId: 'me',
+      requestBody: {
+        raw: encodedEmail,
+      },
+    });
+  }
 }

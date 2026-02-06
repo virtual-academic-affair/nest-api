@@ -4,9 +4,7 @@ import { RegistrationItemDetail } from './registration-item-detail.entity';
 
 @Entity('class_registrations')
 export class ClassRegistration extends BelongsToMessage {
-  @Index('idx_class_registrations_email_id')
-  @Column()
-  emailId: string; // Liên kết với Message-ID của Email
+  // messageId inherits from BelongsToMessage - links to Message.id
 
   @Index('idx_class_registrations_student_code')
   @Column()

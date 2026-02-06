@@ -38,6 +38,6 @@ import googleConfig from '@shared/config/google.config';
     MessageLabelsService,
     EmailSyncScheduler,
   ],
-  exports: [MessagesService],
+  exports: [MessagesService, GoogleapisService],
 })
 export class EmailModule {}

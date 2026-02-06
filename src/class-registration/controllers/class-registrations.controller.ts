@@ -2,21 +2,18 @@ import { Auth } from '@authentication/decorators/auth.decorator';
 import { Roles } from '@authentication/decorators/roles.decorator';
 import { Role } from '@authentication/enums/role.enum';
 import { AuthType } from '@authentication/enums/auth-type.enum';
-import { Controller, Get, Post, Body, Param, ParseIntPipe, Query } from '@nestjs/common';
-import { RestrictMethods } from '@shared/resource/decorators/restrict-methods.decorator';
+import { Controller, Get, Post, Body, Param, ParseIntPipe } from '@nestjs/common';
+import { GrpcMethod } from '@nestjs/microservices';
 import { ResourceController } from '@shared/resource/controllers/resource.controller';
-import { ResourceAction } from '@shared/resource/enums/resource-action.enum';
 import { ClassRegistration } from '@class-registration/entities/class-registration.entity';
 import { ClassRegistrationsService } from '@class-registration/services/class-registrations.service';
-import { RegistrationQueryDto } from '@class-registration/dtos/registrations/query.dto';
+import { QueryDto } from '@class-registration/dtos/class-registrations/query.dto';
+import { ReplyDto, ReplyPreviewResponse } from '@class-registration/dtos/class-registrations/reply.dto';
 import { CreateClassRegistrationDto } from '@class-registration/dtos/registrations/create.dto';
 
 @Auth(AuthType.Bearer)
 @Roles(Role.Admin)
 @Controller('class-registrations')
-@RestrictMethods({
-  only: [ResourceAction.FindAll, ResourceAction.FindOne],
-})
 export class ClassRegistrationsController extends ResourceController<ClassRegistration> {
   constructor(
     private readonly classRegistrationsService: ClassRegistrationsService
@@ -25,58 +22,58 @@ export class ClassRegistrationsController extends ResourceController<ClassRegist
   }
 
   protected getDtoClasses() {
-    return { query: RegistrationQueryDto };
+    return {
+      query: QueryDto,
+      create: CreateClassRegistrationDto,
+    };
+  }
+
+  /**
+   * GET /class-registrations/stats/:type?
+   * Thống kê (type: 'overview' | 'register' | 'cancel' | 'request-open')
+   * Mặc định: overview
+   */
+  @Get('stats/:type?')
+  async getStats(
+    @Param('type') type?: 'overview' | 'register' | 'cancel' | 'request-open'
+  ) {
+    return await this.classRegistrationsService.getStats(type);
+  }
+
+  /**
+   * GET /class-registrations/:id/reply/preview
+   * Xem trước nội dung email reply (cho chế độ manual)
+   * Trả về: to, subject, greeting, summary, fullBody
+   */
+  @Get(':id/reply/preview')
+  async previewReply(
+    @Param('id', ParseIntPipe) id: number
+  ): Promise<ReplyPreviewResponse> {
+    return await this.classRegistrationsService.previewReply(id);
+  }
+
+  /**
+   * POST /class-registrations/:id/reply
+   * Gửi email phản hồi cho sinh viên
+   * - Auto mode: gửi greeting, hệ thống tự tạo nội dung
+   * - Manual mode: gửi fullBody đã được user chỉnh sửa
+   */
+  @Post(':id/reply')
+  async reply(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: ReplyDto
+  ) {
+    return await this.classRegistrationsService.sendReply(id, dto);
   }
 
   /**
    * POST /class-registrations
-   * Tạo mới class registration
+   * HTTP: Admin tạo tay với full data
+   * gRPC: ClassRegistrationService.Create - tạo từ messageId (TODO: parse email)
    */
-  @Post()
-  async create(@Body() dto: CreateClassRegistrationDto) {
-    return await this.classRegistrationsService.createRegistration(dto);
-  }
-
-  /**
-   * GET /class-registrations/priority
-   * Lấy danh sách registrations sắp xếp theo thứ tự ưu tiên
-   */
-  @Get('priority')
-  async findAllWithPriority(@Query() queryDto: RegistrationQueryDto) {
-    return await this.classRegistrationsService.findAllWithPriority(queryDto);
-  }
-
-  /**
-   * GET /class-registrations/stats/overview
-   * Thống kê tổng quan
-   */
-  @Get('stats/overview')
-  async getOverviewStats() {
-    return await this.classRegistrationsService.getOverviewStats();
-  }
-
-  /**
-   * GET /class-registrations/stats/open-requests
-   * Thống kê số lượng môn muốn mở
-   */
-  @Get('stats/open-requests')
-  async getOpenRequestStats() {
-    return await this.classRegistrationsService.getOpenRequestStats();
-  }
-
-  /**
-   * GET /class-registrations/:id/details
-   * Lấy chi tiết registration với tất cả items
-   */
-  @Get(':id/details')
-  async findOneWithItems(@Param('id', ParseIntPipe) id: number) {
-    return await this.classRegistrationsService.findOneWithItems(id);
-  }
-
-
   @Post()
   @GrpcMethod('ClassRegistrationService', 'Create')
-  async create(@Body() dto: unknown) {
-    return super.create(dto);
+  async create(@Body() dto: CreateClassRegistrationDto) {
+    return await this.classRegistrationsService.createRegistration(dto);
   }
 }

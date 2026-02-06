@@ -39,9 +39,10 @@ export class CreateRegistrationItemDto {
 }
 
 export class CreateClassRegistrationDto {
-  @IsDefined()
-  @IsString()
-  emailId!: string; // Liên kết với Message-ID của Email
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  messageId?: number; // Liên kết với Message.id
 
   @IsDefined()
   @IsString()

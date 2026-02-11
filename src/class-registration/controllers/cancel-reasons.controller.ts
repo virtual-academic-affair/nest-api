@@ -12,7 +12,7 @@ import { UpdateDto } from '@class-registration/dtos/cancel-reasons/update.dto';
 
 @Auth(AuthType.Bearer)
 @Roles(Role.Admin)
-@Controller('classRegistrationModule/cancelReasons')
+@Controller('classReg/cancelReasons')
 export class CancelReasonsController extends ResourceController<CancelReason> {
   constructor(protected readonly service: CancelReasonsService) {
     super(service);

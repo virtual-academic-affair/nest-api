@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseFilters } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 import { Auth } from '@authentication/decorators/auth.decorator';
 import { Roles } from '@authentication/decorators/roles.decorator';

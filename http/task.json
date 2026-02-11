@@ -13,7 +13,7 @@
                 "header": [],
                 "body": {
                     "mode": "raw",
-                    "raw": "{\n    \"name\": \"Dự án Website mới\",\n    \"description\": \"Thiết kế và lập trình frontend cho website\",\n    \"deadline\": \"2023-12-31T23:59:59Z\",\n    \"priority\": \"HIGH\",\n    \"status\": \"TODO\",\n    \"assignedAt\": \"2023-10-27T10:00:00Z\",\n    \"assigners\": [\"Khoa CNTT\"],\n    \"taskAssignees\": [\n        {\n            \"name\": \"Nguyễn Văn A\"\n        }\n    ]\n}",
+                    "raw": "{\n    \"name\": \"Dự án Website mới\",\n    \"description\": \"Thiết kế và lập trình frontend cho website\",\n    \"deadline\": \"2023-12-31T23:59:59Z\",\n    \"priority\": \"HIGH\",\n    \"status\": \"TODO\",\n        \"assigners\": [\"Khoa CNTT\"],\n    \"taskAssignees\": [\n        {\n            \"name\": \"Nguyễn Văn A\"\n        }\n    ]\n}",
                     "options": {
                         "raw": {
                             "language": "json"
@@ -145,7 +145,7 @@
                 "header": [],
                 "body": {
                     "mode": "raw",
-                    "raw": "{\n    \"taskAssignees\": [\n        {\n            \"name\": \"Sếp Mới\",\n            \"assigneeId\": 1,\n            \"assignedAt\": \"2023-11-05T09:00:00Z\"\n        }\n    ]\n}",
+                    "raw": "{\n    \"taskAssignees\": [\n        {\n            \"name\": \"Sếp Mới\",\n            \"assigneeId\": 1,\n                 }\n    ]\n}",
                     "options": {
                         "raw": {
                             "language": "json"

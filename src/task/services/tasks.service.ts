@@ -1,12 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { In, Repository, SelectQueryBuilder } from 'typeorm';
 import { ResourceService } from '@shared/resource/services/resource.service';
 import { Task } from '@task/entities/task.entity';
-import { CreateDto } from '@task/dtos/tasks/create.dto';
 import { TaskAssignee } from '@task/entities/task-assignee.entity';
+import { CreateDto } from '@task/dtos/tasks/create.dto';
 import { User } from '@authentication/entities/user.entity';
-import { In } from 'typeorm';
 
 @Injectable()
 export class TasksService extends ResourceService<Task> {
@@ -17,88 +16,72 @@ export class TasksService extends ResourceService<Task> {
     @InjectRepository(TaskAssignee)
     private readonly assigneeRepo: Repository<TaskAssignee>,
     @InjectRepository(User)
-    private readonly userRepo: Repository<User>,
+    private readonly userRepo: Repository<User>
   ) {
     super(repository);
   }
+
   async create(dto: CreateDto) {
-    console.log('TasksService.create dto:', JSON.stringify(dto, null, 2));
-    if (dto.taskAssignees) {
-      const assigneeIds = dto.taskAssignees
-        .map((a: any) => a.assigneeId)
-        .filter((id) => id);
-
-      let users: User[] = [];
-      if (assigneeIds.length > 0) {
-        users = await this.userRepo.find({ where: { id: In(assigneeIds) } });
-      }
-
-      dto.taskAssignees.forEach((assignee) => {
-        if (dto.assignedAt && !assignee.assignedAt) {
-          assignee.assignedAt = dto.assignedAt;
-        }
-
-        if (assignee.assigneeId) {
-          const user = users.find((u) => u.id === assignee.assigneeId);
-          if (user) {
-            assignee.name = user.name;
-          }
-        }
-      });
-    }
+    await this.enrichAssignees(dto);
     return super.create(dto);
   }
 
-  async update(id: number, dto: any) {
+  async update(id: number, dto: CreateDto) {
+    await this.enrichAssignees(dto);
+
     if (dto.taskAssignees) {
       const currentTask = await this.findOne(id);
-      if (currentTask && currentTask.taskAssignees) {
-        const existingIds = currentTask.taskAssignees.map((a) => a.id);
-        const newIds = dto.taskAssignees
-          .map((a: any) => a.id)
-          .filter((id: any) => id); 
 
-        const idsToDelete = existingIds.filter((id) => !newIds.includes(id));
+      if (currentTask?.taskAssignees) {
+        const newIds = dto.taskAssignees
+          .map((a) => a.id)
+          .filter(Boolean) as number[];
+        const idsToDelete = currentTask.taskAssignees
+          .map((a) => a.id)
+          .filter((existingId) => !newIds.includes(existingId));
 
         if (idsToDelete.length > 0) {
           await this.assigneeRepo.delete(idsToDelete);
         }
       }
-    }
 
-    if (dto.taskAssignees) {
-      const assigneeIds = dto.taskAssignees
-        .map((a: any) => a.assigneeId)
-        .filter((id) => id);
-      
-      let users: User[] = [];
-      if (assigneeIds.length > 0) {
-        users = await this.userRepo.find({ where: { id: In(assigneeIds) } });
-      }
-
-      dto.taskAssignees.forEach((assignee: any) => {
-        if (dto.assignedAt && !assignee.assignedAt) {
-          assignee.assignedAt = dto.assignedAt;
-        }
-
-        if (assignee.assigneeId) {
-          const user = users.find((u) => u.id === assignee.assigneeId);
-          if (user) {
-            assignee.name = user.name;
-          }
-        }
-      });
+      dto.taskAssignees.forEach((a: any) => (a.taskId = id));
     }
 
     return super.update(id, dto);
   }
 
-  protected withAll(queryBuilder: SelectQueryBuilder<Task>): void {
-    queryBuilder.leftJoinAndSelect('Task.taskAssignees', 'taskAssignees');
+  private async enrichAssignees(dto: CreateDto) {
+    if (!dto.taskAssignees?.length) {
+      return;
+    }
 
+    const assigneeIds = dto.taskAssignees
+      .map((a) => a.assigneeId)
+      .filter(Boolean) as number[];
+
+    const users = assigneeIds.length
+      ? await this.userRepo.find({ where: { id: In(assigneeIds) } })
+      : [];
+
+    for (const assignee of dto.taskAssignees) {
+      if (!assignee.assignedAt) {
+        assignee.assignedAt = new Date();
+      }
+      const user = assignee.assigneeId
+        ? users.find((u) => u.id === assignee.assigneeId)
+        : undefined;
+      if (user) {
+        assignee.name = user.name;
+      }
+    }
   }
 
-  protected withOne(queryBuilder: SelectQueryBuilder<Task>): void {
-    this.withAll(queryBuilder);
+  protected withAll(qb: SelectQueryBuilder<Task>): void {
+    qb.leftJoinAndSelect('Task.taskAssignees', 'taskAssignees');
+  }
+
+  protected withOne(qb: SelectQueryBuilder<Task>): void {
+    this.withAll(qb);
   }
 }

@@ -21,8 +21,6 @@ export class Task extends BelongsToMessage {
   @Column({ type: 'timestamp', nullable: true })
   deadline: Date;
 
-
-
   @Column({ type: 'enum', enum: TaskPriority, nullable: true })
   priority: TaskPriority;
 
@@ -35,4 +33,3 @@ export class Task extends BelongsToMessage {
   })
   taskAssignees: TaskAssignee[];
 }
-

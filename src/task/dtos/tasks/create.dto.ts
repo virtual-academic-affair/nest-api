@@ -21,8 +21,7 @@ export class CreateDto extends PartialType(HasMessageIdDto) {
   assigners?: string[];
 
   @IsString()
-  @IsOptional()
-  name?: string;
+  name: string;
 
   @IsString()
   @IsOptional()
@@ -32,13 +31,6 @@ export class CreateDto extends PartialType(HasMessageIdDto) {
   @Type(() => Date)
   @IsOptional()
   deadline?: Date;
-
-  @IsDate()
-  @Type(() => Date)
-  @IsOptional()
-  assignedAt?: Date;
-
-
 
   @IsEnum(TaskPriority)
   @IsOptional()

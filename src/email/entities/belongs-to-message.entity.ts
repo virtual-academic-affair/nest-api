@@ -8,6 +8,6 @@ export abstract class BelongsToMessage extends BaseEntity {
   messageId: number | null = null;
 
   @ManyToOne(() => Message, { nullable: true, onDelete: 'SET NULL' })
-  @JoinColumn({ name: 'messageId' })
+  @JoinColumn()
   message?: Message | null;
 }

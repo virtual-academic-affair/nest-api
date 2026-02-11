@@ -11,17 +11,16 @@ export class UsersService extends ResourceService<User> {
   protected searchableColumns = ['email', 'name'];
 
   protected orderableColumns = ['id', 'email', 'name', 'role', 'isActive'];
-  
+
   constructor(@InjectRepository(User) repository: Repository<User>) {
     super(repository);
   }
 
   protected applyCustomFilters(
     queryBuilder: SelectQueryBuilder<User>,
-    queryDto: QueryDto
+    { role }: QueryDto
   ): void {
-    const { role } = queryDto;
-    role && queryBuilder.andWhere({ role: role });
+    role && queryBuilder.andWhere({ role });
   }
 
   async assignRole(dto: AssignRoleDto) {

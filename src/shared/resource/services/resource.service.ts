@@ -1,5 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { ObjectLiteral, Repository, SelectQueryBuilder } from 'typeorm';
+import {
+  Brackets,
+  ILike,
+  ObjectLiteral,
+  Repository,
+  SelectQueryBuilder,
+} from 'typeorm';
 import { ResourceQueryDto } from '@shared/resource/dtos/resource-query.dto';
 
 export interface PaginatedResult<T> {
@@ -35,12 +41,11 @@ export abstract class ResourceService<T extends ObjectLiteral> {
     this.withAll(queryBuilder);
 
     if (keyword && this.searchableColumns.length > 0) {
-      const conditions = this.searchableColumns
-        .map((col) => `${this.entityName}.${col} LIKE :keyword`)
-        .join(' OR ');
-      queryBuilder.andWhere(`(${conditions})`, {
-        keyword: `%${keyword}%`,
-      });
+      new Brackets((qb) =>
+        this.searchableColumns.map((col) =>
+          qb.orWhere({ [col]: ILike(`%${keyword}%`) })
+        )
+      );
     }
 
     this.applyCustomFilters(queryBuilder, queryDto);

@@ -17,9 +17,8 @@ export class MessagesService extends ResourceService<Message> {
 
   protected applyCustomFilters(
     queryBuilder: SelectQueryBuilder<Message>,
-    queryDto: QueryDto
+    { systemLabels }: QueryDto
   ): void {
-    const { systemLabels } = queryDto;
     systemLabels && queryBuilder.andWhere({ systemLabels: In(systemLabels) });
   }
 }

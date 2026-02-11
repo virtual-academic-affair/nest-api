@@ -1,6 +1,11 @@
-import { IsString } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
-export class CreateCancelReasonDto {
+export class CreateDto {
   @IsString()
-  reasonText!: string;
+  @IsNotEmpty()
+  content: string;
+
+  @IsOptional()
+  @IsBoolean()
+  isActive?: boolean;
 }

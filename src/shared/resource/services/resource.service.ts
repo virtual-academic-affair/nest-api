@@ -43,7 +43,8 @@ export abstract class ResourceService<T extends ObjectLiteral> {
     const orderDirection = orderDir === 'DESC' ? 'DESC' : 'ASC';
 
     const [items, total] = await queryBuilder
-      .orderBy(`${this.entityName}.${orderColumn}`, orderDirection)
+      .orderBy('createdAt', 'DESC')
+      .addOrderBy(orderColumn, orderDirection)
       .skip(skip)
       .take(limit)
       .getManyAndCount();

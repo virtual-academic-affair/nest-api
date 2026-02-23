@@ -5,7 +5,7 @@ module.exports = {
     tsconfigRootDir: __dirname,
     sourceType: 'module',
   },
-  plugins: ['@typescript-eslint/eslint-plugin'],
+  plugins: ['@typescript-eslint/eslint-plugin', 'import'],
   extends: [
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
@@ -16,6 +16,11 @@ module.exports = {
     jest: true,
   },
   ignorePatterns: ['.eslintrc.js'],
+  settings: {
+    'import/resolver': {
+      typescript: { alwaysTryTypes: true, project: './tsconfig.json' },
+    },
+  },
   rules: {
     curly: ['error', 'all'],
     '@typescript-eslint/interface-name-prefix': 'off',
@@ -28,6 +33,20 @@ module.exports = {
       {
         argsIgnorePattern: '^_',
         varsIgnorePattern: '^_',
+      },
+    ],
+    'import/order': [
+      'error',
+      {
+        groups: [
+          'builtin',
+          'external',
+          'internal',
+          'parent',
+          'sibling',
+          'index',
+        ],
+        alphabetize: { order: 'asc', caseInsensitive: true },
       },
     ],
   },

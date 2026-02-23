@@ -11,9 +11,7 @@ export class ClassRegistrationItem extends BaseEntity {
   @Column()
   classRegistrationId: number;
 
-  @ManyToOne(() => ClassRegistration, (registration) => registration.items, {
-    onDelete: 'CASCADE',
-  })
+  @ManyToOne(() => ClassRegistration, (registration) => registration.items, { onDelete: 'CASCADE' })
   @JoinColumn()
   classRegistration: ClassRegistration;
 

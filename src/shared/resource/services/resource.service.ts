@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ObjectLiteral, Repository, SelectQueryBuilder } from 'typeorm';
+import { Brackets, ILike, ObjectLiteral, Repository, SelectQueryBuilder } from 'typeorm';
 import { ResourceQueryDto } from '@shared/resource/dtos/resource-query.dto';
 
 export interface PaginatedResult<T> {
@@ -15,7 +15,6 @@ export interface PaginatedResult<T> {
 @Injectable()
 export abstract class ResourceService<T extends ObjectLiteral> {
   protected readonly searchableColumns: string[] = [];
-
   protected readonly orderableColumns: string[] = ['createdAt', 'updatedAt'];
 
   protected constructor(protected readonly repository: Repository<T>) {}
@@ -35,19 +34,12 @@ export abstract class ResourceService<T extends ObjectLiteral> {
     this.withAll(queryBuilder);
 
     if (keyword && this.searchableColumns.length > 0) {
-      const conditions = this.searchableColumns
-        .map((col) => `${this.entityName}.${col} LIKE :keyword`)
-        .join(' OR ');
-      queryBuilder.andWhere(`(${conditions})`, {
-        keyword: `%${keyword}%`,
-      });
+      new Brackets((qb) => this.searchableColumns.map((col) => qb.orWhere({ [col]: ILike(`%${keyword}%`) })));
     }
 
     this.applyCustomFilters(queryBuilder, queryDto);
 
-    const orderColumn = this.orderableColumns.includes(orderCol)
-      ? orderCol
-      : 'id';
+    const orderColumn = this.orderableColumns.includes(orderCol) ? orderCol : 'id';
     const orderDirection = orderDir === 'DESC' ? 'DESC' : 'ASC';
 
     const [items, total] = await queryBuilder
@@ -71,9 +63,7 @@ export abstract class ResourceService<T extends ObjectLiteral> {
     const queryBuilder = this.repository.createQueryBuilder(this.entityName);
     this.withOne(queryBuilder);
 
-    return await queryBuilder
-      .where(`${this.entityName}.id = :id`, { id })
-      .getOneOrFail();
+    return await queryBuilder.where(`${this.entityName}.id = :id`, { id }).getOneOrFail();
   }
 
   async create(createDto: object): Promise<T> {
@@ -92,10 +82,7 @@ export abstract class ResourceService<T extends ObjectLiteral> {
     return (await this.repository.remove(entity)) as unknown as T;
   }
 
-  protected applyCustomFilters(
-    _queryBuilder: SelectQueryBuilder<T>,
-    _queryDto: ResourceQueryDto
-  ): void {}
+  protected applyCustomFilters(_queryBuilder: SelectQueryBuilder<T>, _queryDto: ResourceQueryDto): void {}
 
   protected withAll(_queryBuilder: SelectQueryBuilder<T>): void {}
 

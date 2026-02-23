@@ -1,91 +1,74 @@
 # Class Registration Module
 
-Module quản lý đăng ký môn học của sinh viên.
+## Introduction
+
+Module quản lý đăng ký môn học của sinh viên qua email. Sinh viên gửi email yêu cầu đăng ký/hủy môn học, hệ thống tự
+động parse và tạo đơn đăng ký.
 
 ## Entities
 
-| Entity | Mô tả |
-|--------|-------|
-| `ClassRegistration` | Đơn đăng ký (liên kết với Message) |
-| `RegistrationItemDetail` | Chi tiết từng môn trong đơn |
-| `CancelReasonMaster` | Danh sách lý do từ chối |
+| Entity                  | Mô tả                                            |
+|-------------------------|--------------------------------------------------|
+| `ClassRegistration`     | Đơn đăng ký (liên kết với Message qua messageId) |
+| `ClassRegistrationItem` | Chi tiết từng môn trong đơn (đăng ký/hủy)        |
+| `CancelReason`          | Danh sách lý do từ chối                          |
 
 ## API Endpoints
 
-### Class Registrations (`/class-registrations`)
+### Class Registrations
 
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| GET | `/` | Danh sách đơn đăng ký |
-| GET | `/:id` | Chi tiết một đơn |
-| POST | `/` | Tạo đơn mới |
-| GET | `/stats/:type?` | Thống kê (overview/register/cancel/request-open) |
-| GET | `/:id/reply/preview` | Xem trước email reply |
-| POST | `/:id/reply` | Gửi email reply |
+| Endpoint                                | Method | Role  | Chức năng                       |
+|-----------------------------------------|--------|-------|---------------------------------|
+| `/classRegistrations`                   | GET    | Admin | Danh sách đơn (phân trang, lọc) |
+| `/classRegistrations/:id`               | GET    | Admin | Chi tiết đơn                    |
+| `/classRegistrations`                   | POST   | Admin | Tạo đơn mới                     |
+| `/classRegistrations/stats/:type`       | GET    | Admin | Thống kê                        |
+| `/classRegistrations/:id/reply/preview` | GET    | Admin | Xem trước email                 |
+| `/classRegistrations/:id/reply`         | POST   | Admin | Gửi email reply                 |
 
-### Registration Items (`/registration-items`)
+### Registration Items
 
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| GET | `/:id` | Chi tiết một item |
-| GET | `/by-registration/:id` | Items theo đơn đăng ký |
-| PUT | `/:id/process` | Duyệt/từ chối item |
-| POST | `/process-bulk` | Duyệt/từ chối hàng loạt |
+| Endpoint                                        | Method | Role  | Chức năng       |
+|-------------------------------------------------|--------|-------|-----------------|
+| `/classRegistrations/:registrationId/items`     | GET    | Admin | Danh sách items |
+| `/classRegistrations/:registrationId/items/:id` | GET    | Admin | Chi tiết item   |
+| `/classRegistrations/:registrationId/items`     | POST   | Admin | Tạo item mới    |
+| `/classRegistrations/:registrationId/items/:id` | PUT    | Admin | Cập nhật item   |
+| `/classRegistrations/:registrationId/items/:id` | DELETE | Admin | Xóa item        |
 
-### Cancel Reasons (`/cancel-reasons`)
+### Cancel Reasons
 
-CRUD chuẩn cho danh sách lý do từ chối.
+| Endpoint                                | Method | Role  | Chức năng       |
+|-----------------------------------------|--------|-------|-----------------|
+| `/classRegistrations/cancelReasons`     | GET    | Admin | Danh sách lý do |
+| `/classRegistrations/cancelReasons/:id` | GET    | Admin | Chi tiết lý do  |
+| `/classRegistrations/cancelReasons`     | POST   | Admin | Tạo lý do mới   |
+| `/classRegistrations/cancelReasons/:id` | PUT    | Admin | Cập nhật lý do  |
+| `/classRegistrations/cancelReasons/:id` | DELETE | Admin | Xóa lý do       |
 
-## Query Filters
+## Services
 
-```
-GET /class-registrations?page=1&limit=10&keyword=B21&studentCode=xxx&academicYear=2021&status=PENDING&action=REGISTER&orderBy=priority
-```
+| Service                         | Chức năng                           |
+|---------------------------------|-------------------------------------|
+| `ClassRegistrationsService`     | CRUD đơn, gửi email reply, thống kê |
+| `ClassRegistrationItemsService` | CRUD items                          |
+| `CancelReasonsService`          | CRUD lý do                          |
 
-| Param | Mô tả |
-|-------|-------|
+## Query Parameters
+
+| Param     | Mô tả                             |
+|-----------|-----------------------------------|
+| `page`    | Số trang                          |
+| `limit`   | Số item/trang                     |
 | `keyword` | Tìm theo studentCode, studentName |
-| `studentCode` | Lọc theo MSSV |
-| `academicYear` | Lọc theo khóa học |
-| `status` | PENDING / APPROVED / REJECTED |
-| `action` | REGISTER / CANCEL / REQUEST_OPEN |
-| `orderBy` | `priority` - sắp xếp theo độ ưu tiên |
+| `status`  | PENDING, APPROVED, REJECTED       |
+| `action`  | REGISTER, CANCEL, REQUEST_OPEN    |
+| `orderBy` | Sắp xếp (vd: `priority`)          |
 
 ## Priority Ordering
 
 Khi `orderBy=priority`:
-1. **academicYear ASC** - SV năm cuối/khóa cũ trước
-2. **isInCurriculum DESC** - Môn trong CTDT trước
-3. **message.sentAt ASC** - Email gửi trước
 
-## Reply Modes
-
-### Auto Mode
-```json
-POST /class-registrations/:id/reply
-{ "greeting": "Chào bạn,..." }
-```
-Hệ thống tự tạo nội dung email từ greeting + summary.
-
-### Manual Mode
-```json
-GET /class-registrations/:id/reply/preview  // Lấy nội dung mẫu
-POST /class-registrations/:id/reply
-{ "fullBody": "Nội dung đã chỉnh sửa..." }
-```
-User xem preview, chỉnh sửa, rồi gửi.
-
-## Class Transfer Detection
-
-Tự động nhận diện chuyển lớp khi:
-- Cùng `subjectName`
-- Khác `className`
-- Có cả CANCEL và REGISTER
-
-Email reply sẽ hiển thị: `🔀 Toán cao cấp: E11 → E12`
-
-## Auth
-
-Tất cả endpoints yêu cầu:
-- `@Auth(AuthType.Bearer)` - JWT token
-- `@Roles(Role.Admin)` - Chỉ Admin
+1. academicYear ASC - SV năm cuối trước
+2. isInCurriculum DESC - Môn trong CTDT trước
+3. message.sentAt ASC - Email gửi trước

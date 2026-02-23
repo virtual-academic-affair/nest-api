@@ -7,5 +7,5 @@ export class CreateDto {
 
   @IsOptional()
   @IsBoolean()
-  isActive?: boolean;
+  isActive: boolean;
 }

@@ -1,25 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
-import { User } from '../entities/user.entity';
 import { AssignRoleDto } from '@authentication/dtos/auth/assign-role.dto';
-import { ResourceService } from '@shared/resource/services/resource.service';
 import { QueryDto } from '@authentication/dtos/users/query.dto';
+import { User } from '@authentication/entities/user.entity';
+import { ResourceService } from '@shared/resource/services/resource.service';
 
 @Injectable()
 export class UsersService extends ResourceService<User> {
   protected searchableColumns = ['email', 'name'];
-
   protected orderableColumns = ['id', 'email', 'name', 'role', 'isActive'];
 
   constructor(@InjectRepository(User) repository: Repository<User>) {
     super(repository);
   }
 
-  protected applyCustomFilters(
-    queryBuilder: SelectQueryBuilder<User>,
-    { role }: QueryDto
-  ): void {
+  protected applyCustomFilters(queryBuilder: SelectQueryBuilder<User>, { role }: QueryDto): void {
     role && queryBuilder.andWhere({ role });
   }
 

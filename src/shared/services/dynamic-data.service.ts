@@ -1,5 +1,5 @@
-import { Role } from '@authentication/enums/role.enum';
 import { Injectable } from '@nestjs/common';
+import { Role } from '@authentication/enums/role.enum';
 import { SystemLabel, SystemLabelLang } from '@shared/enums/system-label.enum';
 import { SettingService } from '@shared/setting/services/setting.service';
 
@@ -17,10 +17,7 @@ export class DynamicDataService {
   constructor(private readonly settingService: SettingService) {}
 
   async getSettings(keys: string[]): Promise<Record<string, any>> {
-    const settings = await Promise.all(
-      keys.map(async (key) => [key, await this.settingService.get(key)])
-    );
-
+    const settings = await Promise.all(keys.map(async (key) => [key, await this.settingService.get(key)]));
     return Object.fromEntries(settings);
   }
 

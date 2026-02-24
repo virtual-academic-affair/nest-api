@@ -6,6 +6,7 @@ import { gmail_v1 } from 'googleapis';
 import { htmlToText } from 'html-to-text';
 import { Repository } from 'typeorm';
 import { Message } from '@email/entities/message.entity';
+import { SuperEmailSetting } from '@email/interfaces/super-email-setting.type';
 import { GoogleapisService } from '@email/services/googleapis.service';
 import { RABBIT_SERVICE } from '@shared/config/constants';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
@@ -25,10 +26,11 @@ export class EmailSyncService {
   ) {}
 
   async run(): Promise<void> {
-    const [lastPullTimestamp, allowedDomains, gmail] = await Promise.all([
+    const [lastPullTimestamp, allowedDomains, gmail, superEmail] = await Promise.all([
       this.getLastPullTimestamp(),
       this.settingService.get<string[]>(SettingKey.EmailAllowedDomains),
       this.googleapisService.getGmailClient(),
+      this.settingService.get<SuperEmailSetting>(SettingKey.EmailSuperEmail),
     ]);
 
     const messageIds = await this.fetchMessageIdsSince(gmail, lastPullTimestamp, allowedDomains);
@@ -36,7 +38,7 @@ export class EmailSyncService {
     for (const messageId of messageIds) {
       try {
         this.logger.log(`Processing message ${messageId}`);
-        await this.processAndPublishMessage(gmail, messageId);
+        await this.processAndPublishMessage(gmail, messageId, superEmail.email);
       } catch (error) {
         this.logger.warn(`Skip message ${messageId}`, error);
       }
@@ -66,7 +68,11 @@ export class EmailSyncService {
     return messageIds;
   }
 
-  private async processAndPublishMessage(gmail: gmail_v1.Gmail, gmailMessageId: string): Promise<void> {
+  private async processAndPublishMessage(
+    gmail: gmail_v1.Gmail,
+    gmailMessageId: string,
+    superEmail: string,
+  ): Promise<void> {
     const exists = await this.messageRepository.findOne({
       where: { gmailMessageId },
     });
@@ -92,6 +98,7 @@ export class EmailSyncService {
       sentAt: parsedMessage.headers.date ? new Date(parsedMessage.headers.date) : undefined,
       senderEmail,
       senderName: parsedMessage.headers.from,
+      superEmail,
     });
 
     const textContent = parsedMessage.textHtml ?? parsedMessage.textPlain ?? '';

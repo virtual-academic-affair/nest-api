@@ -15,10 +15,7 @@ export class EmailSyncScheduler {
     try {
       await this.emailSyncService.run();
     } catch (error) {
-      this.logger.error(
-        'Email sync job failed',
-        error instanceof Error ? error.stack : String(error)
-      );
+      this.logger.error('Email sync job failed', error instanceof Error ? error.stack : String(error));
     } finally {
       this.logger.log('Email sync job finished');
     }

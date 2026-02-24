@@ -8,6 +8,7 @@ import { ClassRegistrationItem } from '@class-registration/entities/class-regist
 import { ClassRegistration } from '@class-registration/entities/class-registration.entity';
 import { RegistrationStatus } from '@class-registration/enums/registration-status.enum';
 import { ClassRegistrationTemplate } from '@class-registration/templates/class-registration.template';
+import { EmailReplyService } from '@email/services/email-reply.service';
 import { ResourceService } from '@shared/resource/services/resource.service';
 
 @Injectable()
@@ -19,6 +20,7 @@ export class ClassRegistrationsService extends ResourceService<ClassRegistration
     @InjectRepository(ClassRegistration) repository: Repository<ClassRegistration>,
     @InjectRepository(ClassRegistrationItem) private readonly itemRepository: Repository<ClassRegistrationItem>,
     private readonly configService: ConfigService,
+    private readonly emailReplyService: EmailReplyService,
   ) {
     super(repository);
   }
@@ -28,7 +30,7 @@ export class ClassRegistrationsService extends ResourceService<ClassRegistration
   }
 
   protected withOne(queryBuilder: SelectQueryBuilder<ClassRegistration>): void {
-    queryBuilder.leftJoinAndSelect(this.p('items'), 'items');
+    queryBuilder.leftJoinAndSelect(this.p('items'), 'items').leftJoinAndSelect(this.p('message'), 'message');
   }
 
   protected applyCustomFilters(
@@ -94,6 +96,6 @@ export class ClassRegistrationsService extends ResourceService<ClassRegistration
     throwUnless(message, new ConflictException('Registration has no message'));
 
     content ??= await this.previewReply(id).then((res) => res.content);
-    return await message.reply(content);
+    return await this.emailReplyService.reply(message, content);
   }
 }

@@ -1,43 +1,25 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{TITLE}}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Momo+Signature&family=Momo+Trust+Sans:wght@200..800&display=swap"
-          rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<body style="background-color: #ffffff; padding: 24px; margin: 0; -webkit-font-smoothing: antialiased; font-family: 'system-ui', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
 
-    <style type="text/tailwindcss">
-        @layer base {
-            body {
-                font-family: 'Momo Trust Sans', sans-serif;
-                -webkit-font-smoothing: antialiased;
-            }
-        }
-    </style>
-</head>
-<body class="bg-white p-6 sm:p-16">
-
-<div class="max-w-[750px] mx-auto">
-    <div class="mb-10">
-        <img src="{{EMAIL_LOGO_URL}}" alt="Logo" class="block h-10 w-auto"
-             style="display: block; max-height: 40px; width: auto;"
-        />
+<div style="max-width: 800px; margin: 0 auto;">
+    <div style="margin-bottom: 40px;">
+        <img src="{{EMAIL_LOGO_URL}}" alt="Logo" style="display: block; height: 40px; width: auto; border: 0;"/>
     </div>
-    <h1 class="text-2xl font-semibold text-gray-900 mb-6"> {{TITLE}} </h1>
-    <div class="text-[15px] leading-[1.8] text-gray-700 mb-10">{{CONTENT}}</div>
 
-    <footer class="text-[13px] text-gray-400 border-t border-gray-100 pt-6">
+    <h1 style="font-size: 32px; font-weight: 600; color: #111827; margin-bottom: 50px; letter-spacing: -0.02em;">
+        {{TITLE}}
+    </h1>
+
+    <div style="font-size: 14px; line-height: 1.8; color: #374151; margin-bottom: 40px;">
+        {{CONTENT}}
+    </div>
+
+    <footer style="font-size: 14px; color: #9ca3af; border-top: 1px solid #f3f4f6; padding-top: 24px;">
         Trân trọng, <br>
-        Đội ngũ <a href="{{APP_URL}}" class="not-italic font-bold text-gray-600 hover:text-blue-600">
-        {{APP_NAME}}
-    </a>
+        <span style="display: block; margin-top: 4px;">
+            <a href="{{APP_URL}}" style="font-weight: 700; color: #4b5563; text-decoration: none;">
+                {{APP_NAME}}
+            </a>
+        </span>
     </footer>
 </div>
-
 </body>
-</html>

@@ -13,15 +13,15 @@ export class ClassRegistrationTemplate extends EmailTemplate {
   }
 
   private readonly actionConfig: Record<string, { label: string; color: string }> = {
-    [RegistrationAction.Register]: { label: 'Đăng ký', color: 'blue' },
-    [RegistrationAction.Cancel]: { label: 'Hủy', color: 'red' },
-    [RegistrationAction.RequestOpen]: { label: 'YC mở lớp', color: 'amber' },
+    [RegistrationAction.Register]: { label: 'Đăng ký', color: '#2563EB' },
+    [RegistrationAction.Cancel]: { label: 'Hủy', color: '#DC2626' },
+    [RegistrationAction.RequestOpen]: { label: 'YC mở lớp', color: '#D97706' },
   };
 
-  private readonly statusConfig: Record<string, { icon: string; label: string; color: string }> = {
-    [RegistrationStatus.Pending]: { icon: 'hourglass_empty', label: 'Chờ', color: 'amber' },
-    [RegistrationStatus.Approved]: { icon: 'check_circle', label: 'Đã duyệt', color: 'emerald' },
-    [RegistrationStatus.Rejected]: { icon: 'cancel', label: 'Từ chối', color: 'red' },
+  private readonly statusConfig: Record<string, { label: string; color: string }> = {
+    [RegistrationStatus.Pending]: { label: 'Chờ', color: '#D97706' },
+    [RegistrationStatus.Approved]: { label: 'Đã duyệt', color: '#059669' },
+    [RegistrationStatus.Rejected]: { label: 'Từ chối', color: '#DC2626' },
   };
 
   protected getTitle(): string {
@@ -36,8 +36,9 @@ export class ClassRegistrationTemplate extends EmailTemplate {
 
         const detailsHtml =
           [
+            `<span>- Nguyện vọng: ${action.label}</span>`,
             item.slotInfo && `<span>- Lớp HP: ${item.slotInfo}</span>`,
-            item.isInCurriculum === false && `<span class="text-red-500">- Ngoài CTDT</span>`,
+            item.isInCurriculum === false && `<span style="color: #EF4444;">- Ngoài CTDT</span>`,
           ]
             .filter(Boolean)
             .join('<br/>') || '';
@@ -47,50 +48,48 @@ export class ClassRegistrationTemplate extends EmailTemplate {
           : '';
 
         return `
-          <tr class="border-b border-gray-100 text-black">
-            <td class="p-3 text-center text-gray-400 w-10">${index + 1}</td>
-            <td class="p-3 whitespace-nowrap w-24">${item.subjectCode || '-'}</td>
-            <td class="p-3 w-64"><strong>${item.subjectName}</strong></td>
-            <td class="p-3 w-20 text-center">${item.className || '-'}</td>
-            <td class="p-3 w-40">${detailsHtml}</td>
-            <td class="p-3 whitespace-nowrap w-28 text-center">
-              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[12px] font-medium 
-              bg-${action.color}-100 text-${action.color}-800"> ${action.label} </span>
+          <tr style="border-bottom: 1px solid #F3F4F6; color: #000000;">
+            <td style="padding: 12px; text-align: center; color: #9CA3AF; width: 40px;">${index + 1}</td>
+            <td style="padding: 12px;">
+              <div>${item.subjectCode}</div>
+              <div style="font-weight: bold; color: #000000;">${item.subjectName}</div>
             </td>
-            <td class="p-3 whitespace-nowrap w-28 text-center">
-              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[12px] font-medium bg-${
+            <td style="padding: 12px; width: 80px; text-align: center;">${item.className || '-'}</td>
+            <td style="padding: 12px; width: 200px;">
+                ${detailsHtml}
+              </span>
+            </td>
+            <td style="padding: 12px; white-space: nowrap; width: 112px; text-align: center;">
+              <span style="font-size: 11px; display: inline-block; padding: 2px 16px; border-radius: 9999px; font-weight: 500; background-color: ${
                 status.color
-              }-100 text-${status.color}-800">
-                <span class="mr-1">${this.getIcon(status.icon)}</span>
+              }1A; color: ${status.color};">
                 ${status.label}
               </span>
             </td>
-            <td class="p-3 w-64">${rejectReasonsHtml}</td>
+            <td style="padding: 12px; width: 200px;">${rejectReasonsHtml}</td>
           </tr>
         `;
       })
       .join('');
 
     return `
-      <div class="space-y-1 text-gray-700 mb-6">
-        <p><strong>MSSV:</strong> ${this.classRegistration.studentCode}</p>
-        <p><strong>Họ tên:</strong> ${this.classRegistration.studentName ?? '--'}</p>
-        <p><strong>Niên khóa:</strong> ${this.classRegistration.academicYear ?? '--'}</p>
+      <div style="color: #374151; margin-bottom: 24px;">
+        <p style="margin: 4px 0;"><strong>MSSV:</strong> ${this.classRegistration.studentCode}</p>
+        <p style="margin: 4px 0;"><strong>Họ tên:</strong> ${this.classRegistration.studentName ?? '--'}</p>
+        <p style="margin: 4px 0;"><strong>Niên khóa:</strong> ${this.classRegistration.academicYear ?? '--'}</p>
       </div>
 
-      <h3 class="text-gray-800 font-bold mb-4 tracking-wide">Danh sách lớp tín chỉ</h3>
-      <div class="overflow-x-auto">
-        <table class="w-full border-collapse table-fixed">
+      <h3 style="color: #1F2937; font-weight: bold; margin-bottom: 16px; letter-spacing: 0.025em; font-size: 21px">Danh sách đăng ký học phần</h3>
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
           <thead>
-            <tr class="border-b-2 border-black">
-              <th class="text-center w-10">#</th>
-              <th class="w-24">Mã MH</th>
-              <th class="w-32">Tên MH</th>
-              <th class="w-20">Lớp HP</th>
-              <th class="w-40">Thông tin lớp</th>
-              <th class="text-center w-28">Yêu cầu</th>
-              <th class="text-center w-28">Kết quả</th>
-              <th class="w-64">Ghi chú</th>
+            <tr style="border-bottom: 2px solid #000000;">
+              <th style="text-align: center; width: 40px;">#</th>
+              <th style="text-align: center; width: 128px;">Học phần</th>
+              <th style="text-align: center; width: 80px;">Lớp HP</th>
+              <th style="text-align: center; width: 200px;">Thông tin lớp</th>
+              <th style="text-align: center; width: 112px;">Kết quả</th>
+              <th style="text-align: center; width: 200px;">Ghi chú</th>
             </tr>
           </thead>
           <tbody>
@@ -99,11 +98,11 @@ export class ClassRegistrationTemplate extends EmailTemplate {
         </table>
       </div>
       
-      <div class="mt-4"> 
+      <div style="margin-top: 16px;"> 
         Sinh viên vui lòng truy cập portal để kiểm tra lại thông tin kết quả đăng ký học phần 
-        <a href="https://portal.ctdb.hcmus.edu.vn/sinh-vien/ket-qua-dkhp" class="not-italic font-bold text-gray-600 hover:text-blue-600"> 
+        <a href="https://portal.ctdb.hcmus.edu.vn/sinh-vien/ket-qua-dkhp" style="font-style: normal; font-weight: bold; color: #4B5563; text-decoration: none;"> 
           tại đây
-        </a>.
+        </a>
       </div>
     `;
   }

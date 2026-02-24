@@ -1,5 +1,4 @@
 import { Column, Entity, Index, Unique } from 'typeorm';
-import { EmailReplyService } from '@email/services/email-reply.service';
 import { SystemLabel } from '@shared/enums/system-label.enum';
 import { BaseEntity } from '@shared/resource/entities/base.entity';
 
@@ -39,14 +38,4 @@ export class Message extends BaseEntity {
   @Index()
   @Column('text', { array: true, nullable: true })
   systemLabels: SystemLabel[];
-
-  /**
-   * Reply to this message - uses singleton EmailReplyService instance
-   * @param content - The new content to send
-   * @param senderName - Optional custom sender name
-   * @returns The Gmail message ID of the sent reply
-   */
-  async reply(content: string, senderName?: string): Promise<string> {
-    return EmailReplyService.instance.reply(this, content, senderName);
-  }
 }

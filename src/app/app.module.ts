@@ -12,9 +12,7 @@ import { TaskModule } from '@task/task.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      load: [appConfig],
-    }),
+    ConfigModule.forRoot({ load: [appConfig] }),
     ScheduleModule.forRoot(),
     TypeOrmModule.forRoot({
       url: process.env.DB_URL,

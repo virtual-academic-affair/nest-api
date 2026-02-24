@@ -1,11 +1,5 @@
 import { status as GrpcStatus } from '@grpc/grpc-js';
-import {
-  ArgumentsHost,
-  Catch,
-  HttpException,
-  HttpStatus,
-  Logger,
-} from '@nestjs/common';
+import { ArgumentsHost, Catch, HttpException, HttpStatus, Logger } from '@nestjs/common';
 import { BaseRpcExceptionFilter, RpcException } from '@nestjs/microservices';
 import { Observable, throwError } from 'rxjs';
 
@@ -50,10 +44,7 @@ export class GrpcExceptionFilter extends BaseRpcExceptionFilter {
     if (exception instanceof RpcException) {
       const error = exception.getError();
       return typeof error === 'object'
-        ? {
-            code: (error as any).code ?? GrpcStatus.UNKNOWN,
-            message: (error as any).message ?? 'Unknown Rpc Error',
-          }
+        ? { code: (error as any).code ?? GrpcStatus.UNKNOWN, message: (error as any).message ?? 'Unknown Rpc Error' }
         : { code: GrpcStatus.UNKNOWN, message: String(error) };
     }
 
@@ -65,20 +56,13 @@ export class GrpcExceptionFilter extends BaseRpcExceptionFilter {
         ? response.message.join(', ')
         : response?.message || response?.error || exception.message;
 
-      return {
-        code: httpToGrpcStatus[httpStatus] ?? GrpcStatus.UNKNOWN,
-        message,
-      };
+      return { code: httpToGrpcStatus[httpStatus] ?? GrpcStatus.UNKNOWN, message };
     }
 
     if (exception?.constructor?.name === 'EntityNotFoundError') {
       return { code: GrpcStatus.NOT_FOUND, message: exception.message };
     }
 
-    return {
-      code: GrpcStatus.INTERNAL,
-      message:
-        exception instanceof Error ? exception.message : String(exception),
-    };
+    return { code: GrpcStatus.INTERNAL, message: exception instanceof Error ? exception.message : String(exception) };
   }
 }

@@ -13,7 +13,7 @@ async function bootstrap() {
 
     const { app: grpcApp, url: grpcUrl } = await setupGrpcApp(config);
 
-    await grpcApp.listen();
+    // await grpcApp.listen();
     await httpApp.listen(httpPort);
 
     logger.log(`HTTP server running on ${httpUrl}`);

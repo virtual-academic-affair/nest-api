@@ -2,11 +2,7 @@ import { INestApplication } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { HttpAppModule } from './http-app.module';
 
-export async function setupHttpApp(port?: number): Promise<{
-  app: INestApplication;
-  port: number;
-  url: string;
-}> {
+export async function setupHttpApp(port?: number): Promise<{ app: INestApplication; port: number; url: string }> {
   const app = await NestFactory.create(HttpAppModule);
   app.enableCors();
 

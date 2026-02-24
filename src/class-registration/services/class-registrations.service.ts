@@ -85,11 +85,15 @@ export class ClassRegistrationsService extends ResourceService<ClassRegistration
   async previewReply(id: number) {
     const classRegistration = await this.findOne(id);
     const template = new ClassRegistrationTemplate(this.configService, classRegistration);
-    return { html: template.generate() };
+    return { content: template.generate() };
   }
 
-  async sendReply(id: number, dto: { content?: string }) {
-    // TODO: Send email with dto.html
-    return { success: true };
+  async sendReply(id: number, content?: string) {
+    const registration = await this.findOne(id);
+    const message = registration.message;
+    throwUnless(message, new ConflictException('Registration has no message'));
+
+    content ??= await this.previewReply(id).then((res) => res.content);
+    return await message.reply(content);
   }
 }

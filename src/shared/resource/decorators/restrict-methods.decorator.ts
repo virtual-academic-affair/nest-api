@@ -8,5 +8,4 @@ export interface RestrictMethodsOptions {
   except?: ResourceAction[];
 }
 
-export const RestrictMethods = (options: RestrictMethodsOptions) =>
-  SetMetadata(RESTRICT_METHODS_KEY, options);
+export const RestrictMethods = (options: RestrictMethodsOptions) => SetMetadata(RESTRICT_METHODS_KEY, options);

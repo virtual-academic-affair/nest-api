@@ -14,7 +14,11 @@ export class User extends BaseEntity {
   @Column({ nullable: true })
   name: string;
 
-  @Column({ enum: Role, default: Role.Student })
+  @Column({
+    type: 'enum',
+    enum: Role,
+    default: Role.Student,
+  })
   role: Role;
 
   @Column({ nullable: true })

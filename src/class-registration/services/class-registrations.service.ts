@@ -7,7 +7,7 @@ import { QueryDto } from '@class-registration/dtos/class-registrations/query.dto
 import { ClassRegistrationItem } from '@class-registration/entities/class-registration-item.entity';
 import { ClassRegistration } from '@class-registration/entities/class-registration.entity';
 import { RegistrationStatus } from '@class-registration/enums/registration-status.enum';
-import { ClassRegistrationTemplate } from '@email/templates/class-registration.template';
+import { ClassRegistrationTemplate } from '@class-registration/templates/class-registration.template';
 import { ResourceService } from '@shared/resource/services/resource.service';
 
 @Injectable()

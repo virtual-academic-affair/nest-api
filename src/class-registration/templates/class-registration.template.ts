@@ -60,7 +60,7 @@ export class ClassRegistrationTemplate extends EmailTemplate {
               </span>
             </td>
             <td style="padding: 12px; white-space: nowrap; width: 112px; text-align: center;">
-              <span style="font-size: 11px; display: inline-block; padding: 2px 16px; border-radius: 9999px; font-weight: 500; background-color: ${
+              <span style="width: 80px; font-size: 11px; display: inline-block; padding: 2px; border-radius: 9999px; font-weight: 500; background-color: ${
                 status.color
               }1A; color: ${status.color};">
                 ${status.label}
@@ -83,13 +83,13 @@ export class ClassRegistrationTemplate extends EmailTemplate {
       <div style="overflow-x: auto;">
         <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
           <thead>
-            <tr style="border-bottom: 2px solid #000000;">
-              <th style="text-align: center; width: 40px;">#</th>
-              <th style="text-align: center; width: 128px;">Học phần</th>
-              <th style="text-align: center; width: 80px;">Lớp HP</th>
-              <th style="text-align: center; width: 200px;">Thông tin lớp</th>
-              <th style="text-align: center; width: 112px;">Kết quả</th>
-              <th style="text-align: center; width: 200px;">Ghi chú</th>
+            <tr style="border-bottom: 1px solid #000000;">
+              <th style="text-align: center; width: 40px; padding-bottom: 4px;">#</th>
+              <th style="text-align: center; width: 128px; padding-bottom: 4px;">Học phần</th>
+              <th style="text-align: center; width: 80px; padding-bottom: 4px;">Lớp HP</th>
+              <th style="text-align: center; width: 200px; padding-bottom: 4px;">Thông tin lớp</th>
+              <th style="text-align: center; width: 112px; padding-bottom: 4px;">Kết quả</th>
+              <th style="text-align: center; width: 200px; padding-bottom: 4px;">Ghi chú</th>
             </tr>
           </thead>
           <tbody>

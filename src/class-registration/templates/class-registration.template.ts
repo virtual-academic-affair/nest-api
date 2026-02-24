@@ -25,7 +25,7 @@ export class ClassRegistrationTemplate extends EmailTemplate {
   };
 
   protected getTitle(): string {
-    return 'Thông báo kết quả đăng ký lớp';
+    return 'Thông báo kết quả đăng ký học phần';
   }
 
   protected getContent(): string {

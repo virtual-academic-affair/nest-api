@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
-import { GoogleService } from '@authentication/services/google.service';
 import { CodeDto } from '@authentication/dtos/google/code.dto';
+import { GoogleService } from '@authentication/services/google.service';
 
 @Controller('authentication/google')
 export class GoogleController {

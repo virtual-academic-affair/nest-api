@@ -19,15 +19,14 @@ export class UsersService extends ResourceService<User> {
     role && queryBuilder.andWhere({ role });
   }
 
-  async assignRole(dto: AssignRoleDto) {
-    const { email, role } = dto;
+  async assignRole({ email, role }: AssignRoleDto) {
     let user = await this.repository.findOneBy({ email });
     if (user) {
       user.role = role;
       return await this.repository.save(user);
     }
 
-    user = this.repository.create(dto);
+    user = this.repository.create({ email, role });
     return await this.repository.save(user);
   }
 }

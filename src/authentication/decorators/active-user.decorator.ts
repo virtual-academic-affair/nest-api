@@ -2,21 +2,20 @@ import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { REQUEST_USER_KEY } from '@authentication/guards/access-token.guard';
 import { ActiveUserData } from '@authentication/interfaces/active-user-data.interface';
 
-export const ActiveUser = createParamDecorator(
-  (field: keyof ActiveUserData | undefined, ctx: ExecutionContext) =>
-    getActiveUser(field, ctx)
+export const ActiveUser = createParamDecorator((field: keyof ActiveUserData | undefined, ctx: ExecutionContext) =>
+  getActiveUser(field, ctx),
 );
 
 export function getActiveUser(
   field: keyof ActiveUserData | undefined,
-  ctx: ExecutionContext
+  ctx: ExecutionContext,
 ): number | string | ActiveUserData {
   let user: ActiveUserData | undefined;
 
   if (ctx.getType() === 'rpc') {
     const metadata = ctx.switchToRpc().getContext();
     user = {
-      sub: parseInt(metadata?.get?.('x-user-id')?.[0], 10),
+      sub: +metadata?.get?.('x-user-id')?.[0],
       email: metadata?.get?.('x-user-email')?.[0],
       role: metadata?.get?.('x-user-role')?.[0],
     } as ActiveUserData;

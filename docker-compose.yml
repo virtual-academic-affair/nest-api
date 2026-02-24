@@ -1,25 +1,15 @@
 version: '3'
+
 services:
-  db:
-    image: postgres
+  nest-api:
+    image: ghcr.io/virtual-academic-affair/nest-api:latest
+    container_name: nest-api-container
     restart: always
     ports:
-      - '5555:5432'
-    environment:
-      POSTGRES_PASSWORD: pass123
-      POSTGRES_USER: postgres
-      POSTGRES_DB: postgres
-  redis:
-    image: redis
-    ports:
-      - '6379:6379'
-    restart: always
-  rabbitmq:
-    image: rabbitmq:3-management
-    restart: always
-    ports:
-      - '5672:5672'
-      - '15672:15672'
-    environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
+      - "3000:3000"
+    env_file:
+      - .env.production
+
+networks:
+  nest-network:
+    driver: bridge

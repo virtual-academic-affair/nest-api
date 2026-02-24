@@ -33,7 +33,7 @@ export class ClassRegistrationItem extends BaseEntity {
   slotInfo?: string;
 
   @Index()
-  @Column({ type: 'boolean', default: false })
+  @Column({ type: 'boolean' })
   isInCurriculum: boolean;
 
   @Index()

@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { EmailModule } from '@email/email.module';
 import { CancelReasonsController } from './controllers/cancel-reasons.controller';
@@ -12,7 +13,11 @@ import { ClassRegistrationItemsService } from './services/class-registration-ite
 import { ClassRegistrationsService } from './services/class-registrations.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ClassRegistration, ClassRegistrationItem, CancelReason]), EmailModule],
+  imports: [
+    ConfigModule,
+    TypeOrmModule.forFeature([ClassRegistration, ClassRegistrationItem, CancelReason]),
+    EmailModule,
+  ],
   controllers: [ClassRegistrationsController, ClassRegistrationItemsController, CancelReasonsController],
   providers: [ClassRegistrationsService, ClassRegistrationItemsService, CancelReasonsService],
   exports: [ClassRegistrationsService],

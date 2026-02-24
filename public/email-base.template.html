@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Momo+Signature&family=Momo+Trust+Sans:wght@200..800&display=swap"
           rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
     <style type="text/tailwindcss">
         @layer base {
@@ -21,8 +22,12 @@
 </head>
 <body class="bg-white p-6 sm:p-16">
 
-<div class="max-w-[550px] mx-auto">
-    <div class="mb-10">{{EMAIL_LOGO_URL}}</div>
+<div class="max-w-[750px] mx-auto">
+    <div class="mb-10">
+        <img src="{{EMAIL_LOGO_URL}}" alt="Logo" class="block h-10 w-auto"
+             style="display: block; max-height: 40px; width: auto;"
+        />
+    </div>
     <h1 class="text-2xl font-semibold text-gray-900 mb-6"> {{TITLE}} </h1>
     <div class="text-[15px] leading-[1.8] text-gray-700 mb-10">{{CONTENT}}</div>
 

@@ -8,7 +8,7 @@ export class User extends BaseEntity {
   @Column({ unique: true, nullable: false })
   email: string;
 
-  @Column({ unique: true, nullable: true })
+  @Column({ nullable: true })
   googleId?: string;
 
   @Column({ nullable: true })

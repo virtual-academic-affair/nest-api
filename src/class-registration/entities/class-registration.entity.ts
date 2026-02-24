@@ -9,8 +9,8 @@ export class ClassRegistration extends BelongsToMessage {
   studentCode: string;
 
   @Index('idx_class_registrations_academic_year')
-  @Column({ type: 'smallint' })
-  academicYear: number;
+  @Column({ type: 'smallint', nullable: true })
+  academicYear?: number;
 
   @Column({ nullable: true })
   studentName?: string;

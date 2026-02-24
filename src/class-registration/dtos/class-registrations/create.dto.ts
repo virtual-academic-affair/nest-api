@@ -1,15 +1,17 @@
 import { PartialType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsArray, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsArray, IsDefined, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { CreateDto as CreateItemDto } from '@class-registration/dtos/class-registration-items/create.dto';
 import { HasMessageIdDto } from '@email/dtos/messages/has-message-id.dto';
 
 export class CreateDto extends PartialType(HasMessageIdDto) {
   @IsString()
+  @IsDefined()
   studentCode: string;
 
+  @IsOptional()
   @IsNumber()
-  academicYear: number;
+  academicYear?: number;
 
   @IsOptional()
   @IsString()

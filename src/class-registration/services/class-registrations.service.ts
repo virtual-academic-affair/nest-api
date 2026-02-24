@@ -1,4 +1,5 @@
 import { Body, ConflictException, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { CreateDto } from '@class-registration/dtos/class-registrations/create.dto';
@@ -6,7 +7,8 @@ import { QueryDto } from '@class-registration/dtos/class-registrations/query.dto
 import { ClassRegistrationItem } from '@class-registration/entities/class-registration-item.entity';
 import { ClassRegistration } from '@class-registration/entities/class-registration.entity';
 import { RegistrationStatus } from '@class-registration/enums/registration-status.enum';
-
+import { ClassRegistrationTemplate } from '@class-registration/templates/class-registration.template';
+import { EmailReplyService } from '@email/services/email-reply.service';
 import { ResourceService } from '@shared/resource/services/resource.service';
 
 @Injectable()
@@ -16,17 +18,19 @@ export class ClassRegistrationsService extends ResourceService<ClassRegistration
 
   constructor(
     @InjectRepository(ClassRegistration) repository: Repository<ClassRegistration>,
-    @InjectRepository(ClassRegistrationItem) private readonly itemDetailRepository: Repository<ClassRegistrationItem>,
+    @InjectRepository(ClassRegistrationItem) private readonly itemRepository: Repository<ClassRegistrationItem>,
+    private readonly configService: ConfigService,
+    private readonly emailReplyService: EmailReplyService,
   ) {
     super(repository);
   }
 
   protected withAll(queryBuilder: SelectQueryBuilder<ClassRegistration>): void {
-    queryBuilder.loadRelationCountAndMap('itemsCount', 'items');
+    queryBuilder.loadRelationCountAndMap(this.p('itemsCount'), this.p('items'));
   }
 
   protected withOne(queryBuilder: SelectQueryBuilder<ClassRegistration>): void {
-    queryBuilder.relation('items');
+    queryBuilder.leftJoinAndSelect(this.p('items'), 'items').leftJoinAndSelect(this.p('message'), 'message');
   }
 
   protected applyCustomFilters(
@@ -40,23 +44,23 @@ export class ClassRegistrationsService extends ResourceService<ClassRegistration
 
     if (smartOrder) {
       queryBuilder
-        .leftJoinAndSelect(`${this.entityName}.items`, 'items')
-        .leftJoinAndSelect(`${this.entityName}.message`, 'message')
-        .orderBy(`${this.entityName}.academicYear`, 'ASC')
+        .leftJoinAndSelect(this.p('items'), 'items')
+        .leftJoinAndSelect(this.p('message'), 'message')
+        .orderBy(this.p('academicYear'), 'ASC')
         .addOrderBy('items.isInCurriculum', 'DESC')
-        .addOrderBy(`COALESCE(message.sentAt, ${this.entityName}.createdAt)`, 'ASC');
+        .addOrderBy(`COALESCE(message.sentAt, ${this.p('createdAt')}`, 'ASC');
     }
   }
 
   async create(@Body() dto: CreateDto) {
-    const existing = await this.repository.findOneBy({ messageId: dto.messageId });
+    const existing = dto?.messageId && (await this.repository.findOneBy({ messageId: dto.messageId }));
     throwIf(existing, new ConflictException('Registration already exists'));
 
     return await super.create(dto);
   }
 
   async stats(startDate: Date, endDate: Date) {
-    const stats = await this.itemDetailRepository
+    const stats = await this.itemRepository
       .createQueryBuilder('item')
       .select([
         'DATE(item.createdAt) AS date',
@@ -71,18 +75,27 @@ export class ClassRegistrationsService extends ResourceService<ClassRegistration
       .getRawMany();
 
     return stats.reduce((acc, { date, action, ...counts }) => {
-      acc[date] = acc[date] || { total: 0 };
-      acc[date][action] = Object.fromEntries(Object.entries(counts).map(([k, v]) => [k, +v]));
+      date = new Date(date).toISOString();
+
+      acc[date] = acc[date] || { date, total: 0, detail: {} };
+      acc[date]['detail'][action] = Object.fromEntries(Object.entries(counts).map(([k, v]) => [k, +v]));
       acc[date].total += +counts.total;
       return acc;
     }, {});
   }
 
   async previewReply(id: number) {
-    return this.findOne(id);
+    const classRegistration = await this.findOne(id);
+    const template = new ClassRegistrationTemplate(this.configService, classRegistration);
+    return { content: template.generate() };
   }
 
-  async sendReply(id: number, _dto: any) {
-    return this.findOne(id);
+  async sendReply(id: number, content?: string) {
+    const registration = await this.findOne(id);
+    const message = registration.message;
+    throwUnless(message, new ConflictException('Registration has no message'));
+
+    content ??= await this.previewReply(id).then((res) => res.content);
+    return await this.emailReplyService.reply(message, content);
   }
 }

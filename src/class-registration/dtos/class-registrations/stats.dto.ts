@@ -13,6 +13,7 @@ export class StatsDto {
   @Transform(({ obj, value }) => {
     const diff = differenceInDays(new Date(value), new Date(obj.from));
     throwIf(diff < 1 || diff > 30, new BadRequestException('Date range must be 1-30 days'));
+    return value;
   })
   to: string;
 }

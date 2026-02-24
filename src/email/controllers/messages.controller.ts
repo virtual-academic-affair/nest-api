@@ -1,15 +1,15 @@
+import { Controller, Post } from '@nestjs/common';
 import { Auth } from '@authentication/decorators/auth.decorator';
 import { Roles } from '@authentication/decorators/roles.decorator';
-import { Role } from '@authentication/enums/role.enum';
 import { AuthType } from '@authentication/enums/auth-type.enum';
-import { Controller, Post } from '@nestjs/common';
-import { RestrictMethods } from '@shared/resource/decorators/restrict-methods.decorator';
-import { ResourceController } from '@shared/resource/controllers/resource.controller';
-import { ResourceAction } from '@shared/resource/enums/resource-action.enum';
-import { Message } from '@email/entities/message.entity';
-import { MessagesService } from '@email/services/messages.service';
+import { Role } from '@authentication/enums/role.enum';
 import { QueryDto } from '@email/dtos/messages/query.dto';
+import { Message } from '@email/entities/message.entity';
 import { EmailSyncService } from '@email/services/email-sync.service';
+import { MessagesService } from '@email/services/messages.service';
+import { ResourceController } from '@shared/resource/controllers/resource.controller';
+import { RestrictMethods } from '@shared/resource/decorators/restrict-methods.decorator';
+import { ResourceAction } from '@shared/resource/enums/resource-action.enum';
 
 @Auth(AuthType.Bearer)
 @Roles(Role.Admin)
@@ -18,10 +18,7 @@ import { EmailSyncService } from '@email/services/email-sync.service';
   only: [ResourceAction.FindAll, ResourceAction.FindOne],
 })
 export class MessagesController extends ResourceController<Message> {
-  constructor(
-    protected readonly service: MessagesService,
-    private readonly emailSyncService: EmailSyncService
-  ) {
+  constructor(protected readonly service: MessagesService, private readonly emailSyncService: EmailSyncService) {
     super(service);
   }
 

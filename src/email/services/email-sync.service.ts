@@ -1,15 +1,16 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { ClientProxy } from '@nestjs/microservices';
-import { SettingKey } from '@shared/setting/enums/setting-key.enum';
-import { SettingService } from '@shared/setting/services/setting.service';
-import { Repository } from 'typeorm';
-import { Message } from '@email/entities/message.entity';
-import { GoogleapisService } from '@email/services/googleapis.service';
+import { InjectRepository } from '@nestjs/typeorm';
 import * as parseMessage from 'gmail-api-parse-message';
 import { gmail_v1 } from 'googleapis';
 import { htmlToText } from 'html-to-text';
+import { Repository } from 'typeorm';
+import { Message } from '@email/entities/message.entity';
+import { SuperEmailSetting } from '@email/interfaces/super-email-setting.type';
+import { GoogleapisService } from '@email/services/googleapis.service';
 import { RABBIT_SERVICE } from '@shared/config/constants';
+import { SettingKey } from '@shared/setting/enums/setting-key.enum';
+import { SettingService } from '@shared/setting/services/setting.service';
 
 export const INGESTED = 'ingested';
 
@@ -21,27 +22,23 @@ export class EmailSyncService {
     @Inject(RABBIT_SERVICE) private readonly client: ClientProxy,
     private readonly googleapisService: GoogleapisService,
     private readonly settingService: SettingService,
-    @InjectRepository(Message)
-    private readonly messageRepository: Repository<Message>
+    @InjectRepository(Message) private readonly messageRepository: Repository<Message>,
   ) {}
 
   async run(): Promise<void> {
-    const [lastPullTimestamp, allowedDomains, gmail] = await Promise.all([
+    const [lastPullTimestamp, allowedDomains, gmail, superEmail] = await Promise.all([
       this.getLastPullTimestamp(),
       this.settingService.get<string[]>(SettingKey.EmailAllowedDomains),
       this.googleapisService.getGmailClient(),
+      this.settingService.get<SuperEmailSetting>(SettingKey.EmailSuperEmail),
     ]);
 
-    const messageIds = await this.fetchMessageIdsSince(
-      gmail,
-      lastPullTimestamp,
-      allowedDomains
-    );
+    const messageIds = await this.fetchMessageIdsSince(gmail, lastPullTimestamp, allowedDomains);
 
     for (const messageId of messageIds) {
       try {
         this.logger.log(`Processing message ${messageId}`);
-        await this.processAndPublishMessage(gmail, messageId);
+        await this.processAndPublishMessage(gmail, messageId, superEmail.email);
       } catch (error) {
         this.logger.warn(`Skip message ${messageId}`, error);
       }
@@ -50,11 +47,7 @@ export class EmailSyncService {
     await this.updateLastPullTimestamp();
   }
 
-  private async fetchMessageIdsSince(
-    gmail: gmail_v1.Gmail,
-    since: Date,
-    allowedDomains: string[]
-  ): Promise<string[]> {
+  private async fetchMessageIdsSince(gmail: gmail_v1.Gmail, since: Date, allowedDomains: string[]): Promise<string[]> {
     const afterTimestamp = Math.floor(since.getTime() / 1000);
     const messageIds: string[] = [];
     let pageToken: string | undefined = undefined;
@@ -62,28 +55,23 @@ export class EmailSyncService {
     do {
       const { data } = await gmail.users.messages.list({
         userId: 'me',
-        q: `after:${afterTimestamp} -from:me (${allowedDomains
-          ?.map((d) => `from:*@${d}`)
-          ?.join(' OR ')})`,
+        q: `after:${afterTimestamp} -from:me (${allowedDomains?.map((d) => `from:*@${d}`)?.join(' OR ')})`,
         includeSpamTrash: false,
         pageToken,
       });
 
-      messageIds.push(
-        ...(data.messages?.map((m) => m.id).filter(Boolean) ?? [])
-      );
+      messageIds.push(...(data.messages?.map((m) => m.id).filter(Boolean) ?? []));
       pageToken = data.nextPageToken ?? undefined;
     } while (pageToken);
 
-    this.logger.log(
-      `Fetched ${messageIds.length} message IDs since ${since.toISOString()}`
-    );
+    this.logger.log(`Fetched ${messageIds.length} message IDs since ${since.toISOString()}`);
     return messageIds;
   }
 
   private async processAndPublishMessage(
     gmail: gmail_v1.Gmail,
-    gmailMessageId: string
+    gmailMessageId: string,
+    superEmail: string,
   ): Promise<void> {
     const exists = await this.messageRepository.findOne({
       where: { gmailMessageId },
@@ -107,18 +95,17 @@ export class EmailSyncService {
       threadId: gmailMessage.threadId,
       subject: parsedMessage.headers.subject,
       labelIds: gmailMessage.labelIds ?? [],
-      sentAt: parsedMessage.headers.date
-        ? new Date(parsedMessage.headers.date)
-        : undefined,
+      sentAt: parsedMessage.headers.date ? new Date(parsedMessage.headers.date) : undefined,
       senderEmail,
       senderName: parsedMessage.headers.from,
+      superEmail,
     });
 
     const textContent = parsedMessage.textHtml ?? parsedMessage.textPlain ?? '';
     const plainTextContent = htmlToText(textContent, { wordwrap: false });
 
     this.client.emit(INGESTED, {
-      emailId: message.id,
+      messageId: message.id,
       subject: message.subject,
       senderEmail: message.senderEmail,
       senderName: message.senderName,
@@ -127,9 +114,7 @@ export class EmailSyncService {
   }
 
   private async getLastPullTimestamp(): Promise<Date> {
-    const lastPullIsoString = await this.settingService.get<string>(
-      SettingKey.EmailLastPullAt
-    );
+    const lastPullIsoString = await this.settingService.get<string>(SettingKey.EmailLastPullAt);
 
     if (lastPullIsoString) {
       return new Date(lastPullIsoString);
@@ -142,7 +127,7 @@ export class EmailSyncService {
   private async updateLastPullTimestamp(): Promise<void> {
     await this.settingService.set(
       SettingKey.EmailLastPullAt,
-      new Date(Date.now() - 30000).toISOString() // 30s ago
+      new Date(Date.now() - 30000).toISOString(), // 30s ago
     );
   }
 }

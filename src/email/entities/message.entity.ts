@@ -1,6 +1,6 @@
+import { Column, Entity, Index, Unique } from 'typeorm';
 import { SystemLabel } from '@shared/enums/system-label.enum';
 import { BaseEntity } from '@shared/resource/entities/base.entity';
-import { Column, Entity, Index, Unique } from 'typeorm';
 
 @Entity()
 @Unique(['gmailMessageId'])
@@ -24,6 +24,9 @@ export class Message extends BaseEntity {
   @Index()
   @Column({ nullable: true })
   senderEmail?: string;
+
+  @Column()
+  superEmail?: string;
 
   @Index()
   @Column({ type: 'timestamp', nullable: true })

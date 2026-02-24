@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Inquiry } from '@inquiry/entities/inquiry.entity';
-import { InquiriesController } from './controllers/inquiries.controller';
 import { InquiriesService } from '@inquiry/services/inquiries.service';
+import { InquiriesController } from './controllers/inquiries.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Inquiry])],

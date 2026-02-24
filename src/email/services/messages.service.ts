@@ -8,7 +8,6 @@ import { ResourceService } from '@shared/resource/services/resource.service';
 @Injectable()
 export class MessagesService extends ResourceService<Message> {
   protected searchableColumns = ['subject', 'senderEmail', 'senderName'];
-
   protected orderableColumns = ['id', 'sentAt'];
 
   constructor(@InjectRepository(Message) repository: Repository<Message>) {

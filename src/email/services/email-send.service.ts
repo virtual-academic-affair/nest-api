@@ -54,14 +54,10 @@ export class EmailSendService {
     // Send the email
     const { data } = await gmail.users.messages.send({
       userId: 'me',
-      requestBody: {
-        raw: encodedEmail,
-        threadId: threadId,
-      },
+      requestBody: { raw: encodedEmail, threadId: threadId },
     });
 
     this.logger.log(`Email sent to ${to} with message ID: ${data.id}`);
-
     return data.id;
   }
 }

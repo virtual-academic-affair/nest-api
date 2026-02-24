@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ResourceService } from '@shared/resource/services/resource.service';
 import { Inquiry } from '@inquiry/entities/inquiry.entity';
+import { ResourceService } from '@shared/resource/services/resource.service';
 
 @Injectable()
 export class InquiriesService extends ResourceService<Inquiry> {

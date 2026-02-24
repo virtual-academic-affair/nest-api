@@ -21,11 +21,7 @@ export class EmailReplyService {
 
     try {
       const gmail = await this.googleapisService.getGmailClient();
-      const { data } = await gmail.users.messages.get({
-        userId: 'me',
-        id: message.gmailMessageId,
-        format: 'full',
-      });
+      const { data } = await gmail.users.messages.get({ userId: 'me', id: message.gmailMessageId, format: 'full' });
       const parsedMessage = parseMessage(data);
       originalContent = parsedMessage.textHtml ?? parsedMessage.textPlain ?? '';
     } catch (error) {

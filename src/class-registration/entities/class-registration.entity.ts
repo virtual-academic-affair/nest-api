@@ -15,7 +15,7 @@ export class ClassRegistration extends BelongsToMessage {
   @Column({ nullable: true })
   studentName?: string;
 
-  @OneToMany(() => ClassRegistrationItem, (item) => item.classRegistration, { cascade: true, onDelete: 'CASCADE' })
+  @OneToMany(() => ClassRegistrationItem, (item) => item.parent, { cascade: true, onDelete: 'CASCADE' })
   items: ClassRegistrationItem[];
   itemsCount: number;
 }

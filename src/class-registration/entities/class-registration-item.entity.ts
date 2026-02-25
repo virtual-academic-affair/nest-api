@@ -9,11 +9,11 @@ import { ClassRegistration } from './class-registration.entity';
 export class ClassRegistrationItem extends BaseEntity {
   @Index()
   @Column()
-  classRegistrationId: number;
+  parentId: number;
 
   @ManyToOne(() => ClassRegistration, (registration) => registration.items, { onDelete: 'CASCADE' })
   @JoinColumn()
-  classRegistration: ClassRegistration;
+  parent: ClassRegistration;
 
   @Index()
   @Column({ type: 'enum', enum: RegistrationAction })

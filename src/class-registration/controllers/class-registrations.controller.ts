@@ -21,10 +21,7 @@ export class ClassRegistrationsController extends ResourceController<ClassRegist
   }
 
   protected getDtoClasses() {
-    return {
-      query: QueryDto,
-      create: CreateDto,
-    };
+    return { query: QueryDto, create: CreateDto };
   }
 
   @Get('stats')

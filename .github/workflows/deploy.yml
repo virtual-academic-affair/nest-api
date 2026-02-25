@@ -10,69 +10,26 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  #  build-and-push:
-  #    runs-on: ubuntu-latest
-  #    permissions:
-  #      contents: read
-  #      packages: write
-  #
-  #    steps:
-  #      - name: Checkout code
-  #        uses: actions/checkout@v4
-  #
-  #      - name: Log in to the Container registry
-  #        uses: docker/login-action@v3
-  #        with:
-  #          registry: ${{ env.REGISTRY }}
-  #          username: ${{ github.actor }}
-  #          password: ${{ secrets.GITHUB_TOKEN }}
-  #
-  #      - name: Build and push Docker image
-  #        uses: docker/build-push-action@v5
-  #        with:
-  #          context: .
-  #          push: true
-  #          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-
-  deploy:
+  build-and-push:
     runs-on: ubuntu-latest
-    #    needs: build-and-push
+    permissions:
+      contents: read
+      packages: write
     
     steps:
-      - name: Set up WARP
-        uses: fscarmen/warp-on-actions@v1.1
-        with:
-          stack: dual
-      
-      #      - name: SSHPass and Config SSH
-      #        run: |
-      #          sudo apt-get update && sudo apt-get install -y sshpass
-      #          mkdir -p ~/.ssh
-      #          echo "StrictHostKeyChecking no" >> ~/.ssh/config
-      
-      #      - name: Deploy via SSH
-      #        env:
-      #          SSHPASS: ${{ secrets.PASSWORD }}
-      #        run: |
-      #          sshpass -e ssh -o ConnectTimeout=30 -p ${{ secrets.PORT }} ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
-      #            cd /home/ubuntu/sourcecode/nest-api
-      #            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-      #            docker compose pull
-      #            docker compose up -d
-      #            docker image prune -f
-      #          EOF
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Deploy to Server
-        uses: appleboy/ssh-action@master
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
         with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.PRIVATE_KEY }}
-          port: ${{ secrets.PORT }}
-          protocol: tcp6
-          script: |
-            cd /home/ubuntu/sourcecode/nest-api
-            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            docker compose pull
-            docker compose up -d --wait # Docker sẽ đợi container "Healthy" mới xong lệnh
-            docker image prune -f
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest

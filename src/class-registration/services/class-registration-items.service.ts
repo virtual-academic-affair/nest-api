@@ -1,8 +1,7 @@
 import { Inject, Injectable, Scope } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository, SelectQueryBuilder } from 'typeorm';
-import { QueryDto } from '@class-registration/dtos/class-registration-items/query.dto';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { ClassRegistrationItem } from '@class-registration/entities/class-registration-item.entity';
 import { ResourceService } from '@shared/resource/services/resource.service';
 
@@ -23,15 +22,6 @@ export class ClassRegistrationItemsService extends ResourceService<ClassRegistra
 
   protected get queryBuilder(): SelectQueryBuilder<ClassRegistrationItem> {
     return super.queryBuilder.where({ classRegistrationId: this.classRegistrationId });
-  }
-
-  protected applyCustomFilters(
-    queryBuilder: SelectQueryBuilder<ClassRegistrationItem>,
-    { status, action, rejectReasons }: QueryDto,
-  ): void {
-    status && queryBuilder.andWhere({ status });
-    action && queryBuilder.andWhere({ action });
-    rejectReasons?.length && queryBuilder.andWhere({ rejectReasons: In(rejectReasons) });
   }
 
   async create(createDto: any): Promise<ClassRegistrationItem> {

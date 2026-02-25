@@ -7,18 +7,9 @@ import { GrpcResponseInterceptor } from './interceptors/grpc-response.intercepto
 @Module({
   imports: [AppModule],
   providers: [
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: GrpcResponseInterceptor,
-    },
-    {
-      provide: APP_FILTER,
-      useClass: GrpcExceptionFilter,
-    },
-    {
-      provide: APP_PIPE,
-      useValue: new ValidationPipe({ transform: true, whitelist: true }),
-    },
+    { provide: APP_INTERCEPTOR, useClass: GrpcResponseInterceptor },
+    { provide: APP_FILTER, useClass: GrpcExceptionFilter },
+    { provide: APP_PIPE, useValue: new ValidationPipe({ transform: true, whitelist: true }) },
   ],
 })
 export class GrpcAppModule {}

@@ -5,17 +5,14 @@ module.exports = {
     tsconfigRootDir: __dirname,
     sourceType: 'module',
   },
-  plugins: ['@typescript-eslint/eslint-plugin'],
-  extends: [
-    'plugin:@typescript-eslint/recommended',
-    'plugin:prettier/recommended',
-  ],
+  plugins: ['@typescript-eslint/eslint-plugin', 'import'],
+  extends: ['plugin:@typescript-eslint/recommended', 'plugin:prettier/recommended'],
   root: true,
-  env: {
-    node: true,
-    jest: true,
-  },
+  env: { node: true, jest: true },
   ignorePatterns: ['.eslintrc.js'],
+  settings: {
+    'import/resolver': { typescript: { alwaysTryTypes: true, project: './tsconfig.json' } },
+  },
   rules: {
     curly: ['error', 'all'],
     '@typescript-eslint/interface-name-prefix': 'off',
@@ -23,11 +20,12 @@ module.exports = {
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-empty-function': ['error', { allow: ['methods'] }],
-    '@typescript-eslint/no-unused-vars': [
+    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+    'import/order': [
       'error',
       {
-        argsIgnorePattern: '^_',
-        varsIgnorePattern: '^_',
+        groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
+        alphabetize: { order: 'asc', caseInsensitive: true },
       },
     ],
   },

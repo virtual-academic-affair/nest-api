@@ -47,7 +47,7 @@ Các controller khác có thể extend `ResourceController` để tự động c
 Các nhãn phân loại email tự động:
 
 | Giá trị             | Mô tả           |
-| ------------------- | --------------- |
+|---------------------|-----------------|
 | `classRegistration` | Đăng ký lớp học |
 | `task`              | Công tác khoa   |
 | `inquiry`           | Tư vấn          |
@@ -58,7 +58,7 @@ Các nhãn phân loại email tự động:
 Các action cơ bản trong CRUD:
 
 | Giá trị   | Mô tả                 |
-| --------- | --------------------- |
+|-----------|-----------------------|
 | `FindAll` | Lấy danh sách         |
 | `FindOne` | Lấy chi tiết một item |
 | `Create`  | Tạo mới               |
@@ -70,7 +70,7 @@ Các action cơ bản trong CRUD:
 Routing keys cho message queue xử lý email:
 
 | Giá trị    | Mô tả                           |
-| ---------- | ------------------------------- |
+|------------|---------------------------------|
 | `ingested` | Email mới được đồng bộ từ Gmail |
 
 ### SettingKey (Dynamic Configuration)
@@ -78,7 +78,7 @@ Routing keys cho message queue xử lý email:
 Các key cấu hình động trong database:
 
 | Key                    | Mô tả                                      |
-| ---------------------- | ------------------------------------------ |
+|------------------------|--------------------------------------------|
 | `email/labels`         | Mapping giữa SystemLabel và Gmail label ID |
 | `email/superEmail`     | Email chính để sync Gmail                  |
 | `email/lastPullAt`     | Thời điểm sync email lần cuối              |

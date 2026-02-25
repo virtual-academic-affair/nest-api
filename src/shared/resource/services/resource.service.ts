@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ObjectLiteral, Repository, SelectQueryBuilder } from 'typeorm';
+import { Brackets, ObjectLiteral, Repository, SelectQueryBuilder } from 'typeorm';
 import { ResourceQueryDto } from '@shared/resource/dtos/resource-query.dto';
 
 export interface PaginatedResult<T> {
@@ -15,13 +15,19 @@ export interface PaginatedResult<T> {
 @Injectable()
 export abstract class ResourceService<T extends ObjectLiteral> {
   protected readonly searchableColumns: string[] = [];
+  protected readonly orderableColumns: string[] = [];
+  protected readonly alias: string;
 
-  protected readonly orderableColumns: string[] = ['createdAt', 'updatedAt'];
+  protected constructor(protected readonly repository: Repository<T>) {
+    this.alias = this.repository.metadata.name;
+  }
 
-  protected constructor(protected readonly repository: Repository<T>) {}
+  protected p(column: keyof T | string): string {
+    return `${this.alias}.${String(column)}`; // path
+  }
 
-  protected get entityName(): string {
-    return this.repository.metadata.name;
+  protected get queryBuilder(): SelectQueryBuilder<T> {
+    return this.repository.createQueryBuilder(this.alias);
   }
 
   async findAll(queryDto: ResourceQueryDto): Promise<PaginatedResult<T>> {
@@ -31,49 +37,37 @@ export abstract class ResourceService<T extends ObjectLiteral> {
     const { keyword, orderCol = 'id', orderDir = 'ASC' } = queryDto;
     const skip = (page - 1) * Math.min(limit, 20);
 
-    const queryBuilder = this.repository.createQueryBuilder(this.entityName);
-    this.withAll(queryBuilder);
+    const qb = this.queryBuilder;
+    this.withAll(qb);
 
     if (keyword && this.searchableColumns.length > 0) {
-      const conditions = this.searchableColumns
-        .map((col) => `${this.entityName}.${col} LIKE :keyword`)
-        .join(' OR ');
-      queryBuilder.andWhere(`(${conditions})`, {
-        keyword: `%${keyword}%`,
-      });
+      qb.andWhere(
+        new Brackets((sub) => {
+          const sql = this.searchableColumns.map((col) => `${this.p(col)} ILike :k`).join(' OR ');
+          sub.where(sql, { k: `%${keyword}%` });
+        }),
+      );
     }
 
-    this.applyCustomFilters(queryBuilder, queryDto);
+    this.applyCustomFilters(qb, queryDto);
 
-    const orderColumn = this.orderableColumns.includes(orderCol)
-      ? orderCol
-      : 'id';
-    const orderDirection = orderDir === 'DESC' ? 'DESC' : 'ASC';
+    const orderColumn = this.orderableColumns.includes(orderCol) ? orderCol : 'id';
 
-    const [items, total] = await queryBuilder
-      .orderBy(`${this.entityName}.${orderColumn}`, orderDirection)
+    const [items, total] = await qb
+      .orderBy(this.p('createdAt'), 'DESC')
+      .addOrderBy(this.p(orderColumn), orderDir === 'DESC' ? 'DESC' : 'ASC')
       .skip(skip)
       .take(limit)
       .getManyAndCount();
 
-    return {
-      items,
-      pagination: {
-        total,
-        currentPage: page,
-        limit,
-        totalPages: Math.ceil(total / limit),
-      },
-    };
+    return { items, pagination: { total, currentPage: page, limit, totalPages: Math.ceil(total / limit) } };
   }
 
   async findOne(id: number): Promise<T> {
-    const queryBuilder = this.repository.createQueryBuilder(this.entityName);
-    this.withOne(queryBuilder);
+    const qb = this.queryBuilder.where({ id });
+    this.withOne(qb);
 
-    return await queryBuilder
-      .where(`${this.entityName}.id = :id`, { id })
-      .getOneOrFail();
+    return await qb.getOneOrFail();
   }
 
   async create(createDto: object): Promise<T> {
@@ -92,10 +86,7 @@ export abstract class ResourceService<T extends ObjectLiteral> {
     return (await this.repository.remove(entity)) as unknown as T;
   }
 
-  protected applyCustomFilters(
-    _queryBuilder: SelectQueryBuilder<T>,
-    _queryDto: ResourceQueryDto
-  ): void {}
+  protected applyCustomFilters(_queryBuilder: SelectQueryBuilder<T>, _queryDto: ResourceQueryDto): void {}
 
   protected withAll(_queryBuilder: SelectQueryBuilder<T>): void {}
 

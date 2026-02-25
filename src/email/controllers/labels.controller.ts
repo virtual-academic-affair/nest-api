@@ -1,10 +1,10 @@
 import { Body, Controller, Get, Post, Put } from '@nestjs/common';
 import { Auth } from '@authentication/decorators/auth.decorator';
-import { AuthType } from '@authentication/enums/auth-type.enum';
 import { Roles } from '@authentication/decorators/roles.decorator';
+import { AuthType } from '@authentication/enums/auth-type.enum';
 import { Role } from '@authentication/enums/role.enum';
-import { LabelsService } from '@email/services/labels.service';
 import { UpdateDto } from '@email/dtos/labels/update.dto';
+import { LabelsService } from '@email/services/labels.service';
 
 @Auth(AuthType.Bearer)
 @Roles(Role.Admin)

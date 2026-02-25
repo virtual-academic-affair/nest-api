@@ -5,10 +5,7 @@ import { Setting } from '@shared/setting/entities/setting.entity';
 
 @Injectable()
 export class SettingService {
-  constructor(
-    @InjectRepository(Setting)
-    private readonly settingRepository: Repository<Setting>
-  ) {}
+  constructor(@InjectRepository(Setting) private readonly settingRepository: Repository<Setting>) {}
 
   async get<T = unknown>(key: string): Promise<T | null> {
     const setting = await this.settingRepository.findOneBy({ key });
@@ -17,16 +14,7 @@ export class SettingService {
 
   async set<T>(key: string, value: T, isPartial = false): Promise<Setting> {
     const existing = await this.settingRepository.findOneBy({ key });
-
-    const newValue =
-      isPartial && typeof existing?.value === 'object'
-        ? { ...existing.value, ...(value as object) }
-        : value;
-
-    return this.settingRepository.save({
-      ...existing,
-      key,
-      value: newValue,
-    } as Setting);
+    value = isPartial && typeof existing?.value === 'object' ? ({ ...existing.value, ...value } as T) : value;
+    return this.settingRepository.save({ ...existing, key, value } as Setting);
   }
 }

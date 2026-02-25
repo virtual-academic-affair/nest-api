@@ -1,3 +1,5 @@
+import { Body, Controller, Post } from '@nestjs/common';
+import { GrpcMethod } from '@nestjs/microservices';
 import { Auth } from '@authentication/decorators/auth.decorator';
 import { Roles } from '@authentication/decorators/roles.decorator';
 import { AuthType } from '@authentication/enums/auth-type.enum';
@@ -6,8 +8,6 @@ import { CreateDto } from '@inquiry/dtos/inquiries/create.dto';
 import { QueryDto } from '@inquiry/dtos/inquiries/query.dto';
 import { Inquiry } from '@inquiry/entities/inquiry.entity';
 import { InquiriesService } from '@inquiry/services/inquiries.service';
-import { Body, Controller, Post } from '@nestjs/common';
-import { GrpcMethod } from '@nestjs/microservices';
 import { ResourceController } from '@shared/resource/controllers/resource.controller';
 
 @Auth(AuthType.Bearer)

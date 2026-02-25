@@ -1,7 +1,7 @@
 import { Body, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
-import { ResourceService } from '../services/resource.service';
 import { ObjectLiteral } from 'typeorm';
 import { validateDto } from '@shared/resource/utils/validate-dto.util';
+import { ResourceService } from '../services/resource.service';
 
 export abstract class ResourceController<T extends ObjectLiteral> {
   protected constructor(protected readonly service: ResourceService<T>) {}
@@ -12,10 +12,7 @@ export abstract class ResourceController<T extends ObjectLiteral> {
     update?: new () => unknown;
   };
 
-  protected async dto<TDto>(
-    key: 'query' | 'create' | 'update',
-    data: unknown
-  ): Promise<TDto> {
+  protected async dto<TDto>(key: 'query' | 'create' | 'update', data: unknown): Promise<TDto> {
     const DtoClass = this.getDtoClasses()[key] as new () => TDto;
     return validateDto(DtoClass, data, key !== 'query');
   }

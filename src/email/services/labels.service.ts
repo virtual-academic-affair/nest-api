@@ -1,26 +1,20 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { SettingService } from '@shared/setting/services/setting.service';
-import { GoogleapisService } from './googleapis.service';
+import { UpdateDto } from '@email/dtos/labels/update.dto';
 import { getLangLabel, SystemLabel } from '@shared/enums/system-label.enum';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
-import { UpdateDto } from '@email/dtos/labels/update.dto';
+import { SettingService } from '@shared/setting/services/setting.service';
+import { GoogleapisService } from './googleapis.service';
 
 @Injectable()
 export class LabelsService {
-  constructor(
-    private readonly settingService: SettingService,
-    private readonly googleapisService: GoogleapisService
-  ) {}
+  constructor(private readonly settingService: SettingService, private readonly googleapisService: GoogleapisService) {}
 
   async findAllGmailLabels() {
     const client = await this.googleapisService.getGmailClient();
     const { data } = await client.users.labels.list({ userId: 'me' });
     return (data.labels ?? [])
       .filter((label) => label.type !== 'system')
-      .map((label) => ({
-        label: label.name,
-        value: label.id,
-      }));
+      .map((label) => ({ label: label.name, value: label.id }));
   }
 
   private async createGmailLabel(name: string, color: string): Promise<string> {
@@ -29,10 +23,7 @@ export class LabelsService {
     try {
       const { data } = await client.users.labels.create({
         userId: 'me',
-        requestBody: {
-          name,
-          color: { textColor: '#ffffff', backgroundColor: color },
-        },
+        requestBody: { name, color: { textColor: '#ffffff', backgroundColor: color } },
       });
 
       return data.id;
@@ -47,9 +38,7 @@ export class LabelsService {
         }
       }
 
-      throw new InternalServerErrorException(
-        `Failed to create or find label: ${name}. Error: ${error.message}`
-      );
+      throw new InternalServerErrorException(`Failed to create or find label: ${name}. Error: ${error.message}`);
     }
   }
 
@@ -62,25 +51,17 @@ export class LabelsService {
   }
 
   async autoCreateLabels(): Promise<UpdateDto> {
-    await this.createGmailLabel(
-      getLangLabel('parent'),
-      getLangLabel('parent', 'color')
-    );
+    await this.createGmailLabel(getLangLabel('parent'), getLangLabel('parent', 'color'));
 
     const labels = (await this.findAll()) || ({} as UpdateDto);
-    const missingKeys = Object.values(SystemLabel).filter(
-      (key) => !labels[key]
-    );
+    const missingKeys = Object.values(SystemLabel).filter((key) => !labels[key]);
 
     const parent = getLangLabel('parent');
     const newEntries = await Promise.all(
       missingKeys.map(async (key) => [
         key,
-        await this.createGmailLabel(
-          `${parent}/${getLangLabel(key)}`,
-          getLangLabel(key, 'color')
-        ),
-      ])
+        await this.createGmailLabel(`${parent}/${getLangLabel(key)}`, getLangLabel(key, 'color')),
+      ]),
     );
     Object.assign(labels, Object.fromEntries(newEntries));
 

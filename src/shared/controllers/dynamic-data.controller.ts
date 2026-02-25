@@ -11,9 +11,7 @@ export class DynamicDataController {
     const result: Record<string, any> = {};
 
     if (query.settings && query.settings.length > 0) {
-      result.settings = await this.dynamicDataService.getSettings(
-        query.settings
-      );
+      result.settings = await this.dynamicDataService.getSettings(query.settings);
     }
 
     if (query.enums && query.enums.length > 0) {

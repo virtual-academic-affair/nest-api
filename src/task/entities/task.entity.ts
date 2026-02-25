@@ -13,10 +13,10 @@ export class Task extends BelongsToMessage {
   name: string;
 
   @Column({ nullable: true })
-  description: string;
+  description?: string;
 
   @Column({ type: 'timestamp', nullable: true })
-  deadline?: Date;
+  due?: Date;
 
   @Column({ type: 'enum', enum: TaskPriority, nullable: true })
   priority?: TaskPriority;
@@ -24,6 +24,6 @@ export class Task extends BelongsToMessage {
   @Column({ type: 'enum', enum: TaskStatus, default: TaskStatus.Todo })
   status: TaskStatus;
 
-  @OneToMany(() => TaskItem, (item) => item.task, { cascade: true, orphanedRowAction: 'delete' })
+  @OneToMany(() => TaskItem, (item) => item.parent, { cascade: true, onDelete: 'CASCADE' })
   items: TaskItem[];
 }

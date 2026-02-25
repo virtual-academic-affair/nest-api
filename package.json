@@ -28,7 +28,6 @@
     "@nestjs/microservices": "^9.4.3",
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/schedule": "^2.2.3",
-    "@nestjs/swagger": "^7.1.13",
     "@nestjs/typeorm": "^10.0.0",
     "@zabih-dev/nest-api-response": "^1.5.0",
     "amqp-connection-manager": "^5.0.0",

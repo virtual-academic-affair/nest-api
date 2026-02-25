@@ -2,86 +2,60 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository, SelectQueryBuilder } from 'typeorm';
 import { ResourceService } from '@shared/resource/services/resource.service';
+import { QueryDto } from '@task/dtos/tasks/query.dto';
 import { Task } from '@task/entities/task.entity';
-import { TaskAssignee } from '@task/entities/task-assignee.entity';
-import { CreateDto } from '@task/dtos/tasks/create.dto';
-import { User } from '@authentication/entities/user.entity';
+import { TaskStatus } from '@task/enums/task-status.enum';
 
 @Injectable()
 export class TasksService extends ResourceService<Task> {
-  protected orderableColumns = ['id', 'messageId', 'createdAt', 'updatedAt'];
+  protected orderableColumns = ['id', 'messageId', 'createdAt', 'updatedAt', 'due'];
 
-  constructor(
-    @InjectRepository(Task) repository: Repository<Task>,
-    @InjectRepository(TaskAssignee)
-    private readonly assigneeRepo: Repository<TaskAssignee>,
-    @InjectRepository(User)
-    private readonly userRepo: Repository<User>
-  ) {
+  constructor(@InjectRepository(Task) repository: Repository<Task>) {
     super(repository);
   }
 
-  async create(dto: CreateDto) {
-    await this.enrichAssignees(dto);
-    return super.create(dto);
+  protected withAll(queryBuilder: SelectQueryBuilder<Task>): void {
+    queryBuilder.leftJoinAndSelect(this.p('items'), 'items');
   }
 
-  async update(id: number, dto: CreateDto) {
-    await this.enrichAssignees(dto);
-
-    if (dto.taskAssignees) {
-      const currentTask = await this.findOne(id);
-
-      if (currentTask?.taskAssignees) {
-        const newIds = dto.taskAssignees
-          .map((a) => a.id)
-          .filter(Boolean) as number[];
-        const idsToDelete = currentTask.taskAssignees
-          .map((a) => a.id)
-          .filter((existingId) => !newIds.includes(existingId));
-
-        if (idsToDelete.length > 0) {
-          await this.assigneeRepo.delete(idsToDelete);
-        }
-      }
-
-      dto.taskAssignees.forEach((a: any) => (a.taskId = id));
-    }
-
-    return super.update(id, dto);
+  protected withOne(queryBuilder: SelectQueryBuilder<Task>): void {
+    queryBuilder.leftJoinAndSelect(this.p('items'), 'items').leftJoinAndSelect(this.p('message'), 'message');
   }
 
-  private async enrichAssignees(dto: CreateDto) {
-    if (!dto.taskAssignees?.length) {
-      return;
-    }
-
-    const assigneeIds = dto.taskAssignees
-      .map((a) => a.assigneeId)
-      .filter(Boolean) as number[];
-
-    const users = assigneeIds.length
-      ? await this.userRepo.find({ where: { id: In(assigneeIds) } })
-      : [];
-
-    for (const assignee of dto.taskAssignees) {
-      if (!assignee.assignedAt) {
-        assignee.assignedAt = new Date();
-      }
-      const user = assignee.assigneeId
-        ? users.find((u) => u.id === assignee.assigneeId)
-        : undefined;
-      if (user) {
-        assignee.name = user.name;
-      }
-    }
+  protected applyCustomFilters(
+    queryBuilder: SelectQueryBuilder<Task>,
+    { status, priority, dueDateFrom, dueDateTo, assigneeIds }: QueryDto,
+  ): void {
+    status && queryBuilder.andWhere({ status });
+    priority && queryBuilder.andWhere({ priority });
+    dueDateFrom && queryBuilder.andWhere('task.due >= :dueDateFrom', { dueDateFrom });
+    dueDateTo && queryBuilder.andWhere('task.due <= :dueDateTo', { dueDateTo });
+    assigneeIds && queryBuilder.andWhere({ assigners: In(assigneeIds) });
   }
 
-  protected withAll(qb: SelectQueryBuilder<Task>): void {
-    qb.leftJoinAndSelect('Task.taskAssignees', 'taskAssignees');
-  }
+  async stats(startDate: Date, endDate: Date) {
+    const stats = await this.repository
+      .createQueryBuilder('task')
+      .select([
+        'DATE(task.createdAt) AS date',
+        'task.priority AS priority',
+        'COUNT(*) AS total',
+        `SUM(CASE WHEN task.status = '${TaskStatus.Todo}' THEN 1 ELSE 0 END) AS todo`,
+        `SUM(CASE WHEN task.status = '${TaskStatus.Doing}' THEN 1 ELSE 0 END) AS doing`,
+        `SUM(CASE WHEN task.status = '${TaskStatus.Done}' THEN 1 ELSE 0 END) AS done`,
+        `SUM(CASE WHEN task.status = '${TaskStatus.Cancelled}' THEN 1 ELSE 0 END) AS cancelled`,
+      ])
+      .where('task.createdAt BETWEEN :startDate AND :endDate', { startDate, endDate })
+      .groupBy('date, priority')
+      .getRawMany();
 
-  protected withOne(qb: SelectQueryBuilder<Task>): void {
-    this.withAll(qb);
+    return stats.reduce((acc, { date, priority, ...counts }) => {
+      date = new Date(date).toISOString();
+
+      acc[date] = acc[date] || { date, total: 0, detail: {} };
+      acc[date]['detail'][priority || 'none'] = Object.fromEntries(Object.entries(counts).map(([k, v]) => [k, +v]));
+      acc[date].total += +counts.total;
+      return acc;
+    }, {});
   }
 }

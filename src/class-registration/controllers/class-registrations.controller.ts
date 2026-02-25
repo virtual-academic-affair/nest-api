@@ -26,7 +26,7 @@ export class ClassRegistrationsController extends ResourceController<ClassRegist
 
   @Get('stats')
   async getStats(@Query() query: StatsDto) {
-    return await this.service.stats(new Date(query.from), new Date(query.to));
+    return await this.service.stats(new Date(query.from), new Date(query.to), query.isDetail);
   }
 
   @Get(':id/reply')

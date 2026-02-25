@@ -9,7 +9,16 @@ import { GrpcResponseInterceptor } from './interceptors/grpc-response.intercepto
   providers: [
     { provide: APP_INTERCEPTOR, useClass: GrpcResponseInterceptor },
     { provide: APP_FILTER, useClass: GrpcExceptionFilter },
-    { provide: APP_PIPE, useValue: new ValidationPipe({ transform: true, whitelist: true }) },
+    {
+      provide: APP_PIPE,
+      useValue: new ValidationPipe({
+        transform: true,
+        whitelist: true,
+        transformOptions: {
+          enableImplicitConversion: true,
+        },
+      }),
+    },
   ],
 })
 export class GrpcAppModule {}

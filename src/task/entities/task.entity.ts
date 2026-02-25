@@ -1,35 +1,29 @@
+import { Column, Entity, OneToMany } from 'typeorm';
 import { BelongsToMessage } from '@email/entities/belongs-to-message.entity';
-import { Entity, Column, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { TaskAssignee } from './task-assignee.entity';
 import { TaskPriority } from '../enums/task-priority.enum';
 import { TaskStatus } from '../enums/task-status.enum';
+import { TaskItem } from './task-item.entity';
 
-@Entity('tasks')
+@Entity()
 export class Task extends BelongsToMessage {
-  @PrimaryGeneratedColumn({ type: 'bigint' })
-  override id: number;
-
-  @Column('simple-array', { nullable: true })
+  @Column('text', { array: true, nullable: true })
   assigners: string[];
 
-  @Column({ type: 'text' })
+  @Column()
   name: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ nullable: true })
   description: string;
 
   @Column({ type: 'timestamp', nullable: true })
-  deadline: Date;
+  deadline?: Date;
 
   @Column({ type: 'enum', enum: TaskPriority, nullable: true })
-  priority: TaskPriority;
+  priority?: TaskPriority;
 
-  @Column({ type: 'enum', enum: TaskStatus, default: TaskStatus.TODO })
+  @Column({ type: 'enum', enum: TaskStatus, default: TaskStatus.Todo })
   status: TaskStatus;
 
-  @OneToMany(() => TaskAssignee, (assignee) => assignee.task, {
-    cascade: true,
-    orphanedRowAction: 'delete',
-  })
-  taskAssignees: TaskAssignee[];
+  @OneToMany(() => TaskItem, (item) => item.task, { cascade: true, orphanedRowAction: 'delete' })
+  items: TaskItem[];
 }

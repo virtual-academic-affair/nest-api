@@ -44,17 +44,17 @@ jobs:
         with:
           stack: dual
 
-      - name: testing ipv6 for command
+      - name: Install SSHPass and Config SSH
         run: |
-          curl -m 9 --ipv6 --verbose https://google.com
+          sudo apt-get update && sudo apt-get install -y sshpass
+          mkdir -p ~/.ssh
+          echo "StrictHostKeyChecking no" >> ~/.ssh/config
 
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          password: ${{ secrets.PASSWORD }}
-          port: ${{ secrets.PORT }}
-          protocol: tcp6
-          script: |
+      - name: Deploy via SSH (Manual Script)
+        env:
+          SSHPASS: ${{ secrets.PASSWORD }}
+        run: |
+          sshpass -e ssh -6 -o ConnectTimeout=30 -p ${{ secrets.PORT }} ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
+            echo "Kết nối thành công!"
             whoami
+          EOF

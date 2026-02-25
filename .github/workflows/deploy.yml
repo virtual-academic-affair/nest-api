@@ -40,14 +40,16 @@ jobs:
     
     steps:
       - name: Deploy via SSH
-        run: |
-          # Thiết lập SSH Key
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          
-          # Quét key để tránh hỏi "yes/no"
-          ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
-          
-          # Chạy lệnh (Nếu là IPv6, bao ngoặc trong command SSH)
-          ssh -i ~/.ssh/id_rsa ${{ secrets.USERNAME }}@[${{ secrets.HOST }}] "cd /home/***/sourcecode/nest-api && docker compose pull && docker compose up -d"
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: '${{ secrets.HOST }}'
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.PORT }}
+          protocol: tcp6
+          script: |
+            cd /home/ubuntu/sourcecode/nest-api
+            echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            docker compose pull
+            docker compose up -d
+            docker image prune -f

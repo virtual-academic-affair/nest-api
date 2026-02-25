@@ -44,6 +44,10 @@ jobs:
         with:
           stack: dual
 
+      - name: testing ipv6 for command
+        run: |
+          curl -m 9 --ipv6 --verbose https://google.com
+
       - name: Deploy via SSH
         uses: appleboy/ssh-action@master
         with:

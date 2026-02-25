@@ -3,7 +3,7 @@ name: Build and Deploy to Production
 on:
   push:
     branches:
-      - main
+      - test-ci-cd
 
 env:
   REGISTRY: ghcr.io
@@ -49,15 +49,29 @@ jobs:
           sudo apt-get update && sudo apt-get install -y sshpass
           mkdir -p ~/.ssh
           echo "StrictHostKeyChecking no" >> ~/.ssh/config
+      
+      #      - name: Deploy via SSH
+      #        env:
+      #          SSHPASS: ${{ secrets.PASSWORD }}
+      #        run: |
+      #          sshpass -e ssh -o ConnectTimeout=30 -p ${{ secrets.PORT }} ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
+      #            cd /home/ubuntu/sourcecode/nest-api
+      #            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      #            docker compose pull
+      #            docker compose up -d
+      #            docker image prune -f
+      #          EOF
 
-      - name: Deploy via SSH
-        env:
-          SSHPASS: ${{ secrets.PASSWORD }}
-        run: |
-          sshpass -e ssh -o ConnectTimeout=30 -p ${{ secrets.PORT }} ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.PRIVATE_KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
             cd /home/ubuntu/sourcecode/nest-api
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             docker compose pull
-            docker compose up -d
+            docker compose up -d --wait # Docker sẽ đợi container "Healthy" mới xong lệnh
             docker image prune -f
-          EOF

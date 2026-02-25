@@ -21,6 +21,10 @@ export class ClassRegistrationItemsService extends ResourceService<ClassRegistra
     this.classRegistrationId = Number(this.request.params?.classRegistrationId);
   }
 
+  protected get queryBuilder(): SelectQueryBuilder<ClassRegistrationItem> {
+    return super.queryBuilder.where({ classRegistrationId: this.classRegistrationId });
+  }
+
   protected applyCustomFilters(
     queryBuilder: SelectQueryBuilder<ClassRegistrationItem>,
     { status, action, rejectReasons }: QueryDto,
@@ -30,15 +34,7 @@ export class ClassRegistrationItemsService extends ResourceService<ClassRegistra
     rejectReasons?.length && queryBuilder.andWhere({ rejectReasons: In(rejectReasons) });
   }
 
-  protected withAll(queryBuilder: SelectQueryBuilder<ClassRegistrationItem>): void {
-    queryBuilder.andWhere({ registrationId: this.classRegistrationId });
-  }
-
-  protected withOne(queryBuilder: SelectQueryBuilder<ClassRegistrationItem>): void {
-    this.withAll(queryBuilder);
-  }
-
   async create(createDto: any): Promise<ClassRegistrationItem> {
-    return await super.create({ ...createDto, registrationId: this.classRegistrationId });
+    return await super.create({ ...createDto, classRegistrationId: this.classRegistrationId });
   }
 }

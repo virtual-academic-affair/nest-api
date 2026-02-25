@@ -14,7 +14,7 @@ import { ResourceController } from '@shared/resource/controllers/resource.contro
 
 @Auth(AuthType.Bearer)
 @Roles(Role.Admin)
-@Controller('classRegistration')
+@Controller('classRegistration/classRegistrations')
 export class ClassRegistrationsController extends ResourceController<ClassRegistration> {
   constructor(protected readonly service: ClassRegistrationsService) {
     super(service);

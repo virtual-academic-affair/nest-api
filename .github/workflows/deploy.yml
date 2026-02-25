@@ -50,13 +50,14 @@ jobs:
           mkdir -p ~/.ssh
           echo "StrictHostKeyChecking no" >> ~/.ssh/config
 
-      - name: Deploy via SSH (Manual Script)
+      - name: Deploy via SSH
         env:
           SSHPASS: ${{ secrets.PASSWORD }}
         run: |
-          sshpass -e ssh -6 -o ConnectTimeout=30 -p ${{ secrets.PORT }} ${{ secrets.USERNAME }}@${{ secrets.HOST }}
-          cd /home/ubuntu/sourcecode/nest-api
-          echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-          docker compose pull
-          docker compose up -d
-          docker image prune -f
+          sshpass -e ssh -o ConnectTimeout=30 -p ${{ secrets.PORT }} ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
+            cd /home/ubuntu/sourcecode/nest-api
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            docker compose pull
+            docker compose up -d
+            docker image prune -f
+          EOF

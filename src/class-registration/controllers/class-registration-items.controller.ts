@@ -12,7 +12,7 @@ import { ResourceController } from '@shared/resource/controllers/resource.contro
 
 @Auth(AuthType.Bearer)
 @Roles(Role.Admin)
-@Controller('classRegistrations/:classRegistrationId/items')
+@Controller('classRegistration/:classRegistrationId/items')
 export class ClassRegistrationItemsController extends ResourceController<ClassRegistrationItem> {
   constructor(protected readonly service: ClassRegistrationItemsService) {
     super(service);

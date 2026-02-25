@@ -49,11 +49,11 @@ jobs:
           curl -m 9 --ipv6 --verbose https://google.com
 
       - name: Deploy via SSH
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
-          password: ${{ secrets.SSH_PASSWORD }}
+          password: ${{ secrets.PASSWORD }}
           port: ${{ secrets.PORT }}
           protocol: tcp6
           script: |

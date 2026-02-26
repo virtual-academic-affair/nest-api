@@ -13,7 +13,7 @@ import { ResourceAction } from '@shared/resource/enums/resource-action.enum';
 
 @Auth(AuthType.Bearer)
 @Roles(Role.Admin)
-@RestrictMethods({ except: [ResourceAction.FindOne] })
+@RestrictMethods({ except: [ResourceAction.FindAll, ResourceAction.FindOne] })
 @Controller('classRegistration/classRegistrations/:parentId/items')
 export class ClassRegistrationItemsController extends ResourceController<ClassRegistrationItem> {
   constructor(protected readonly service: ClassRegistrationItemsService) {

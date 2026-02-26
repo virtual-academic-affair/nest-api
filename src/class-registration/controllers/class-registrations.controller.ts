@@ -8,6 +8,7 @@ import { CreateDto } from '@class-registration/dtos/class-registrations/create.d
 import { QueryDto } from '@class-registration/dtos/class-registrations/query.dto';
 import { ReplyDto } from '@class-registration/dtos/class-registrations/reply.dto';
 import { StatsDto } from '@class-registration/dtos/class-registrations/stats.dto';
+import { UpdateDto } from '@class-registration/dtos/class-registrations/update.dto';
 import { ClassRegistration } from '@class-registration/entities/class-registration.entity';
 import { ClassRegistrationsService } from '@class-registration/services/class-registrations.service';
 import { ResourceController } from '@shared/resource/controllers/resource.controller';
@@ -21,7 +22,7 @@ export class ClassRegistrationsController extends ResourceController<ClassRegist
   }
 
   protected getDtoClasses() {
-    return { query: QueryDto, create: CreateDto };
+    return { query: QueryDto, create: CreateDto, update: UpdateDto };
   }
 
   @Get('stats')

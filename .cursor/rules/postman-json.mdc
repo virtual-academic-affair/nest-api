@@ -85,6 +85,11 @@ Each module in the API should have its own JSON file in `http/` folder (e.g., `a
     "method": "POST",
     "body": {
       "mode": "raw",
+      "options": {
+        "raw": {
+          "language": "json"
+        }
+      },
       "raw": "{\n    \"field\": \"value\"\n}"
     },
     "url": {
@@ -104,6 +109,11 @@ Each module in the API should have its own JSON file in `http/` folder (e.g., `a
     "method": "PUT",
     "body": {
       "mode": "raw",
+      "options": {
+        "raw": {
+          "language": "json"
+        }
+      },
       "raw": "{\n    \"field\": \"newValue\"\n}"
     },
     "url": {
@@ -146,13 +156,28 @@ Each module in the API should have its own JSON file in `http/` folder (e.g., `a
 - **DO NOT** include empty `"header": []`
 - Default headers are not needed
 
-### 3. Query Parameters
+### 3. Body (JSON)
+- When using `mode: "raw"` with JSON data, **MUST** add `"options": { "raw": { "language": "json" } }`
+- Example:
+  ```json
+  "body": {
+    "mode": "raw",
+    "options": {
+      "raw": {
+        "language": "json"
+      }
+    },
+    "raw": "{\n    \"field\": \"value\"\n}"
+  }
+  ```
+
+### 4. Query Parameters
 - Standard pagination: `page`, `limit`
 - Search: `keyword` (disabled by default)
 - Sorting: `orderCol`, `orderDir`
 - Filter fields: add as needed with `disabled: true`
 
-### 4. Descriptions
+### 5. Descriptions
 - **ONLY** use descriptions for enum values
 - Format: `value1 | value2 | value3`
 - Examples:
@@ -166,7 +191,7 @@ Each module in the API should have its own JSON file in `http/` folder (e.g., `a
   - Data formats (e.g., "ISO date", "comma-separated IDs")
   - Generic field descriptions
 
-### 5. Nested Resources
+### 6. Nested Resources
 For nested endpoints (e.g., ClassRegistrationItems within ClassRegistrations):
 
 ```json
@@ -194,7 +219,7 @@ For nested endpoints (e.g., ClassRegistrationItems within ClassRegistrations):
 }
 ```
 
-### 6. Grouping
+### 7. Grouping
 - Group related endpoints under a parent `item`
 - Use singular names for endpoint groups (e.g., `Users`, `ClassRegistrations`, not `User`, `ClassRegistration`)
 

@@ -35,19 +35,18 @@ export class TasksService extends ResourceService<Task> {
   }
 
   async stats(startDate: Date, endDate: Date) {
-    const stats = await this.repository
-      .createQueryBuilder('task')
+    const stats = await this.queryBuilder
       .select([
-        'DATE(task.createdAt) AS date',
-        'task.priority AS priority',
+        `DATE(${this.p('due')}) AS date`,
+        `${this.p('priority')} AS priority`,
         'COUNT(*) AS total',
-        `SUM(CASE WHEN task.status = '${TaskStatus.Todo}' THEN 1 ELSE 0 END) AS todo`,
-        `SUM(CASE WHEN task.status = '${TaskStatus.Doing}' THEN 1 ELSE 0 END) AS doing`,
-        `SUM(CASE WHEN task.status = '${TaskStatus.Done}' THEN 1 ELSE 0 END) AS done`,
-        `SUM(CASE WHEN task.status = '${TaskStatus.Cancelled}' THEN 1 ELSE 0 END) AS cancelled`,
+        `SUM(CASE WHEN ${this.p('status')} = '${TaskStatus.Todo}' THEN 1 ELSE 0 END) AS todo`,
+        `SUM(CASE WHEN ${this.p('status')} = '${TaskStatus.Doing}' THEN 1 ELSE 0 END) AS doing`,
+        `SUM(CASE WHEN ${this.p('status')} = '${TaskStatus.Done}' THEN 1 ELSE 0 END) AS done`,
+        `SUM(CASE WHEN ${this.p('status')} = '${TaskStatus.Cancelled}' THEN 1 ELSE 0 END) AS cancelled`,
       ])
-      .where('task.createdAt BETWEEN :startDate AND :endDate', { startDate, endDate })
-      .groupBy('date, priority')
+      .where(`${this.p('due')} BETWEEN :startDate AND :endDate`, { startDate, endDate })
+      .groupBy(`DATE(${this.p('due')}), priority`)
       .getRawMany();
 
     return stats.reduce((acc, { date, priority, ...counts }) => {

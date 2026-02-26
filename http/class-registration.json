@@ -60,8 +60,8 @@
                 },
                 {
                   "key": "orderCol",
-                  "value": "id",
-                  "description": "id | studentCode | academicYear | createdAt | updatedAt"
+                  "value": "academicYear",
+                  "description": "academicYear"
                 },
                 {
                   "key": "orderDir",
@@ -100,6 +100,11 @@
             "method": "POST",
             "body": {
               "mode": "raw",
+              "options": {
+              "raw": {
+                "language": "json"
+              }
+            },
               "raw": "{\n    \"studentCode\": \"2212000\",\n    \"studentName\": \"Nguyen Van A\",\n    \"academicYear\": 2025,\n    \"messageId\": 1,\n    \"items\": [\n        {\n            \"action\": \"register\",\n            \"subjectName\": \"Toan cao cap\",\n            \"subjectCode\": \"MATH101\",\n            \"className\": \"TH1\",\n            \"slotInfo\": \"Thu 2, tiet 1-3\",\n            \"isInCurriculum\": true\n        }\n    ]\n}"
             },
             "url": {
@@ -119,6 +124,11 @@
             "method": "PUT",
             "body": {
               "mode": "raw",
+              "options": {
+              "raw": {
+                "language": "json"
+              }
+            },
               "raw": "{\n    \"messageId\": 1\n}"
             },
             "url": {
@@ -216,6 +226,11 @@
             "method": "POST",
             "body": {
               "mode": "raw",
+              "options": {
+              "raw": {
+                "language": "json"
+              }
+            },
               "raw": "{\n    \"html\": \"<p>Your registration has been approved.</p>\"\n}"
             },
             "url": {
@@ -243,99 +258,16 @@
       "name": "ClassRegistrationItems",
       "item": [
         {
-          "name": "findAll",
-          "request": {
-            "method": "GET",
-            "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "classRegistration",
-                "classRegistrations",
-                ":parentId",
-                "items"
-              ],
-              "variable": [
-                {
-                  "key": "parentId",
-                  "value": "1"
-                }
-              ],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "1"
-                },
-                {
-                  "key": "limit",
-                  "value": "10"
-                },
-                {
-                  "key": "keyword",
-                  "value": "",
-                  "disabled": true
-                },
-                {
-                  "key": "status",
-                  "value": "",
-                  "description": "pending | approved | rejected",
-                  "disabled": true
-                },
-                {
-                  "key": "action",
-                  "value": "",
-                  "description": "register | cancel | requestOpen",
-                  "disabled": true
-                },
-                {
-                  "key": "orderCol",
-                  "value": "id",
-                  "description": "id | action | status | isInCurriculum | createdAt | updatedAt"
-                },
-                {
-                  "key": "orderDir",
-                  "value": "DESC",
-                  "description": "ASC | DESC"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "findOne",
-          "request": {
-            "method": "GET",
-            "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "classRegistration",
-                "classRegistrations",
-                ":parentId",
-                "items",
-                ":id"
-              ],
-              "variable": [
-                {
-                  "key": "parentId",
-                  "value": "1"
-                },
-                {
-                  "key": "id",
-                  "value": "1"
-                }
-              ]
-            }
-          }
-        },
-        {
           "name": "create",
           "request": {
             "method": "POST",
             "body": {
               "mode": "raw",
+              "options": {
+              "raw": {
+                "language": "json"
+              }
+            },
               "raw": "{\n    \"action\": \"register\",\n    \"subjectName\": \"Toan cao cap\",\n    \"subjectCode\": \"MATH101\",\n    \"className\": \"TH1\",\n    \"slotInfo\": \"Thu 2, tiet 1-3\",\n    \"isInCurriculum\": true\n}"
             },
             "url": {
@@ -363,6 +295,11 @@
             "method": "PUT",
             "body": {
               "mode": "raw",
+              "options": {
+              "raw": {
+                "language": "json"
+              }
+            },
               "raw": "{\n    \"status\": \"rejected\",\n    \"rejectReasons\": [\n        \"Lop da day\"\n    ]\n}"
             },
             "url": {
@@ -456,8 +393,7 @@
                 },
                 {
                   "key": "orderCol",
-                  "value": "id",
-                  "description": "id | isActive | createdAt | updatedAt"
+                  "value": "id"
                 },
                 {
                   "key": "orderDir",
@@ -496,6 +432,11 @@
             "method": "POST",
             "body": {
               "mode": "raw",
+              "options": {
+              "raw": {
+                "language": "json"
+              }
+            },
               "raw": "{\n    \"content\": \"Lop da day\",\n    \"isActive\": true\n}"
             },
             "url": {
@@ -515,6 +456,11 @@
             "method": "PUT",
             "body": {
               "mode": "raw",
+              "options": {
+              "raw": {
+                "language": "json"
+              }
+            },
               "raw": "{\n    \"content\": \"Lop da day - cap nhat\",\n    \"isActive\": false\n}"
             },
             "url": {

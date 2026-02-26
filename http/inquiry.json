@@ -45,8 +45,7 @@
                 },
                 {
                   "key": "orderCol",
-                  "value": "id",
-                  "description": "id | createdAt | updatedAt"
+                  "value": "id"
                 },
                 {
                   "key": "orderDir",
@@ -85,6 +84,11 @@
             "method": "POST",
             "body": {
               "mode": "raw",
+              "options": {
+              "raw": {
+                "language": "json"
+              }
+            },
               "raw": "{\n    \"messageId\": 1\n}"
             },
             "url": {

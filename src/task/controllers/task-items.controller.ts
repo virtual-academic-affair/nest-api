@@ -11,7 +11,7 @@ import { TaskItemsService } from '@task/services/task-items.service';
 
 @Auth(AuthType.Bearer)
 @RestrictMethods({ except: [ResourceAction.FindAll, ResourceAction.FindOne] })
-@Controller('task/:parentId/items')
+@Controller('task/tasks/:parentId/items')
 export class TaskItemsController extends ResourceController<TaskItem> {
   constructor(protected readonly service: TaskItemsService) {
     super(service);

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository, SelectQueryBuilder } from 'typeorm';
+import { ArrayContainedBy, Repository, SelectQueryBuilder } from 'typeorm';
 import { QueryDto } from '@email/dtos/messages/query.dto';
 import { Message } from '@email/entities/message.entity';
 import { ResourceService } from '@shared/resource/services/resource.service';
@@ -15,6 +15,7 @@ export class MessagesService extends ResourceService<Message> {
   }
 
   protected applyCustomFilters(queryBuilder: SelectQueryBuilder<Message>, { systemLabels }: QueryDto): void {
-    systemLabels && queryBuilder.andWhere({ systemLabels: In(systemLabels) });
+    console.log(systemLabels);
+    systemLabels && queryBuilder.andWhere({ systemLabels: ArrayContainedBy(systemLabels) });
   }
 }

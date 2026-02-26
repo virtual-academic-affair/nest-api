@@ -72,8 +72,8 @@
                 },
                 {
                   "key": "orderCol",
-                  "value": "id",
-                  "description": "id | status | priority | due | createdAt | updatedAt"
+                  "value": "due",
+                  "description": "due"
                 },
                 {
                   "key": "orderDir",
@@ -112,6 +112,11 @@
             "method": "POST",
             "body": {
               "mode": "raw",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
               "raw": "{\n    \"name\": \"Du an website moi\",\n    \"description\": \"Thiet ke va lap trinh frontend cho website\",\n    \"due\": \"2025-12-31T23:59:59Z\",\n    \"priority\": \"high\",\n    \"status\": \"todo\",\n    \"assigners\": [\"Khoa CNTT\"],\n    \"messageId\": 1\n}"
             },
             "url": {
@@ -131,7 +136,12 @@
             "method": "PUT",
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"status\": \"doing\",\n    \"priority\": \"urgent\",\n    \"messageId\": 1\n}"
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "raw": "{\n    \"status\": \"doing\",\n    \"priority\": \"urgent\",\n}"
             },
             "url": {
               "host": [
@@ -205,87 +215,16 @@
       "name": "TaskItems",
       "item": [
         {
-          "name": "findAll",
-          "request": {
-            "method": "GET",
-            "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "task",
-                "tasks",
-                ":parentId",
-                "items"
-              ],
-              "variable": [
-                {
-                  "key": "parentId",
-                  "value": "1"
-                }
-              ],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "1"
-                },
-                {
-                  "key": "limit",
-                  "value": "10"
-                },
-                {
-                  "key": "keyword",
-                  "value": "",
-                  "disabled": true
-                },
-                {
-                  "key": "orderCol",
-                  "value": "id",
-                  "description": "id | isChecked | createdAt | updatedAt"
-                },
-                {
-                  "key": "orderDir",
-                  "value": "DESC",
-                  "description": "ASC | DESC"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "findOne",
-          "request": {
-            "method": "GET",
-            "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "task",
-                "tasks",
-                ":parentId",
-                "items",
-                ":id"
-              ],
-              "variable": [
-                {
-                  "key": "parentId",
-                  "value": "1"
-                },
-                {
-                  "key": "id",
-                  "value": "1"
-                }
-              ]
-            }
-          }
-        },
-        {
           "name": "create",
           "request": {
             "method": "POST",
             "body": {
               "mode": "raw",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
               "raw": "{\n    \"name\": \"Task item name\",\n    \"assigneeId\": 1,\n    \"note\": \"Some note\"\n}"
             },
             "url": {
@@ -313,6 +252,11 @@
             "method": "PUT",
             "body": {
               "mode": "raw",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
               "raw": "{\n    \"isChecked\": true,\n    \"name\": \"Updated name\",\n    \"assigneeId\": 1,\n    \"note\": \"Updated note\"\n}"
             },
             "url": {

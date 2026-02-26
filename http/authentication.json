@@ -51,8 +51,7 @@
                 },
                 {
                   "key": "orderCol",
-                  "value": "id",
-                  "description": "id | email | name | role | isActive | createdAt | updatedAt"
+                  "value": "id"
                 },
                 {
                   "key": "orderDir",
@@ -91,6 +90,11 @@
             "method": "PUT",
             "body": {
               "mode": "raw",
+              "options": {
+              "raw": {
+                "language": "json"
+              }
+            },
               "raw": "{\n    \"name\": \"Updated Name\",\n    \"role\": \"student\",\n    \"isActive\": true\n}"
             },
             "url": {
@@ -117,6 +121,11 @@
             "method": "POST",
             "body": {
               "mode": "raw",
+              "options": {
+              "raw": {
+                "language": "json"
+              }
+            },
               "raw": "{\n    \"email\": \"user@example.com\",\n    \"role\": \"admin\"\n}"
             },
             "url": {
@@ -157,6 +166,11 @@
             "method": "POST",
             "body": {
               "mode": "raw",
+              "options": {
+              "raw": {
+                "language": "json"
+              }
+            },
               "raw": "{\n    \"code\": \"<google_oauth_code>\"\n}"
             },
             "url": {
@@ -181,6 +195,11 @@
             "method": "POST",
             "body": {
               "mode": "raw",
+              "options": {
+              "raw": {
+                "language": "json"
+              }
+            },
               "raw": "{\n    \"refreshToken\": \"{{refreshToken}}\"\n}"
             },
             "url": {

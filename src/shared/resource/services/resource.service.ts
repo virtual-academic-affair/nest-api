@@ -58,8 +58,8 @@ export abstract class ResourceService<T extends ObjectLiteral> {
         : this.autoOrderableColumns[0];
 
     const [items, total] = await qb
-      .orderBy(this.p('createdAt'), 'DESC')
       .addOrderBy(this.p(orderColumn), orderDir === 'DESC' ? 'DESC' : 'ASC')
+      .addOrderBy(this.p('createdAt'), 'DESC')
       .skip(skip)
       .take(limit)
       .getManyAndCount();

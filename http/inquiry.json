@@ -1,0 +1,104 @@
+{
+  "info": {
+    "name": "Inquiry",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Inquiries",
+      "item": [
+        {
+          "name": "findAll",
+          "request": {
+            "method": "GET",
+            "url": {
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "inquiryModule",
+                "inquiries"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "keyword",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "orderCol",
+                  "value": "id",
+                  "description": "id | createdAt | updatedAt"
+                },
+                {
+                  "key": "orderDir",
+                  "value": "DESC",
+                  "description": "ASC | DESC"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "findOne",
+          "request": {
+            "method": "GET",
+            "url": {
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "inquiryModule",
+                "inquiries",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "create",
+          "request": {
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"messageId\": 1\n}"
+            },
+            "url": {
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "inquiryModule",
+                "inquiries"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

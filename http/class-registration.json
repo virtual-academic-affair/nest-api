@@ -1,7 +1,6 @@
 {
   "info": {
     "name": "Class Registration",
-    "description": "API collection for Class Registration",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -19,130 +18,222 @@
       "name": "ClassRegistrations",
       "item": [
         {
-          "name": "Get All Class Registrations",
+          "name": "findAll",
           "request": {
             "method": "GET",
-            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/classRegistrations?page=1&limit=10&search=&studentCode=&academicYear=&status=&action=&orderBy=id&orderDir=DESC",
-              "host": ["{{baseUrl}}"],
-              "path": ["classRegistrations"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classRegistration",
+                "classRegistrations"
+              ],
               "query": [
-                {"key": "page", "value": "1"},
-                {"key": "limit", "value": "10"},
-                {"key": "search", "value": "", "disabled": true},
-                {"key": "studentCode", "value": "", "description": "Filter by student code", "disabled": true},
-                {"key": "academicYear", "value": "", "description": "Filter by academic year (e.g., 2025)", "disabled": true},
-                {"key": "status", "value": "", "description": "Filter by status: pending | approved | rejected", "disabled": true},
-                {"key": "action", "value": "", "description": "Filter by action: register | cancel | requestOpen", "disabled": true},
-                {"key": "orderBy", "value": "id"},
-                {"key": "orderDir", "value": "DESC"}
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "keyword",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "studentCode",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "academicYear",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "smartOrder",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "orderCol",
+                  "value": "id",
+                  "description": "id | studentCode | academicYear | createdAt | updatedAt"
+                },
+                {
+                  "key": "orderDir",
+                  "value": "DESC",
+                  "description": "ASC | DESC"
+                }
               ]
             }
           }
         },
         {
-          "name": "Get Class Registration by ID",
+          "name": "findOne",
           "request": {
             "method": "GET",
-            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/classRegistrations/:id",
-              "host": ["{{baseUrl}}"],
-              "path": ["classRegistrations", ":id"],
-              "variable": [{"key": "id", "value": ""}]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classRegistration",
+                "classRegistrations",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
             }
           }
         },
         {
-          "name": "Create Class Registration",
+          "name": "create",
           "request": {
             "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"studentCode\": \"2212000\",\n    \"studentName\": \"Nguyễn Văn A\",\n    \"academicYear\": 2025,\n    \"items\": [\n        {\n            \"action\": \"register\",\n            \"subjectName\": \"Toán cao cấp\",\n            \"subjectCode\": \"MATH101\",\n            \"className\": \"TH1\",\n            \"slotInfo\": \"Thứ 2, tiết 1-3\",\n            \"isInCurriculum\": true\n        }\n    ]\n}"
+              "raw": "{\n    \"studentCode\": \"2212000\",\n    \"studentName\": \"Nguyen Van A\",\n    \"academicYear\": 2025,\n    \"messageId\": 1,\n    \"items\": [\n        {\n            \"action\": \"register\",\n            \"subjectName\": \"Toan cao cap\",\n            \"subjectCode\": \"MATH101\",\n            \"className\": \"TH1\",\n            \"slotInfo\": \"Thu 2, tiet 1-3\",\n            \"isInCurriculum\": true\n        }\n    ]\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/classRegistrations",
-              "host": ["{{baseUrl}}"],
-              "path": ["classRegistrations"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classRegistration",
+                "classRegistrations"
+              ]
             }
           }
         },
         {
-          "name": "Update Class Registration",
+          "name": "update",
           "request": {
             "method": "PUT",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"status\": \"approved\"\n}"
+              "raw": "{\n    \"messageId\": 1\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/classRegistrations/:id",
-              "host": ["{{baseUrl}}"],
-              "path": ["classRegistrations", ":id"],
-              "variable": [{"key": "id", "value": ""}]
-            }
-          }
-        },
-        {
-          "name": "Delete Class Registration",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/classRegistrations/:id",
-              "host": ["{{baseUrl}}"],
-              "path": ["classRegistrations", ":id"],
-              "variable": [{"key": "id", "value": ""}]
-            }
-          }
-        },
-        {
-          "name": "Get Stats",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/classRegistrations/stats?from=2025-01-01&to=2025-01-31",
-              "host": ["{{baseUrl}}"],
-              "path": ["classRegistrations", "stats"],
-              "query": [
-                {"key": "from", "value": "2025-01-01"},
-                {"key": "to", "value": "2025-01-31"}
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classRegistration",
+                "classRegistrations",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
               ]
             }
           }
         },
         {
-          "name": "Preview Reply",
+          "name": "remove",
           "request": {
-            "method": "GET",
-            "header": [],
+            "method": "DELETE",
             "url": {
-              "raw": "{{baseUrl}}/classRegistrations/:id/reply",
-              "host": ["{{baseUrl}}"],
-              "path": ["classRegistrations", ":id", "reply"],
-              "variable": [{"key": "id", "value": ""}]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classRegistration",
+                "classRegistrations",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
             }
           }
         },
         {
-          "name": "Send Reply",
+          "name": "stats",
+          "request": {
+            "method": "GET",
+            "url": {
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classRegistration",
+                "classRegistrations",
+                "stats"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2025-01-01"
+                },
+                {
+                  "key": "to",
+                  "value": "2025-01-31"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "reply",
+          "request": {
+            "method": "GET",
+            "url": {
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classRegistration",
+                "classRegistrations",
+                ":id",
+                "reply"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "sendReply",
           "request": {
             "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
             "body": {
               "mode": "raw",
               "raw": "{\n    \"html\": \"<p>Your registration has been approved.</p>\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/classRegistrations/:id/reply",
-              "host": ["{{baseUrl}}"],
-              "path": ["classRegistrations", ":id", "reply"],
-              "variable": [{"key": "id", "value": ""}]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classRegistration",
+                "classRegistrations",
+                ":id",
+                "reply"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
             }
           }
         }
@@ -152,91 +243,176 @@
       "name": "ClassRegistrationItems",
       "item": [
         {
-          "name": "Get All Items for Class Registration",
+          "name": "findAll",
           "request": {
             "method": "GET",
-            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/classRegistrations/:classRegistrationId/items?page=1&limit=10&orderBy=id&orderDir=DESC",
-              "host": ["{{baseUrl}}"],
-              "path": ["classRegistrations", ":classRegistrationId", "items"],
-              "variable": [{"key": "classRegistrationId", "value": ""}],
-              "query": [
-                {"key": "page", "value": "1"},
-                {"key": "limit", "value": "10"},
-                {"key": "status", "value": "", "description": "Filter by status: pending | approved | rejected", "disabled": true},
-                {"key": "action", "value": "", "description": "Filter by action: register | cancel | requestOpen", "disabled": true},
-                {"key": "orderBy", "value": "id"},
-                {"key": "orderDir", "value": "DESC"}
-              ]
-            }
-          }
-        },
-        {
-          "name": "Get Item by ID",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/classRegistrations/:classRegistrationId/items/:id",
-              "host": ["{{baseUrl}}"],
-              "path": ["classRegistrations", ":classRegistrationId", "items", ":id"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classRegistration",
+                "classRegistrations",
+                ":parentId",
+                "items"
+              ],
               "variable": [
-                {"key": "classRegistrationId", "value": ""},
-                {"key": "id", "value": ""}
+                {
+                  "key": "parentId",
+                  "value": "1"
+                }
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "keyword",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "",
+                  "description": "pending | approved | rejected",
+                  "disabled": true
+                },
+                {
+                  "key": "action",
+                  "value": "",
+                  "description": "register | cancel | requestOpen",
+                  "disabled": true
+                },
+                {
+                  "key": "orderCol",
+                  "value": "id",
+                  "description": "id | action | status | isInCurriculum | createdAt | updatedAt"
+                },
+                {
+                  "key": "orderDir",
+                  "value": "DESC",
+                  "description": "ASC | DESC"
+                }
               ]
             }
           }
         },
         {
-          "name": "Create Item",
+          "name": "findOne",
+          "request": {
+            "method": "GET",
+            "url": {
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classRegistration",
+                "classRegistrations",
+                ":parentId",
+                "items",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "parentId",
+                  "value": "1"
+                },
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "create",
           "request": {
             "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"action\": \"register\",\n    \"subjectName\": \"Toán cao cấp\",\n    \"subjectCode\": \"MATH101\",\n    \"className\": \"TH1\",\n    \"slotInfo\": \"Thứ 2, tiết 1-3\",\n    \"isInCurriculum\": true\n}"
+              "raw": "{\n    \"action\": \"register\",\n    \"subjectName\": \"Toan cao cap\",\n    \"subjectCode\": \"MATH101\",\n    \"className\": \"TH1\",\n    \"slotInfo\": \"Thu 2, tiet 1-3\",\n    \"isInCurriculum\": true\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/classRegistrations/:classRegistrationId/items",
-              "host": ["{{baseUrl}}"],
-              "path": ["classRegistrations", ":classRegistrationId", "items"],
-              "variable": [{"key": "classRegistrationId", "value": ""}]
-            }
-          }
-        },
-        {
-          "name": "Update Item",
-          "request": {
-            "method": "PUT",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"status\": \"approved\",\n    \"rejectReasons\": [\"Lớp đã đầy\"]\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/classRegistrations/:classRegistrationId/items/:id",
-              "host": ["{{baseUrl}}"],
-              "path": ["classRegistrations", ":classRegistrationId", "items", ":id"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classRegistration",
+                "classRegistrations",
+                ":parentId",
+                "items"
+              ],
               "variable": [
-                {"key": "classRegistrationId", "value": ""},
-                {"key": "id", "value": ""}
+                {
+                  "key": "parentId",
+                  "value": "1"
+                }
               ]
             }
           }
         },
         {
-          "name": "Delete Item",
+          "name": "update",
+          "request": {
+            "method": "PUT",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": \"rejected\",\n    \"rejectReasons\": [\n        \"Lop da day\"\n    ]\n}"
+            },
+            "url": {
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classRegistration",
+                "classRegistrations",
+                ":parentId",
+                "items",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "parentId",
+                  "value": "1"
+                },
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "remove",
           "request": {
             "method": "DELETE",
-            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/classRegistrations/:classRegistrationId/items/:id",
-              "host": ["{{baseUrl}}"],
-              "path": ["classRegistrations", ":classRegistrationId", "items", ":id"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classRegistration",
+                "classRegistrations",
+                ":parentId",
+                "items",
+                ":id"
+              ],
               "variable": [
-                {"key": "classRegistrationId", "value": ""},
-                {"key": "id", "value": ""}
+                {
+                  "key": "parentId",
+                  "value": "1"
+                },
+                {
+                  "key": "id",
+                  "value": "1"
+                }
               ]
             }
           }
@@ -247,80 +423,137 @@
       "name": "CancelReasons",
       "item": [
         {
-          "name": "Get All Cancel Reasons",
+          "name": "findAll",
           "request": {
             "method": "GET",
-            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/classRegistrations/cancelReasons?page=1&limit=10&orderBy=id&orderDir=DESC",
-              "host": ["{{baseUrl}}"],
-              "path": ["classRegistrations", "cancelReasons"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classRegistration",
+                "cancelReasons"
+              ],
               "query": [
-                {"key": "page", "value": "1"},
-                {"key": "limit", "value": "10"},
-                {"key": "isActive", "value": "", "description": "Filter by isActive: true | false", "disabled": true},
-                {"key": "orderBy", "value": "id"},
-                {"key": "orderDir", "value": "DESC"}
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "keyword",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "isActive",
+                  "value": "",
+                  "description": "true | false",
+                  "disabled": true
+                },
+                {
+                  "key": "orderCol",
+                  "value": "id",
+                  "description": "id | isActive | createdAt | updatedAt"
+                },
+                {
+                  "key": "orderDir",
+                  "value": "DESC",
+                  "description": "ASC | DESC"
+                }
               ]
             }
           }
         },
         {
-          "name": "Get Cancel Reason by ID",
+          "name": "findOne",
           "request": {
             "method": "GET",
-            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/classRegistrations/cancelReasons/:id",
-              "host": ["{{baseUrl}}"],
-              "path": ["classRegistrations", "cancelReasons", ":id"],
-              "variable": [{"key": "id", "value": ""}]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classRegistration",
+                "cancelReasons",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
             }
           }
         },
         {
-          "name": "Create Cancel Reason",
+          "name": "create",
           "request": {
             "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"name\": \"Lớp đã đầy\",\n    \"isActive\": true\n}"
+              "raw": "{\n    \"content\": \"Lop da day\",\n    \"isActive\": true\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/classRegistrations/cancelReasons",
-              "host": ["{{baseUrl}}"],
-              "path": ["classRegistrations", "cancelReasons"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classRegistration",
+                "cancelReasons"
+              ]
             }
           }
         },
         {
-          "name": "Update Cancel Reason",
+          "name": "update",
           "request": {
             "method": "PUT",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"name\": \"Lớp đã đầy - cập nhật\",\n    \"isActive\": false\n}"
+              "raw": "{\n    \"content\": \"Lop da day - cap nhat\",\n    \"isActive\": false\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/classRegistrations/cancelReasons/:id",
-              "host": ["{{baseUrl}}"],
-              "path": ["classRegistrations", "cancelReasons", ":id"],
-              "variable": [{"key": "id", "value": ""}]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classRegistration",
+                "cancelReasons",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
             }
           }
         },
         {
-          "name": "Delete Cancel Reason",
+          "name": "remove",
           "request": {
             "method": "DELETE",
-            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/classRegistrations/cancelReasons/:id",
-              "host": ["{{baseUrl}}"],
-              "path": ["classRegistrations", "cancelReasons", ":id"],
-              "variable": [{"key": "id", "value": ""}]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "classRegistrations",
+                "cancelReasons",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
             }
           }
         }

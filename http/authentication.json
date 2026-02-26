@@ -1,7 +1,6 @@
 {
   "info": {
     "name": "Authentication",
-    "description": "API collection for Authentication",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -19,14 +18,17 @@
       "name": "Users",
       "item": [
         {
-          "name": "Get All Users",
+          "name": "findAll",
           "request": {
             "method": "GET",
-            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/authentication/users?page=1&limit=10&search=&role=&orderBy=id&orderDir=DESC",
-              "host": ["{{baseUrl}}"],
-              "path": ["authentication", "users"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "authentication",
+                "users"
+              ],
               "query": [
                 {
                   "key": "page",
@@ -44,86 +46,88 @@
                 {
                   "key": "role",
                   "value": "",
-                  "description": "Filter by role: student | lecture | admin",
+                  "description": "student | lecture | admin",
                   "disabled": true
                 },
                 {
                   "key": "orderCol",
                   "value": "id",
-                  "description": "Sort by: id | email | name | role | isActive"
+                  "description": "id | email | name | role | isActive | createdAt | updatedAt"
                 },
                 {
                   "key": "orderDir",
                   "value": "DESC",
-                  "description": "Sort direction: ASC | DESC"
+                  "description": "ASC | DESC"
                 }
               ]
             }
           }
         },
         {
-          "name": "Get User by ID",
+          "name": "findOne",
           "request": {
             "method": "GET",
-            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/authentication/users/:id",
-              "host": ["{{baseUrl}}"],
-              "path": ["authentication", "users", ":id"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "authentication",
+                "users",
+                ":id"
+              ],
               "variable": [
                 {
                   "key": "id",
-                  "value": ""
+                  "value": "1"
                 }
               ]
             }
           }
         },
         {
-          "name": "Update User",
+          "name": "update",
           "request": {
             "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"email\": \"user@example.com\",\n    \"name\": \"Updated Name\"\n}"
+              "raw": "{\n    \"name\": \"Updated Name\",\n    \"role\": \"student\",\n    \"isActive\": true\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/authentication/users/:id",
-              "host": ["{{baseUrl}}"],
-              "path": ["authentication", "users", ":id"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "authentication",
+                "users",
+                ":id"
+              ],
               "variable": [
                 {
                   "key": "id",
-                  "value": ""
+                  "value": "1"
                 }
               ]
             }
           }
         },
         {
-          "name": "Assign Role",
+          "name": "assignRole",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
             "body": {
               "mode": "raw",
               "raw": "{\n    \"email\": \"user@example.com\",\n    \"role\": \"admin\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/authentication/users/assignRole",
-              "host": ["{{baseUrl}}"],
-              "path": ["authentication", "users", "assignRole"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "authentication",
+                "users",
+                "assignRole"
+              ]
             }
           }
         }
@@ -133,54 +137,36 @@
       "name": "Google",
       "item": [
         {
-          "name": "Get Google Auth URL",
+          "name": "getAuthUrl",
           "request": {
             "method": "GET",
-            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/authentication/google",
-              "host": ["{{baseUrl}}"],
-              "path": ["authentication", "google"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "authentication",
+                "google"
+              ]
             }
           }
         },
         {
-          "name": "Authenticate with Google",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "if (pm.response.code === 200) {",
-                  "    const jsonData = pm.response.json();",
-                  "    if (jsonData.accessToken) {",
-                  "        pm.environment.set('accessToken', jsonData.accessToken);",
-                  "    }",
-                  "    if (jsonData.refreshToken) {",
-                  "        pm.environment.set('refreshToken', jsonData.refreshToken);",
-                  "    }",
-                  "}"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
+          "name": "authenticate",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
             "body": {
               "mode": "raw",
               "raw": "{\n    \"code\": \"<google_oauth_code>\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/authentication/google",
-              "host": ["{{baseUrl}}"],
-              "path": ["authentication", "google"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "authentication",
+                "google"
+              ]
             }
           }
         }
@@ -190,64 +176,38 @@
       "name": "Auth",
       "item": [
         {
-          "name": "Refresh Token",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "if (pm.response.code === 200) {",
-                  "    const jsonData = pm.response.json();",
-                  "    if (jsonData.accessToken) {",
-                  "        pm.environment.set('accessToken', jsonData.accessToken);",
-                  "    }",
-                  "    if (jsonData.refreshToken) {",
-                  "        pm.environment.set('refreshToken', jsonData.refreshToken);",
-                  "    }",
-                  "}"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
+          "name": "refresh",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
             "body": {
               "mode": "raw",
               "raw": "{\n    \"refreshToken\": \"{{refreshToken}}\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/authentication/auth/refresh",
-              "host": ["{{baseUrl}}"],
-              "path": ["authentication", "auth", "refresh"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "authentication",
+                "auth",
+                "refresh"
+              ]
             }
           }
         },
         {
-          "name": "Get Current User",
+          "name": "me",
           "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{accessToken}}",
-                  "type": "string"
-                }
-              ]
-            },
             "method": "GET",
-            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/authentication/auth/me",
-              "host": ["{{baseUrl}}"],
-              "path": ["authentication", "auth", "me"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "authentication",
+                "auth",
+                "me"
+              ]
             }
           }
         }

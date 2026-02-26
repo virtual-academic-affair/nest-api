@@ -8,7 +8,7 @@ import { TaskStatus } from '@task/enums/task-status.enum';
 
 @Injectable()
 export class TasksService extends ResourceService<Task> {
-  protected orderableColumns = ['id', 'messageId', 'createdAt', 'updatedAt', 'due'];
+  protected orderableColumns = ['due'];
 
   constructor(@InjectRepository(Task) repository: Repository<Task>) {
     super(repository);

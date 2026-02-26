@@ -2,7 +2,7 @@ import { ConfigService } from '@nestjs/config';
 import { ClassRegistration } from '@class-registration/entities/class-registration.entity';
 import { RegistrationAction } from '@class-registration/enums/registration-action.enum';
 import { RegistrationStatus } from '@class-registration/enums/registration-status.enum';
-import { EmailTemplate } from '@email/services/email-template.service';
+import { EmailTemplate } from '@email/templates/email.template';
 
 export class ClassRegistrationTemplate extends EmailTemplate {
   private readonly classRegistration: ClassRegistration;

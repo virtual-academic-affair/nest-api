@@ -13,7 +13,7 @@ import { ResourceService } from '@shared/resource/services/resource.service';
 @Injectable()
 export class ClassRegistrationsService extends ResourceService<ClassRegistration> {
   protected searchableColumns = ['studentCode', 'studentName'];
-  protected orderableColumns = ['academicYear', 'messageId', 'createdAt', 'updatedAt'];
+  protected orderableColumns = ['academicYear'];
 
   constructor(
     @InjectRepository(ClassRegistration) repository: Repository<ClassRegistration>,

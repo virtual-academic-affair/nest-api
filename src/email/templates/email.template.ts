@@ -26,13 +26,9 @@ export abstract class EmailTemplate {
 
   protected getBaseTemplate(): string {
     if (!this.baseTemplate) {
-      this.baseTemplate = readFileSync(join(process.cwd(), 'public', 'email-base.template.html'), 'utf-8');
+      this.baseTemplate = readFileSync(join(process.cwd(), '..', 'email-base.template.html'), 'utf-8');
     }
     return this.baseTemplate;
-  }
-
-  protected getIcon(name: string): string {
-    return `<span class="material-icons text-[12px] align-middle mr-1">${name}</span>`;
   }
 
   generate(): string {

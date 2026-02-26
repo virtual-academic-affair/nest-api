@@ -16,6 +16,7 @@ export interface PaginatedResult<T> {
 export abstract class ResourceService<T extends ObjectLiteral> {
   protected readonly searchableColumns: string[] = [];
   protected readonly orderableColumns: string[] = [];
+  protected readonly autoOrderableColumns: string[] = ['id', 'createdAt', 'updatedAt'];
   protected readonly alias: string;
 
   protected constructor(protected readonly repository: Repository<T>) {
@@ -51,7 +52,10 @@ export abstract class ResourceService<T extends ObjectLiteral> {
 
     this.applyCustomFilters(qb, queryDto);
 
-    const orderColumn = this.orderableColumns.includes(orderCol) ? orderCol : 'id';
+    const orderColumn =
+      this.orderableColumns.includes(orderCol) || this.autoOrderableColumns.includes(orderCol)
+        ? orderCol
+        : this.autoOrderableColumns[0];
 
     const [items, total] = await qb
       .orderBy(this.p('createdAt'), 'DESC')

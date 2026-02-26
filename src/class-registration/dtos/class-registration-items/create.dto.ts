@@ -12,17 +12,17 @@ export class CreateDto {
 
   @IsOptional()
   @IsString()
-  className: string;
+  className?: string;
 
   @IsOptional()
   @IsString()
-  subjectCode: string;
+  subjectCode?: string;
 
   @IsOptional()
   @IsString()
-  slotInfo: string;
+  slotInfo?: string;
 
   @IsOptional()
   @IsBoolean()
-  isInCurriculum: boolean;
+  isInCurriculum?: boolean;
 }

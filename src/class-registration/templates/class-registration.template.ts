@@ -74,30 +74,38 @@ export class ClassRegistrationTemplate extends EmailTemplate {
 
     return `
       <div style="color: #374151; margin-bottom: 24px;">
-        <p style="margin: 4px 0;"><strong>MSSV:</strong> ${this.classRegistration.studentCode}</p>
+        <p style="margin: 4px 0;"><strong>MSSV:</strong> ${this.classRegistration.studentCode ?? '--'}</p>
         <p style="margin: 4px 0;"><strong>Họ tên:</strong> ${this.classRegistration.studentName ?? '--'}</p>
         <p style="margin: 4px 0;"><strong>Niên khóa:</strong> ${this.classRegistration.academicYear ?? '--'}</p>
       </div>
+      
+      ${this.classRegistration.note}
 
       <h3 style="color: #1F2937; font-weight: bold; margin-bottom: 16px; letter-spacing: 0.025em; font-size: 21px">Danh sách đăng ký học phần</h3>
-      <div style="overflow-x: auto;">
-        <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
-          <thead>
-            <tr style="border-bottom: 1px solid #000000;">
-              <th style="text-align: center; width: 40px; padding-bottom: 4px;">#</th>
-              <th style="text-align: center; width: 128px; padding-bottom: 4px;">Học phần</th>
-              <th style="text-align: center; width: 80px; padding-bottom: 4px;">Lớp HP</th>
-              <th style="text-align: center; width: 200px; padding-bottom: 4px;">Thông tin lớp</th>
-              <th style="text-align: center; width: 112px; padding-bottom: 4px;">Kết quả</th>
-              <th style="text-align: center; width: 200px; padding-bottom: 4px;">Ghi chú</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${itemsHtml}
-          </tbody>
-        </table>
-      </div>
-      
+      ${
+        itemsHtml && itemsHtml.trim() !== ''
+          ? `
+            <div style="overflow-x: auto;">
+              <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
+                <thead>
+                  <tr style="border-bottom: 1px solid #000000;">
+                    <th style="text-align: center; width: 40px; padding-bottom: 4px;">#</th>
+                    <th style="text-align: center; width: 128px; padding-bottom: 4px;">Học phần</th>
+                    <th style="text-align: center; width: 80px; padding-bottom: 4px;">Lớp HP</th>
+                    <th style="text-align: center; width: 200px; padding-bottom: 4px;">Thông tin lớp</th>
+                    <th style="text-align: center; width: 112px; padding-bottom: 4px;">Kết quả</th>
+                    <th style="text-align: center; width: 200px; padding-bottom: 4px;">Ghi chú</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${itemsHtml}
+                </tbody>
+              </table>
+            </div>
+            `
+          : `<p style="color: #6B7280; font-style: italic;">Vui lòng bổ sung các thông tin cơ bản, gồm Học phần (Nhập môn lập trình), Lớp HP (25CLC01), Nguyện vọng (đăng ký/ hủy/ YC mở lớp)</p>`
+      }
+
       <div style="margin-top: 16px;"> 
         Sinh viên vui lòng truy cập portal để kiểm tra lại thông tin kết quả đăng ký học phần 
         <a href="https://portal.ctdb.hcmus.edu.vn/sinh-vien/ket-qua-dkhp" style="font-style: normal; font-weight: bold; color: #4B5563; text-decoration: none;"> 

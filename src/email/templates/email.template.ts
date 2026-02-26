@@ -1,6 +1,5 @@
-import { readFileSync } from 'fs';
-import { join } from 'path';
 import { ConfigService } from '@nestjs/config';
+import { baseTemplate } from './email-base.template';
 
 export interface EmailTemplateConfig {
   appUrl: string;
@@ -9,7 +8,6 @@ export interface EmailTemplateConfig {
 }
 
 export abstract class EmailTemplate {
-  private baseTemplate: string;
   protected readonly config: EmailTemplateConfig;
 
   protected constructor(configService: ConfigService) {
@@ -24,19 +22,12 @@ export abstract class EmailTemplate {
     return this.config;
   }
 
-  protected getBaseTemplate(): string {
-    if (!this.baseTemplate) {
-      this.baseTemplate = readFileSync(join(process.cwd(), '..', 'email-base.template.html'), 'utf-8');
-    }
-    return this.baseTemplate;
-  }
-
   generate(): string {
     const config = this.getConfig();
     const title = this.getTitle();
     const content = this.getContent();
     console.log(title);
-    return this.getBaseTemplate()
+    return baseTemplate
       .replace(/{{TITLE}}/g, title)
       .replace(/{{CONTENT}}/g, content)
       .replace(/{{APP_URL}}/g, config.appUrl)

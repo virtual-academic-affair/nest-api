@@ -4,18 +4,21 @@ import { ClassRegistrationItem } from './class-registration-item.entity';
 
 @Entity()
 export class ClassRegistration extends BelongsToMessage {
-  @Index('idx_class_registrations_student_code')
+  @Index()
   @Column()
   studentCode: string;
 
-  @Index('idx_class_registrations_academic_year')
+  @Index()
   @Column({ type: 'smallint', nullable: true })
   academicYear?: number;
 
   @Column({ nullable: true })
   studentName?: string;
 
-  @OneToMany(() => ClassRegistrationItem, (item) => item.classRegistration, { cascade: true, onDelete: 'CASCADE' })
+  @Column({ type: 'text', nullable: true })
+  note?: string;
+
+  @OneToMany(() => ClassRegistrationItem, (item) => item.parent, { cascade: true, onDelete: 'CASCADE' })
   items: ClassRegistrationItem[];
   itemsCount: number;
 }

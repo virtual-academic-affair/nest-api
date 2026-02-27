@@ -9,7 +9,6 @@ import { ResourceService } from '@shared/resource/services/resource.service';
 @Injectable()
 export class UsersService extends ResourceService<User> {
   protected searchableColumns = ['email', 'name'];
-  protected orderableColumns = ['id', 'email', 'name', 'role', 'isActive'];
 
   constructor(@InjectRepository(User) repository: Repository<User>) {
     super(repository);

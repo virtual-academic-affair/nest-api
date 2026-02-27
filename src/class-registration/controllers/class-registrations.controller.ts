@@ -8,28 +8,26 @@ import { CreateDto } from '@class-registration/dtos/class-registrations/create.d
 import { QueryDto } from '@class-registration/dtos/class-registrations/query.dto';
 import { ReplyDto } from '@class-registration/dtos/class-registrations/reply.dto';
 import { StatsDto } from '@class-registration/dtos/class-registrations/stats.dto';
+import { UpdateDto } from '@class-registration/dtos/class-registrations/update.dto';
 import { ClassRegistration } from '@class-registration/entities/class-registration.entity';
 import { ClassRegistrationsService } from '@class-registration/services/class-registrations.service';
 import { ResourceController } from '@shared/resource/controllers/resource.controller';
 
 @Auth(AuthType.Bearer)
 @Roles(Role.Admin)
-@Controller('classRegistrations')
+@Controller('classRegistration/classRegistrations')
 export class ClassRegistrationsController extends ResourceController<ClassRegistration> {
   constructor(protected readonly service: ClassRegistrationsService) {
     super(service);
   }
 
   protected getDtoClasses() {
-    return {
-      query: QueryDto,
-      create: CreateDto,
-    };
+    return { query: QueryDto, create: CreateDto, update: UpdateDto };
   }
 
   @Get('stats')
   async getStats(@Query() query: StatsDto) {
-    return await this.service.stats(new Date(query.from), new Date(query.to));
+    return await this.service.stats(new Date(query.from), new Date(query.to), query.isDetail);
   }
 
   @Get(':id/reply')

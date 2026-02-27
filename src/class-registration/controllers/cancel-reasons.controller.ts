@@ -12,7 +12,7 @@ import { ResourceController } from '@shared/resource/controllers/resource.contro
 
 @Auth(AuthType.Bearer)
 @Roles(Role.Admin)
-@Controller('classRegistrations/cancelReasons')
+@Controller('classRegistration/cancelReasons')
 export class CancelReasonsController extends ResourceController<CancelReason> {
   constructor(protected readonly service: CancelReasonsService) {
     super(service);

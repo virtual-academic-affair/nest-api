@@ -1,6 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
 import { Transform } from 'class-transformer';
-import { IsBoolean, IsDateString, IsOptional } from 'class-validator';
+import { IsDateString, IsOptional } from 'class-validator';
 import { differenceInDays } from 'date-fns';
 
 export class StatsDto {
@@ -16,8 +16,4 @@ export class StatsDto {
     return value;
   })
   to: string;
-
-  @IsOptional()
-  @IsBoolean()
-  isDetail?: boolean;
 }

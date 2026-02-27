@@ -1,6 +1,6 @@
 {
   "info": {
-    "name": "Authentication",
+    "name": "Task",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -15,7 +15,7 @@
   },
   "item": [
     {
-      "name": "Users",
+      "name": "Tasks",
       "item": [
         {
           "name": "findAll",
@@ -26,8 +26,8 @@
                 "{{baseUrl}}"
               ],
               "path": [
-                "authentication",
-                "users"
+                "task",
+                "tasks"
               ],
               "query": [
                 {
@@ -41,18 +41,40 @@
                 {
                   "key": "keyword",
                   "value": "",
-                  "description": "email | name",
+                  "description": "name | description",
                   "disabled": true
                 },
                 {
-                  "key": "role",
+                  "key": "status",
                   "value": "",
-                  "description": "student | lecture | admin",
+                  "description": "todo | doing | done | cancelled",
+                  "disabled": true
+                },
+                {
+                  "key": "priority",
+                  "value": "",
+                  "description": "low | medium | high | urgent",
+                  "disabled": true
+                },
+                {
+                  "key": "dueDateFrom",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "dueDateTo",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "assigneeIds",
+                  "value": "",
                   "disabled": true
                 },
                 {
                   "key": "orderCol",
-                  "value": "id"
+                  "value": "id",
+                  "description": "due"
                 },
                 {
                   "key": "orderDir",
@@ -72,8 +94,8 @@
                 "{{baseUrl}}"
               ],
               "path": [
-                "authentication",
-                "users",
+                "task",
+                "tasks",
                 ":id"
               ],
               "variable": [
@@ -81,6 +103,30 @@
                   "key": "id",
                   "value": "1"
                 }
+              ]
+            }
+          }
+        },
+        {
+          "name": "create",
+          "request": {
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "raw": "{\n    \"name\": \"Du an website moi\",\n    \"description\": \"Thiet ke va lap trinh frontend cho website\",\n    \"due\": \"2025-12-31T23:59:59Z\",\n    \"priority\": \"high\",\n    \"status\": \"todo\",\n    \"assigners\": [\"Khoa CNTT\"],\n    \"assigneeIds\": [2],\n    \"messageId\": 1\n}"
+            },
+            "url": {
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "task",
+                "tasks"
               ]
             }
           }
@@ -92,19 +138,19 @@
             "body": {
               "mode": "raw",
               "options": {
-              "raw": {
-                "language": "json"
-              }
-            },
-              "raw": "{\n    \"name\": \"Updated Name\",\n    \"role\": \"student\",\n    \"isActive\": true\n}"
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "raw": "{\n    \"status\": \"doing\",\n    \"priority\": \"urgent\"\n}"
             },
             "url": {
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "authentication",
-                "users",
+                "task",
+                "tasks",
                 ":id"
               ],
               "variable": [
@@ -117,37 +163,29 @@
           }
         },
         {
-          "name": "assignRole",
+          "name": "remove",
           "request": {
-            "method": "POST",
-            "body": {
-              "mode": "raw",
-              "options": {
-              "raw": {
-                "language": "json"
-              }
-            },
-              "raw": "{\n    \"email\": \"user@example.com\",\n    \"role\": \"admin\"\n}"
-            },
+            "method": "DELETE",
             "url": {
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "authentication",
-                "users",
-                "assignRole"
+                "task",
+                "tasks",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
               ]
             }
           }
-        }
-      ]
-    },
-    {
-      "name": "Google",
-      "item": [
+        },
         {
-          "name": "getAuthUrl",
+          "name": "stats",
           "request": {
             "method": "GET",
             "url": {
@@ -155,78 +193,19 @@
                 "{{baseUrl}}"
               ],
               "path": [
-                "authentication",
-                "google"
-              ]
-            }
-          }
-        },
-        {
-          "name": "authenticate",
-          "request": {
-            "method": "POST",
-            "body": {
-              "mode": "raw",
-              "options": {
-              "raw": {
-                "language": "json"
-              }
-            },
-              "raw": "{\n    \"code\": \"<google_oauth_code>\"\n}"
-            },
-            "url": {
-              "host": [
-                "{{baseUrl}}"
+                "task",
+                "tasks",
+                "stats"
               ],
-              "path": [
-                "authentication",
-                "google"
-              ]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Auth",
-      "item": [
-        {
-          "name": "refresh",
-          "request": {
-            "method": "POST",
-            "body": {
-              "mode": "raw",
-              "options": {
-              "raw": {
-                "language": "json"
-              }
-            },
-              "raw": "{\n    \"refreshToken\": \"{{refreshToken}}\"\n}"
-            },
-            "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "authentication",
-                "auth",
-                "refresh"
-              ]
-            }
-          }
-        },
-        {
-          "name": "me",
-          "request": {
-            "method": "GET",
-            "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "authentication",
-                "auth",
-                "me"
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2025-01-01"
+                },
+                {
+                  "key": "to",
+                  "value": "2025-01-31"
+                }
               ]
             }
           }

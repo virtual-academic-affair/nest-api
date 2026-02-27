@@ -1,0 +1,277 @@
+---
+alwaysApply: false
+description: Postman JSON collection generation rules
+globs: http/*.json
+---
+
+# Postman JSON Collection Generation Rules
+
+## File Structure
+
+Each module in the API should have its own JSON file in `http/` folder (e.g., `authentication.json`, `class-registration.json`, `task.json`, `email.json`, `inquiry.json`).
+
+## Collection Format
+
+```json
+{
+  "info": {
+    "name": "<Module Name>",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    // Group endpoints by resource
+  ]
+}
+```
+
+## Endpoint Request Format
+
+### GET Request (with query params)
+
+```json
+{
+  "name": "<endpointName>",
+  "request": {
+    "method": "GET",
+    "url": {
+      "host": ["{{baseUrl}}"],
+      "path": ["module", "resources", ":id"],
+      "query": [
+        { "key": "page", "value": "1" },
+        { "key": "limit", "value": "10" },
+        { "key": "keyword", "value": "", "disabled": true, "description": "field1 | field2" },
+        { "key": "orderCol", "value": "field1", "description": "field1 | field2" },
+        { "key": "orderDir", "value": "DESC", "description": "ASC | DESC" }
+      ]
+    }
+  }
+}
+```
+
+### GET Request (with path variable)
+
+```json
+{
+  "name": "findOne",
+  "request": {
+    "method": "GET",
+    "url": {
+      "host": ["{{baseUrl}}"],
+      "path": ["module", "resources", ":id"],
+      "variable": [
+        { "key": "id", "value": "1" }
+      ]
+    }
+  }
+}
+```
+
+### POST Request
+
+```json
+{
+  "name": "create",
+  "request": {
+    "method": "POST",
+    "body": {
+      "mode": "raw",
+      "options": {
+        "raw": {
+          "language": "json"
+        }
+      },
+      "raw": "{\n    \"field\": \"value\"\n}"
+    },
+    "url": {
+      "host": ["{{baseUrl}}"],
+      "path": ["module", "resources"]
+    }
+  }
+}
+```
+
+### PUT Request
+
+```json
+{
+  "name": "update",
+  "request": {
+    "method": "PUT",
+    "body": {
+      "mode": "raw",
+      "options": {
+        "raw": {
+          "language": "json"
+        }
+      },
+      "raw": "{\n    \"field\": \"newValue\"\n}"
+    },
+    "url": {
+      "host": ["{{baseUrl}}"],
+      "path": ["module", "resources", ":id"],
+      "variable": [
+        { "key": "id", "value": "1" }
+      ]
+    }
+  }
+}
+```
+
+### DELETE Request
+
+```json
+{
+  "name": "remove",
+  "request": {
+    "method": "DELETE",
+    "url": {
+      "host": ["{{baseUrl}}"],
+      "path": ["module", "resources", ":id"],
+      "variable": [
+        { "key": "id", "value": "1" }
+      ]
+    }
+  }
+}
+```
+
+## Conventions
+
+### 1. URL Format
+- **DO NOT** use `raw` property in URL
+- Use `host`, `path`, `query`, `variable` separately
+- Path parameters use `:paramName` format
+
+### 2. Headers
+- **DO NOT** include empty `"header": []`
+- Default headers are not needed
+
+### 3. Body (JSON)
+- When using `mode: "raw"` with JSON data, **MUST** add `"options": { "raw": { "language": "json" } }`
+- Example:
+  ```json
+  "body": {
+    "mode": "raw",
+    "options": {
+      "raw": {
+        "language": "json"
+      }
+    },
+    "raw": "{\n    \"field\": \"value\"\n}"
+  }
+  ```
+
+### 4. Query Parameters
+- Standard pagination: `page`, `limit`
+- Search: `keyword` (disabled by default)
+- Sorting: `orderCol`, `orderDir`
+- Filter fields: add as needed with `disabled: true`
+
+### 5. Descriptions
+- **keyword**: Use `searchableColumns` from service. If empty array, include `keyword` param but without description.
+- **orderCol**: Use `orderableColumns` from service. If empty, use `id` without description.
+- **orderDir**: Always add description `ASC | DESC`
+- **Other enum fields**: Add description with format `value1 | value2 | value3`
+
+Examples:
+- `keyword`: `studentCode | studentName` (from searchableColumns)
+- `orderCol`: `academicYear` (from orderableColumns)
+- `orderDir`: `ASC | DESC`
+- `status`: `pending | approved | rejected`
+- `role`: `student | lecture | admin`
+
+- **DO NOT** add descriptions for:
+  - Date formats (e.g., "YYYY-MM-DD")
+  - Data formats (e.g., "ISO date", "comma-separated IDs")
+  - Generic field descriptions
+
+### 6. Nested Resources
+For nested endpoints (e.g., ClassRegistrationItems within ClassRegistrations):
+
+```json
+{
+  "name": "ClassRegistrationItems",
+  "item": [
+    {
+      "name": "findAll",
+      "request": {
+        "method": "GET",
+        "url": {
+          "host": ["{{baseUrl}}"],
+          "path": ["classRegistration", "classRegistrations", ":parentId", "items"],
+          "variable": [
+            { "key": "parentId", "value": "1" }
+          ],
+          "query": [
+            { "key": "page", "value": "1" },
+            { "key": "limit", "value": "10" }
+          ]
+        }
+      }
+    }
+  ]
+}
+```
+
+### 7. Grouping
+- Group related endpoints under a parent `item`
+- Use singular names for endpoint groups (e.g., `Users`, `ClassRegistrations`, not `User`, `ClassRegistration`)
+
+## Example Files
+
+Reference these existing files for examples:
+- [authentication.json](mdc:http/authentication.json)
+- [class-registration.json](mdc:http/class-registration.json)
+- [task.json](mdc:http/task.json)
+- [email.json](mdc:http/email.json)
+- [inquiry.json](mdc:http/inquiry.json)
+
+## Reading Controller Files
+
+When generating Postman JSON from a NestJS controller:
+
+1. **Identify Resource Controller**: If controller `extends ResourceController`, it's a resource controller with standard CRUD methods.
+
+2. **Check Service for Query Parameters**: Look at the corresponding Service file to find:
+
+   a. **searchableColumns**: Used for `keyword` query param
+      ```typescript
+      // Example from class-registrations.service.ts
+      protected searchableColumns = ['studentCode', 'studentName'];
+      ```
+      - If empty array → include `keyword` param but without description
+      - If has values → add description with format `column1 | column2`
+
+   b. **orderableColumns**: Used for `orderCol` query param
+      ```typescript
+      // Example from class-registrations.service.ts
+      protected orderableColumns = ['academicYear'];
+      ```
+      - If empty array → use `id` as default value, no description
+      - If has values → add first value as default, add description with format `column1 | column2`
+
+3. **Check Restriction Decorators**: Look for decorators at class level to identify limitations:
+
+   a. **@RestrictMethods**: Limits which CRUD actions are allowed:
+      ```typescript
+      @RestrictMethods({ except: [ResourceAction.Create, ResourceAction.Delete] })
+      ```
+      - `except` → actions that are NOT allowed
+      - `only` → actions that ARE allowed (alternative to except)
+      - Available actions: `FindAll`, `FindOne`, `Create`, `Update`, `Delete`
+
+   b. **@Auth(AuthType.Bearer)**: Authentication type required
+
+   c. **@Roles(Role.Admin)**: Role-based access (e.g., `Role.Admin`, `Role.Lecture`, `Role.Student`)
+
+4. **Adjust Endpoints Accordingly**: If an action is restricted (via `except` or `only`), DO NOT include that endpoint in the Postman collection.

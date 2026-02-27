@@ -1,15 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { Role } from '@authentication/enums/role.enum';
-import { SystemLabel, SystemLabelLang } from '@shared/enums/system-label.enum';
+import { SystemLabelLang } from '@shared/enums/system-label.enum';
 import { SettingService } from '@shared/setting/services/setting.service';
 
 const EnumRegistry = {
-  shared: {
-    systemLabel: { SystemLabel, SystemLabelLang },
-  },
-  authentication: {
-    role: { Role },
-  },
+  shared: { systemLabel: SystemLabelLang },
+  authentication: { role: Role },
 };
 
 @Injectable()

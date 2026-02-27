@@ -9,11 +9,11 @@ import { ClassRegistration } from './class-registration.entity';
 export class ClassRegistrationItem extends BaseEntity {
   @Index()
   @Column()
-  classRegistrationId: number;
+  parentId: number;
 
   @ManyToOne(() => ClassRegistration, (registration) => registration.items, { onDelete: 'CASCADE' })
   @JoinColumn()
-  classRegistration: ClassRegistration;
+  parent: ClassRegistration;
 
   @Index()
   @Column({ type: 'enum', enum: RegistrationAction })
@@ -33,7 +33,7 @@ export class ClassRegistrationItem extends BaseEntity {
   slotInfo?: string;
 
   @Index()
-  @Column({ type: 'boolean' })
+  @Column({ type: 'boolean', nullable: true })
   isInCurriculum: boolean;
 
   @Index()

@@ -9,15 +9,15 @@ async function bootstrap() {
 
   try {
     const { app: httpApp, port: httpPort, url: httpUrl } = await setupHttpApp();
-    const config = httpApp.get(ConfigService);
-
-    const { app: grpcApp, url: grpcUrl } = await setupGrpcApp(config);
-
-    await grpcApp.listen();
     await httpApp.listen(httpPort);
-
     logger.log(`HTTP server running on ${httpUrl}`);
-    logger.log(`gRPC server running on ${grpcUrl}`);
+
+    if (process.env.START_GRPC === 'true') {
+      const config = httpApp.get(ConfigService);
+      const { app: grpcApp, url: grpcUrl } = await setupGrpcApp(config);
+      await grpcApp.listen();
+      logger.log(`gRPC server running on ${grpcUrl}`);
+    }
   } catch (error) {
     logger.error('Failed to start application', error);
     process.exit(1);

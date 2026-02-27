@@ -7,7 +7,7 @@ export class GrpcResponseInterceptor implements NestInterceptor {
   intercept(_context: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
       map((data) => {
-        return { success: true, message: 'OK', ...data };
+        return { success: true, ...data };
       }),
     );
   }

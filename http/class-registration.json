@@ -101,10 +101,10 @@
             "body": {
               "mode": "raw",
               "options": {
-              "raw": {
-                "language": "json"
-              }
-            },
+                "raw": {
+                  "language": "json"
+                }
+              },
               "raw": "{\n    \"studentCode\": \"2212000\",\n    \"studentName\": \"Nguyen Van A\",\n    \"academicYear\": 2025,\n    \"note\": \"Ghi chu thanh toan\",\n    \"messageId\": 1,\n    \"items\": [\n        {\n            \"action\": \"register\",\n            \"subjectName\": \"Toan cao cap\",\n            \"subjectCode\": \"MATH101\",\n            \"className\": \"TH1\",\n            \"slotInfo\": \"Thu 2, tiet 1-3\",\n            \"isInCurriculum\": true\n        }\n    ]\n}"
             },
             "url": {
@@ -125,10 +125,10 @@
             "body": {
               "mode": "raw",
               "options": {
-              "raw": {
-                "language": "json"
-              }
-            },
+                "raw": {
+                  "language": "json"
+                }
+              },
               "raw": "{\n    \"studentCode\": \"2212000\",\n    \"studentName\": \"Nguyen Van A\",\n    \"academicYear\": 2025,\n    \"note\": \"Ghi chu cap nhat\",\n    \"items\": [\n        {\n            \"action\": \"register\",\n            \"subjectName\": \"Toan cao cap\",\n            \"subjectCode\": \"MATH101\",\n            \"className\": \"TH1\",\n            \"slotInfo\": \"Thu 2, tiet 1-3\",\n            \"isInCurriculum\": true\n        }\n    ]\n}"
             },
             "url": {
@@ -198,7 +198,7 @@
           }
         },
         {
-          "name": "reply",
+          "name": "previewReply",
           "request": {
             "method": "GET",
             "url": {
@@ -221,16 +221,16 @@
           }
         },
         {
-          "name": "sendReply",
+          "name": "reply",
           "request": {
             "method": "POST",
             "body": {
               "mode": "raw",
               "options": {
-              "raw": {
-                "language": "json"
-              }
-            },
+                "raw": {
+                  "language": "json"
+                }
+              },
               "raw": "{\n    \"html\": \"<p>Your registration has been approved.</p>\",\n    \"note\": \"Luu y: Phi duoc giam 50%\"\n}"
             },
             "url": {
@@ -264,10 +264,10 @@
             "body": {
               "mode": "raw",
               "options": {
-              "raw": {
-                "language": "json"
-              }
-            },
+                "raw": {
+                  "language": "json"
+                }
+              },
               "raw": "{\n    \"action\": \"register\",\n    \"subjectName\": \"Toan cao cap\",\n    \"subjectCode\": \"MATH101\",\n    \"className\": \"TH1\",\n    \"slotInfo\": \"Thu 2, tiet 1-3\",\n    \"isInCurriculum\": true\n}"
             },
             "url": {
@@ -296,10 +296,10 @@
             "body": {
               "mode": "raw",
               "options": {
-              "raw": {
-                "language": "json"
-              }
-            },
+                "raw": {
+                  "language": "json"
+                }
+              },
               "raw": "{\n    \"status\": \"rejected\",\n    \"rejectReasons\": [\n        \"Lop da day\"\n    ]\n}"
             },
             "url": {
@@ -433,10 +433,10 @@
             "body": {
               "mode": "raw",
               "options": {
-              "raw": {
-                "language": "json"
-              }
-            },
+                "raw": {
+                  "language": "json"
+                }
+              },
               "raw": "{\n    \"content\": \"Lop da day\",\n    \"isActive\": true\n}"
             },
             "url": {
@@ -457,10 +457,10 @@
             "body": {
               "mode": "raw",
               "options": {
-              "raw": {
-                "language": "json"
-              }
-            },
+                "raw": {
+                  "language": "json"
+                }
+              },
               "raw": "{\n    \"content\": \"Lop da day - cap nhat\",\n    \"isActive\": false\n}"
             },
             "url": {

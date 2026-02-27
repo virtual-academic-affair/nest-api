@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository, SelectQueryBuilder } from 'typeorm';
+import { ClsService } from 'nestjs-cls';
+import { In, LessThanOrEqual, MoreThanOrEqual, Repository, SelectQueryBuilder } from 'typeorm';
+import { REQUEST_USER_KEY } from '@authentication/guards/authentication.guard';
+import { ActiveUserData } from '@authentication/interfaces/active-user-data.interface';
 import { ResourceService } from '@shared/resource/services/resource.service';
 import { QueryDto } from '@task/dtos/tasks/query.dto';
 import { Task } from '@task/entities/task.entity';
@@ -11,16 +14,25 @@ export class TasksService extends ResourceService<Task> {
   protected orderableColumns = ['due'];
   protected searchableColumns = ['name', 'description'];
 
-  constructor(@InjectRepository(Task) repository: Repository<Task>) {
+  constructor(
+    @InjectRepository(Task) repository: Repository<Task>,
+    private readonly cls: ClsService,
+  ) {
     super(repository);
   }
 
   protected withAll(queryBuilder: SelectQueryBuilder<Task>): void {
-    queryBuilder.leftJoinAndSelect(this.p('items'), 'items');
+    queryBuilder
+      .leftJoinAndSelect(this.p('assignees'), 'assignees')
+      .leftJoinAndSelect('assignees.assignee', 'assignee');
   }
 
   protected withOne(queryBuilder: SelectQueryBuilder<Task>): void {
-    queryBuilder.leftJoinAndSelect(this.p('items'), 'items').leftJoinAndSelect(this.p('message'), 'message');
+    queryBuilder
+      .leftJoinAndSelect(this.p('assignees'), 'assignees')
+      .leftJoinAndSelect('assignees.assignee', 'assignee')
+      .leftJoinAndSelect('assignees.assigner', 'assigner')
+      .leftJoinAndSelect(this.p('message'), 'message');
   }
 
   protected applyCustomFilters(
@@ -29,9 +41,9 @@ export class TasksService extends ResourceService<Task> {
   ): void {
     status && queryBuilder.andWhere({ status });
     priority && queryBuilder.andWhere({ priority });
-    dueDateFrom && queryBuilder.andWhere('task.due >= :dueDateFrom', { dueDateFrom });
-    dueDateTo && queryBuilder.andWhere('task.due <= :dueDateTo', { dueDateTo });
-    assigneeIds && queryBuilder.andWhere({ assigners: In(assigneeIds) });
+    dueDateFrom && queryBuilder.andWhere({ due: MoreThanOrEqual(dueDateFrom) });
+    dueDateTo && queryBuilder.andWhere({ due: LessThanOrEqual(dueDateTo) });
+    assigneeIds && queryBuilder.andWhere({ assignees: { assigneeId: In(assigneeIds) } });
   }
 
   async stats(startDate: Date, endDate: Date) {
@@ -57,5 +69,13 @@ export class TasksService extends ResourceService<Task> {
       acc[date].total += +counts.total;
       return acc;
     }, {});
+  }
+
+  async create(createDto: any): Promise<Task> {
+    const userId = this.cls.get<ActiveUserData>(REQUEST_USER_KEY);
+    return super.create({
+      ...createDto,
+      assignees: createDto.assigneeIds?.map((id) => ({ assigneeId: id, assignerId: userId.sub })),
+    });
   }
 }

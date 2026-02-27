@@ -1,8 +1,12 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { ClsService } from 'nestjs-cls';
+import { getActiveUser } from '@authentication/decorators/active-user.decorator';
 import { AUTH_TYPE_KEY } from '@authentication/decorators/auth.decorator';
 import { AuthType } from '@authentication/enums/auth-type.enum';
 import { AccessTokenGuard } from './access-token.guard';
+
+export const REQUEST_USER_KEY = 'user';
 
 @Injectable()
 export class AuthenticationGuard implements CanActivate {
@@ -13,7 +17,11 @@ export class AuthenticationGuard implements CanActivate {
     [AuthType.None]: { canActivate: () => true },
   };
 
-  constructor(private readonly reflector: Reflector, private readonly accessTokenGuard: AccessTokenGuard) {}
+  constructor(
+    private readonly reflector: Reflector,
+    private readonly accessTokenGuard: AccessTokenGuard,
+    private readonly cls: ClsService,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const authTypes = this.reflector.getAllAndOverride<AuthType[]>(AUTH_TYPE_KEY, [
@@ -28,6 +36,7 @@ export class AuthenticationGuard implements CanActivate {
         error = err;
       });
       if (canActivate) {
+        this.cls.set(REQUEST_USER_KEY, getActiveUser(null, context));
         return true;
       }
     }

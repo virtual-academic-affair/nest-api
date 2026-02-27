@@ -1,7 +1,8 @@
-import { Module } from '@nestjs/common';
+import { Module, OnModuleInit } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { ClsModule, ClsService } from 'nestjs-cls';
 import { AuthenticationModule } from '@authentication/authentication.module';
 import { ClassRegistrationModule } from '@class-registration/class-registration.module';
 import { EmailModule } from '@email/email.module';
@@ -9,6 +10,7 @@ import { InquiryModule } from '@inquiry/inquiry.module';
 import { appConfig } from '@shared/config/app.config';
 import { SharedModule } from '@shared/shared.module';
 import { TaskModule } from '@task/task.module';
+import { ClsServiceManager } from './cls-manager';
 
 @Module({
   imports: [
@@ -26,6 +28,13 @@ import { TaskModule } from '@task/task.module';
     ClassRegistrationModule,
     TaskModule,
     InquiryModule,
+    ClsModule.forRoot({ global: true, middleware: { mount: true } }),
   ],
 })
-export class AppModule {}
+export class AppModule implements OnModuleInit {
+  constructor(private readonly cls: ClsService) {}
+
+  onModuleInit() {
+    ClsServiceManager.setService(this.cls);
+  }
+}

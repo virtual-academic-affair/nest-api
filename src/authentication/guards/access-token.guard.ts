@@ -5,9 +5,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Request } from 'express';
 import { Repository } from 'typeorm';
 import { User } from '@authentication/entities/user.entity';
+import { REQUEST_USER_KEY } from '@authentication/guards/authentication.guard';
 import jwtConfig from '@shared/config/jwt.config';
-
-export const REQUEST_USER_KEY = 'user';
 
 @Injectable()
 export class AccessTokenGuard implements CanActivate {

@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ClsService } from 'nestjs-cls';
-import { In, LessThanOrEqual, MoreThanOrEqual, Repository, SelectQueryBuilder } from 'typeorm';
+import { DataSource, In, LessThanOrEqual, MoreThanOrEqual, Repository, SelectQueryBuilder } from 'typeorm';
 import { REQUEST_USER_KEY } from '@authentication/guards/authentication.guard';
 import { ActiveUserData } from '@authentication/interfaces/active-user-data.interface';
 import { ResourceService } from '@shared/resource/services/resource.service';
 import { QueryDto } from '@task/dtos/tasks/query.dto';
+import { UpdateDto } from '@task/dtos/tasks/update.dto';
+import { TaskAssignee } from '@task/entities/task-assignee.entity';
 import { Task } from '@task/entities/task.entity';
 import { TaskStatus } from '@task/enums/task-status.enum';
 
@@ -17,6 +19,7 @@ export class TasksService extends ResourceService<Task> {
   constructor(
     @InjectRepository(Task) repository: Repository<Task>,
     private readonly cls: ClsService,
+    private readonly dataSource: DataSource,
   ) {
     super(repository);
   }
@@ -72,10 +75,44 @@ export class TasksService extends ResourceService<Task> {
   }
 
   async create(createDto: any): Promise<Task> {
-    const userId = this.cls.get<ActiveUserData>(REQUEST_USER_KEY);
     return super.create({
       ...createDto,
-      assignees: createDto.assigneeIds?.map((id) => ({ assigneeId: id, assignerId: userId.sub })),
+      assignees: this.enrichAssignees(createDto.assigneeIds),
+    });
+  }
+
+  enrichAssignees(assigneeIds: number[]) {
+    const userId = this.cls.get<ActiveUserData>(REQUEST_USER_KEY).sub;
+    return assigneeIds?.map((id) => ({ assigneeId: id, assignerId: userId }));
+  }
+
+  async update(id: number, updateDto: UpdateDto): Promise<Task> {
+    if (!updateDto?.assigneeIds) {
+      return super.update(id, updateDto);
+    }
+
+    return await this.dataSource.transaction(async (manager) => {
+      const task = await manager.findOneOrFail(Task, { where: { id }, relations: ['assignees'] });
+
+      const newAssigneeIds = updateDto.assigneeIds;
+      const currentAssigneeIds = task.assignees.map((a) => a.assigneeId);
+
+      const toDelete = currentAssigneeIds
+        .filter((c) => !newAssigneeIds.includes(c))
+        .map((c) => ({ taskId: id, assigneeId: c }));
+
+      if (toDelete.length > 0) {
+        await manager.delete(TaskAssignee, toDelete);
+      }
+
+      const updatedTask = manager.create(Task, {
+        ...task,
+        ...updateDto,
+        assignees: this.enrichAssignees(newAssigneeIds),
+        id,
+      });
+
+      return await manager.save(updatedTask);
     });
   }
 }

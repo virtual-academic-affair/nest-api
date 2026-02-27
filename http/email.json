@@ -41,12 +41,13 @@
                 {
                   "key": "keyword",
                   "value": "",
+                  "description": "subject | senderEmail | senderName",
                   "disabled": true
                 },
                 {
-                  "key": "systemLabels",
+                  "key": "systemLabels[]",
                   "value": "",
-                  "description": "inbox | sent | draft | trash | spam | important | unread | starred | viewed",
+                  "description": "systemLabels",
                   "disabled": true
                 },
                 {
@@ -144,10 +145,10 @@
             "body": {
               "mode": "raw",
               "options": {
-              "raw": {
-                "language": "json"
-              }
-            },
+                "raw": {
+                  "language": "json"
+                }
+              },
               "raw": "{\n    \"labels\": [\n        {\n            \"name\": \"Label Name\",\n            \"id\": \"Label_123\"\n        }\n    ]\n}"
             },
             "url": {
@@ -204,10 +205,10 @@
             "body": {
               "mode": "raw",
               "options": {
-              "raw": {
-                "language": "json"
-              }
-            },
+                "raw": {
+                  "language": "json"
+                }
+              },
               "raw": "{\n    \"domains\": [\"example.com\", \"test.com\"]\n}"
             },
             "url": {
@@ -248,10 +249,10 @@
             "body": {
               "mode": "raw",
               "options": {
-              "raw": {
-                "language": "json"
-              }
-            },
+                "raw": {
+                  "language": "json"
+                }
+              },
               "raw": "{\n    \"code\": \"<google_oauth_code>\"\n}"
             },
             "url": {

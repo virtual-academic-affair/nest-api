@@ -41,6 +41,7 @@
                 {
                   "key": "keyword",
                   "value": "",
+                  "description": "name | description",
                   "disabled": true
                 },
                 {

@@ -49,8 +49,8 @@ Each module in the API should have its own JSON file in `http/` folder (e.g., `a
       "query": [
         { "key": "page", "value": "1" },
         { "key": "limit", "value": "10" },
-        { "key": "keyword", "value": "", "disabled": true },
-        { "key": "orderCol", "value": "id", "description": "id | field1 | field2 | createdAt | updatedAt" },
+        { "key": "keyword", "value": "", "disabled": true, "description": "field1 | field2" },
+        { "key": "orderCol", "value": "field1", "description": "field1 | field2" },
         { "key": "orderDir", "value": "DESC", "description": "ASC | DESC" }
       ]
     }
@@ -178,13 +178,17 @@ Each module in the API should have its own JSON file in `http/` folder (e.g., `a
 - Filter fields: add as needed with `disabled: true`
 
 ### 5. Descriptions
-- **ONLY** use descriptions for enum values
-- Format: `value1 | value2 | value3`
-- Examples:
-  - `orderCol`: `id | field1 | field2 | createdAt | updatedAt`
-  - `orderDir`: `ASC | DESC`
-  - `status`: `pending | approved | rejected`
-  - `role`: `student | lecture | admin`
+- **keyword**: Use `searchableColumns` from service. If empty array, include `keyword` param but without description.
+- **orderCol**: Use `orderableColumns` from service. If empty, use `id` without description.
+- **orderDir**: Always add description `ASC | DESC`
+- **Other enum fields**: Add description with format `value1 | value2 | value3`
+
+Examples:
+- `keyword`: `studentCode | studentName` (from searchableColumns)
+- `orderCol`: `academicYear` (from orderableColumns)
+- `orderDir`: `ASC | DESC`
+- `status`: `pending | approved | rejected`
+- `role`: `student | lecture | admin`
 
 - **DO NOT** add descriptions for:
   - Date formats (e.g., "YYYY-MM-DD")
@@ -238,7 +242,25 @@ When generating Postman JSON from a NestJS controller:
 
 1. **Identify Resource Controller**: If controller `extends ResourceController`, it's a resource controller with standard CRUD methods.
 
-2. **Check Restriction Decorators**: Look for decorators at class level to identify limitations:
+2. **Check Service for Query Parameters**: Look at the corresponding Service file to find:
+
+   a. **searchableColumns**: Used for `keyword` query param
+      ```typescript
+      // Example from class-registrations.service.ts
+      protected searchableColumns = ['studentCode', 'studentName'];
+      ```
+      - If empty array → include `keyword` param but without description
+      - If has values → add description with format `column1 | column2`
+
+   b. **orderableColumns**: Used for `orderCol` query param
+      ```typescript
+      // Example from class-registrations.service.ts
+      protected orderableColumns = ['academicYear'];
+      ```
+      - If empty array → use `id` as default value, no description
+      - If has values → add first value as default, add description with format `column1 | column2`
+
+3. **Check Restriction Decorators**: Look for decorators at class level to identify limitations:
 
    a. **@RestrictMethods**: Limits which CRUD actions are allowed:
       ```typescript
@@ -252,4 +274,4 @@ When generating Postman JSON from a NestJS controller:
 
    c. **@Roles(Role.Admin)**: Role-based access (e.g., `Role.Admin`, `Role.Lecture`, `Role.Student`)
 
-3. **Adjust Endpoints Accordingly**: If an action is restricted (via `except` or `only`), DO NOT include that endpoint in the Postman collection.
+4. **Adjust Endpoints Accordingly**: If an action is restricted (via `except` or `only`), DO NOT include that endpoint in the Postman collection.

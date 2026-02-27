@@ -41,6 +41,7 @@
                 {
                   "key": "keyword",
                   "value": "",
+                  "description": "email | name",
                   "disabled": true
                 },
                 {

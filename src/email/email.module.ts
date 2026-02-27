@@ -9,9 +9,9 @@ import { MessageLabelsController } from '@email/controllers/message-labels.contr
 import { MessagesController } from '@email/controllers/messages.controller';
 import { Message } from '@email/entities/message.entity';
 import { EmailSyncScheduler } from '@email/scheduler/email-sync.scheduler';
-import { EmailReplyService } from '@email/services/email-reply.service';
-import { EmailSendService } from '@email/services/email-send.service';
-import { EmailSyncService } from '@email/services/email-sync.service';
+import { EmailReplyService } from '@email/services/email-send/email-reply.service';
+import { EmailSendService } from '@email/services/email-send/email-send.service';
+import { EmailSyncService } from '@email/services/email-send/email-sync.service';
 import { GoogleapisService } from '@email/services/googleapis.service';
 import { GrantsService } from '@email/services/grants.service';
 import { LabelsService } from '@email/services/labels.service';

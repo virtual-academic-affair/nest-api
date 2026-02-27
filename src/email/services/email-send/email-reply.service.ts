@@ -1,7 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as parseMessage from 'gmail-api-parse-message';
 import { Message } from '@email/entities/message.entity';
-import { EmailSendService } from '@email/services/email-send.service';
+import { EmailSendService } from '@email/services/email-send/email-send.service';
+import { compile } from '@email/services/email-send/email-template.service';
 import { GoogleapisService } from '@email/services/googleapis.service';
 
 @Injectable()
@@ -28,20 +29,17 @@ export class EmailReplyService {
       this.logger.error('Failed to fetch original content:', error);
     }
 
-    return `
-      <div style="font-family: Arial, sans-serif; line-height: 1.6;">
-        ${newContent}
-        <hr style="border: none; border-top: 1px solid #ccc; margin: 20px 0;">
-        <div style="color: #666; font-size: 12px;">
-          <p>
-            <strong>On ${message.sentAt?.toLocaleString()}, ${message.senderName || message.senderEmail} wrote:</strong>
-          </p>
-          <blockquote style="margin: 0; padding-left: 10px; border-left: 3px solid #ccc; color: #666;">
-            ${originalContent}
-          </blockquote>
-        </div>
-      </div>
-    `.trim();
+    const quotedInfo = `On ${message.sentAt
+      .toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
+      .replace(/,([^,]*)$/, '$1')} at ${message.sentAt
+      .toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
+      .replace(' ', ' ')} ${message.senderName.replace(/"/g, '')} <${message.senderEmail}> wrote:`;
+
+    return compile('reply.hbs', {
+      newContent,
+      originalContent,
+      quotedInfo,
+    });
   }
 
   getSubject(message: Message): string {

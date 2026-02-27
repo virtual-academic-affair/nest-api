@@ -5,7 +5,7 @@ import { AuthType } from '@authentication/enums/auth-type.enum';
 import { Role } from '@authentication/enums/role.enum';
 import { QueryDto } from '@email/dtos/messages/query.dto';
 import { Message } from '@email/entities/message.entity';
-import { EmailSyncService } from '@email/services/email-sync.service';
+import { EmailSyncService } from '@email/services/email-send/email-sync.service';
 import { MessagesService } from '@email/services/messages.service';
 import { ResourceController } from '@shared/resource/controllers/resource.controller';
 import { RestrictMethods } from '@shared/resource/decorators/restrict-methods.decorator';

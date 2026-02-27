@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { google } from 'googleapis';
 import { CodeDto } from '@email/dtos/grants/code.dto';
-import { EmailSyncService } from '@email/services/email-sync.service';
+import { EmailSyncService } from '@email/services/email-send/email-sync.service';
 import { GoogleapisService } from '@email/services/googleapis.service';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
 import { SettingService } from '@shared/setting/services/setting.service';

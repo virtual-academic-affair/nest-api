@@ -6,6 +6,7 @@ import { AuthType } from '@authentication/enums/auth-type.enum';
 import { Role } from '@authentication/enums/role.enum';
 import { CreateDto } from '@inquiry/dtos/inquiries/create.dto';
 import { QueryDto } from '@inquiry/dtos/inquiries/query.dto';
+import { UpdateDto } from '@inquiry/dtos/inquiries/update.dto';
 import { Inquiry } from '@inquiry/entities/inquiry.entity';
 import { InquiriesService } from '@inquiry/services/inquiries.service';
 import { ResourceController } from '@shared/resource/controllers/resource.controller';
@@ -19,7 +20,7 @@ export class InquiriesController extends ResourceController<Inquiry> {
   }
 
   protected getDtoClasses() {
-    return { query: QueryDto, create: CreateDto };
+    return { query: QueryDto, create: CreateDto, update: UpdateDto };
   }
 
   @Post()

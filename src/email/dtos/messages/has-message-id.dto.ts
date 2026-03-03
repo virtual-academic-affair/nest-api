@@ -1,5 +1,6 @@
+import { MessageStatus } from '@email/enums/message-status.enum';
 import { Type } from 'class-transformer';
-import { IsDefined, IsInt, Min } from 'class-validator';
+import { IsDefined, IsEnum, IsInt, Min } from 'class-validator';
 
 export class HasMessageIdDto {
   @IsDefined()
@@ -7,4 +8,8 @@ export class HasMessageIdDto {
   @IsInt()
   @Min(1)
   messageId!: number;
+
+  @IsDefined()
+  @IsEnum(MessageStatus)
+  messageStatus!: MessageStatus;
 }

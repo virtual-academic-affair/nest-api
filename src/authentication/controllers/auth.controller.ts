@@ -10,7 +10,10 @@ import { UsersService } from '@authentication/services/users.service';
 
 @Controller('authentication/auth')
 export class AuthenticationController {
-  constructor(private readonly userService: UsersService, private readonly authService: AuthService) {}
+  constructor(
+    private readonly userService: UsersService,
+    private readonly authService: AuthService,
+  ) {}
 
   @Post('refresh')
   async refresh(@Body() dto: RefreshTokenDto) {

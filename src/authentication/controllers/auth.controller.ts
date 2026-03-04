@@ -26,4 +26,10 @@ export class AuthenticationController {
   async findOne(@ActiveUser('sub') sub: ActiveUserData['sub']) {
     return this.userService.findOne(sub);
   }
+
+  @GrpcMethod('AuthService', 'FindOneByKeyword')
+  async findOneByKeyword(@Body() { keyword }: { keyword?: string }) {
+    const { items } = await this.userService.findAll({ keyword, limit: 1 });
+    return { user: items[0] || null };
+  }
 }

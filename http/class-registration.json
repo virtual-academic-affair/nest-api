@@ -60,6 +60,17 @@
                   "disabled": true
                 },
                 {
+                  "key": "messageId",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "messageStatuses[]",
+                  "value": "",
+                  "description": "opened | replied | closed | resolved",
+                  "disabled": true
+                },
+                {
                   "key": "orderCol",
                   "value": "academicYear",
                   "description": "academicYear"

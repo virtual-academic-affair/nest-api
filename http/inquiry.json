@@ -26,7 +26,7 @@
                 "{{baseUrl}}"
               ],
               "path": [
-                "inquiryModule",
+                "inquiry",
                 "inquiries"
               ],
               "query": [
@@ -41,6 +41,17 @@
                 {
                   "key": "keyword",
                   "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "messageId",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "messageStatuses[]",
+                  "value": "",
+                  "description": "opened | replied | closed | resolved",
                   "disabled": true
                 },
                 {
@@ -65,7 +76,7 @@
                 "{{baseUrl}}"
               ],
               "path": [
-                "inquiryModule",
+                "inquiry",
                 "inquiries",
                 ":id"
               ],
@@ -89,15 +100,94 @@
                 "language": "json"
               }
             },
-              "raw": "{\n    \"messageId\": 1\n}"
+              "raw": "{\n    \"messageId\": 1,\n    \"types\": [\"graduation\"],\n    \"question\": \"Bao gio co lich bao ve?\",\n    \"answer\": \"Du kien cuoi thang 6\"\n}"
             },
             "url": {
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "inquiryModule",
+                "inquiry",
                 "inquiries"
+              ]
+            }
+          }
+        },
+        {
+          "name": "update",
+          "request": {
+            "method": "PUT",
+            "body": {
+              "mode": "raw",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "raw": "{\n    \"types\": [\"procedure\"],\n    \"question\": \"Cho em hoi thu tuc nop ho so?\",\n    \"answer\": \"Em nop tai phong giao vu\"\n}"
+            },
+            "url": {
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "inquiry",
+                "inquiries",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "remove",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "inquiry",
+                "inquiries",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "stats",
+          "request": {
+            "method": "GET",
+            "url": {
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "inquiry",
+                "inquiries",
+                "stats"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2025-01-01"
+                },
+                {
+                  "key": "to",
+                  "value": "2025-01-31"
+                }
               ]
             }
           }

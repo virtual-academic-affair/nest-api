@@ -45,9 +45,9 @@
                   "disabled": true
                 },
                 {
-                  "key": "roles",
+                  "key": "roles[]",
                   "value": "",
-                  "description": "sinh_vien | giang_vien | giao_vu",
+                  "description": "student | lecture | admin",
                   "disabled": true
                 },
                 {
@@ -96,7 +96,7 @@
                   "language": "json"
                 }
               },
-              "raw": "{\n    \"name\": \"Updated Name\",\n    \"role\": \"sinh_vien\",\n    \"isActive\": true\n}"
+              "raw": "{\n    \"name\": \"Updated Name\",\n    \"role\": \"student\",\n    \"isActive\": true\n}"
             },
             "url": {
               "host": [

@@ -47,7 +47,7 @@
                 {
                   "key": "systemLabels[]",
                   "value": "",
-                  "description": "systemLabels",
+                  "description": "classRegistration | task | inquiry | other",
                   "disabled": true
                 },
                 {

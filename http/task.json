@@ -45,13 +45,13 @@
                   "disabled": true
                 },
                 {
-                  "key": "status",
+                  "key": "statuses[]",
                   "value": "",
                   "description": "todo | doing | done | cancelled",
                   "disabled": true
                 },
                 {
-                  "key": "priority",
+                  "key": "priorities[]",
                   "value": "",
                   "description": "low | medium | high | urgent",
                   "disabled": true
@@ -67,13 +67,24 @@
                   "disabled": true
                 },
                 {
-                  "key": "assigneeIds",
+                  "key": "assigneeIds[]",
                   "value": "",
                   "disabled": true
                 },
                 {
+                  "key": "messageId",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "messageStatuses[]",
+                  "value": "",
+                  "description": "opened | replied | closed | resolved",
+                  "disabled": true
+                },
+                {
                   "key": "orderCol",
-                  "value": "id",
+                  "value": "due",
                   "description": "due"
                 },
                 {

@@ -176,6 +176,8 @@ Each module in the API should have its own JSON file in `http/` folder (e.g., `a
 - Search: `keyword` (disabled by default)
 - Sorting: `orderCol`, `orderDir`
 - Filter fields: add as needed with `disabled: true`
+- If a query field is an array (usually plural names), key **must** use `[]` suffix.
+  - Example: use `"key": "roles[]"`, `"key": "statuses[]"`, `"key": "systemLabels[]"`
 
 ### 5. Descriptions
 - **keyword**: Use `searchableColumns` from service. If empty array, include `keyword` param but without description.

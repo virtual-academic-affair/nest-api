@@ -20,14 +20,19 @@ export class InquiriesService extends ResourceService<Inquiry> {
     applyMessageFilters(queryBuilder, { messageId, messageStatuses });
   }
 
+  protected withOne(queryBuilder: SelectQueryBuilder<Inquiry>): void {
+    queryBuilder.leftJoinAndSelect(this.p('message'), 'message');
+  }
+
   async stats(startDate: Date, endDate: Date) {
+    const alias = this.queryBuilder.alias;
     const stats = await this.queryBuilder
       .select([
         `DATE(${this.p('createdAt')}) AS date`,
         'COUNT(*) AS total',
-        `SUM(CASE WHEN '${InquiryType.Graduation}' = ANY(${this.p('types')}::text[]) THEN 1 ELSE 0 END) AS graduation`,
-        `SUM(CASE WHEN '${InquiryType.Process}' = ANY(${this.p('types')}::text[]) THEN 1 ELSE 0 END) AS process`,
-        `SUM(CASE WHEN '${InquiryType.Procedure}' = ANY(${this.p('types')}::text[]) THEN 1 ELSE 0 END) AS procedure`,
+        `SUM(CASE WHEN '${InquiryType.Graduation}' = ANY("${alias}"."types"::text[]) THEN 1 ELSE 0 END) AS graduation`,
+        `SUM(CASE WHEN '${InquiryType.Process}' = ANY("${alias}"."types"::text[]) THEN 1 ELSE 0 END) AS process`,
+        `SUM(CASE WHEN '${InquiryType.Procedure}' = ANY("${alias}"."types"::text[]) THEN 1 ELSE 0 END) AS procedure`,
       ])
       .where(`${this.p('createdAt')} BETWEEN :startDate AND :endDate`, { startDate, endDate })
       .groupBy('date')

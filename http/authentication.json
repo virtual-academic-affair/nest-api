@@ -45,9 +45,9 @@
                   "disabled": true
                 },
                 {
-                  "key": "role",
+                  "key": "roles",
                   "value": "",
-                  "description": "student | lecture | admin",
+                  "description": "sinh_vien | giang_vien | giao_vu",
                   "disabled": true
                 },
                 {
@@ -92,11 +92,11 @@
             "body": {
               "mode": "raw",
               "options": {
-              "raw": {
-                "language": "json"
-              }
-            },
-              "raw": "{\n    \"name\": \"Updated Name\",\n    \"role\": \"student\",\n    \"isActive\": true\n}"
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "raw": "{\n    \"name\": \"Updated Name\",\n    \"role\": \"sinh_vien\",\n    \"isActive\": true\n}"
             },
             "url": {
               "host": [
@@ -123,10 +123,10 @@
             "body": {
               "mode": "raw",
               "options": {
-              "raw": {
-                "language": "json"
-              }
-            },
+                "raw": {
+                  "language": "json"
+                }
+              },
               "raw": "{\n    \"email\": \"user@example.com\",\n    \"role\": \"admin\"\n}"
             },
             "url": {
@@ -168,10 +168,10 @@
             "body": {
               "mode": "raw",
               "options": {
-              "raw": {
-                "language": "json"
-              }
-            },
+                "raw": {
+                  "language": "json"
+                }
+              },
               "raw": "{\n    \"code\": \"<google_oauth_code>\"\n}"
             },
             "url": {
@@ -197,10 +197,10 @@
             "body": {
               "mode": "raw",
               "options": {
-              "raw": {
-                "language": "json"
-              }
-            },
+                "raw": {
+                  "language": "json"
+                }
+              },
               "raw": "{\n    \"refreshToken\": \"{{refreshToken}}\"\n}"
             },
             "url": {

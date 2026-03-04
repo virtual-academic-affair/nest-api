@@ -1,0 +1,24 @@
+syntax = "proto3";
+package app_server.auth.v1;
+
+import "google/protobuf/empty.proto";
+
+message UserResponse {
+  int32 id = 1;
+  string email = 2;
+  string name = 3;
+  string role = 4;
+  string picture = 5;
+  bool isActive = 6;
+  string createdAt = 7;
+  string updatedAt = 8;
+}
+
+message FindOneByKeywordRequest {
+  string keyword = 1;
+}
+
+service AuthService {
+  rpc Me(google.protobuf.Empty) returns (UserResponse);
+  rpc FindOneByKeyword(FindOneByKeywordRequest) returns (UserResponse);
+}

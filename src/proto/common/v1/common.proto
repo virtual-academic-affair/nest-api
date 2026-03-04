@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package app_server.common.v1;
+
+message SuccessResponse {
+  bool success = 1;
+}

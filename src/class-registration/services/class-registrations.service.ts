@@ -8,6 +8,7 @@ import { ClassRegistration } from '@class-registration/entities/class-registrati
 import { ClassRegistrationItemsService } from '@class-registration/services/class-registration-items.service';
 import { ClassRegistrationTemplate } from '@class-registration/templates/class-registration.template';
 import { EmailReplyService } from '@email/services/email-send/email-reply.service';
+import { applyMessageFilters } from '@shared/resource/dtos/message-resource-query.dto';
 import { ResourceService } from '@shared/resource/services/resource.service';
 
 @Injectable()
@@ -34,8 +35,9 @@ export class ClassRegistrationsService extends ResourceService<ClassRegistration
 
   protected applyCustomFilters(
     queryBuilder: SelectQueryBuilder<ClassRegistration>,
-    { studentCode, academicYear, smartOrder }: QueryDto,
+    { studentCode, academicYear, smartOrder, messageId, messageStatuses }: QueryDto,
   ): void {
+    applyMessageFilters(queryBuilder, { messageId, messageStatuses });
     studentCode && queryBuilder.andWhere({ studentCode });
     academicYear && queryBuilder.andWhere({ academicYear });
 

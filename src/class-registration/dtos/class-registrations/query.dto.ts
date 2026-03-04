@@ -1,8 +1,8 @@
 import { Type } from 'class-transformer';
 import { IsBoolean, IsInt, IsOptional, IsString } from 'class-validator';
-import { ResourceQueryDto } from '@shared/resource/dtos/resource-query.dto';
+import { MessageResourceQueryDto } from '@shared/resource/dtos/message-resource-query.dto';
 
-export class QueryDto extends ResourceQueryDto {
+export class QueryDto extends MessageResourceQueryDto {
   @IsOptional()
   @IsString()
   studentCode?: string;

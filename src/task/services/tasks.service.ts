@@ -4,6 +4,7 @@ import { ClsService } from 'nestjs-cls';
 import { DataSource, In, LessThanOrEqual, MoreThanOrEqual, Repository, SelectQueryBuilder } from 'typeorm';
 import { REQUEST_USER_KEY } from '@authentication/guards/authentication.guard';
 import { ActiveUserData } from '@authentication/interfaces/active-user-data.interface';
+import { applyMessageFilters } from '@shared/resource/dtos/message-resource-query.dto';
 import { ResourceService } from '@shared/resource/services/resource.service';
 import { QueryDto } from '@task/dtos/tasks/query.dto';
 import { UpdateDto } from '@task/dtos/tasks/update.dto';
@@ -40,10 +41,11 @@ export class TasksService extends ResourceService<Task> {
 
   protected applyCustomFilters(
     queryBuilder: SelectQueryBuilder<Task>,
-    { status, priority, dueDateFrom, dueDateTo, assigneeIds }: QueryDto,
+    { statuses, priorities, dueDateFrom, dueDateTo, assigneeIds, messageId, messageStatuses }: QueryDto,
   ): void {
-    status && queryBuilder.andWhere({ status });
-    priority && queryBuilder.andWhere({ priority });
+    applyMessageFilters(queryBuilder, { messageId, messageStatuses });
+    statuses?.length && queryBuilder.andWhere({ status: In(statuses) });
+    priorities?.length && queryBuilder.andWhere({ priority: In(priorities) });
     dueDateFrom && queryBuilder.andWhere({ due: MoreThanOrEqual(dueDateFrom) });
     dueDateTo && queryBuilder.andWhere({ due: LessThanOrEqual(dueDateTo) });
     assigneeIds && queryBuilder.andWhere({ assignees: { assigneeId: In(assigneeIds) } });

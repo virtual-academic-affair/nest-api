@@ -15,7 +15,6 @@ export class MessagesService extends ResourceService<Message> {
   }
 
   protected applyCustomFilters(queryBuilder: SelectQueryBuilder<Message>, { systemLabels }: QueryDto): void {
-    console.log(systemLabels);
     systemLabels && queryBuilder.andWhere({ systemLabels: ArrayContainedBy(systemLabels) });
   }
 }

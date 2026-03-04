@@ -4,6 +4,6 @@ import { ResourceQueryDto } from '@shared/resource/dtos/resource-query.dto';
 
 export class QueryDto extends ResourceQueryDto {
   @IsOptional()
-  @IsEnum(Role)
-  role?: Role;
+  @IsEnum(Role, { each: true })
+  roles?: Role[];
 }

@@ -1,17 +1,17 @@
 import { Type } from 'class-transformer';
 import { IsDate, IsEnum, IsInt, IsOptional } from 'class-validator';
-import { ResourceQueryDto } from '@shared/resource/dtos/resource-query.dto';
+import { MessageResourceQueryDto } from '@shared/resource/dtos/message-resource-query.dto';
 import { TaskPriority } from '@task/enums/task-priority.enum';
 import { TaskStatus } from '@task/enums/task-status.enum';
 
-export class QueryDto extends ResourceQueryDto {
-  @IsEnum(TaskStatus)
+export class QueryDto extends MessageResourceQueryDto {
+  @IsEnum(TaskStatus, { each: true })
   @IsOptional()
-  status?: TaskStatus;
+  statuses?: TaskStatus[];
 
-  @IsEnum(TaskPriority)
+  @IsEnum(TaskPriority, { each: true })
   @IsOptional()
-  priority?: TaskPriority;
+  priorities?: TaskPriority[];
 
   @IsDate()
   @Type(() => Date)

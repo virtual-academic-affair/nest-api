@@ -23,11 +23,12 @@ export class GoogleService implements OnModuleInit {
     this.oAuthClient = new OAuth2Client(this.googleConfiguration);
   }
 
-  generateAuthUrl() {
+  generateAuthUrl(redirectUrl?: string) {
     return this.oAuthClient.generateAuthUrl({
       access_type: 'offline',
       scope: ['openid', 'email', 'profile'],
       prompt: 'consent',
+      ...(redirectUrl ? { redirect_uri: redirectUrl } : {}),
     });
   }
 

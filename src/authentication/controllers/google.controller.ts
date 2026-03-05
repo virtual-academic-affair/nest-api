@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { CodeDto } from '@authentication/dtos/google/code.dto';
 import { GoogleService } from '@authentication/services/google.service';
 
@@ -7,8 +7,8 @@ export class GoogleController {
   constructor(private readonly googleService: GoogleService) {}
 
   @Get()
-  getGoogleUrl() {
-    return this.googleService.generateAuthUrl();
+  getGoogleUrl(@Query('redirectUrl') redirectUrl?: string) {
+    return this.googleService.generateAuthUrl(redirectUrl);
   }
 
   @Post()

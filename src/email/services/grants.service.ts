@@ -14,12 +14,13 @@ export class GrantsService {
     private readonly emailSyncService: EmailSyncService,
   ) {}
 
-  generateAuthUrl(): string {
+  generateAuthUrl(redirectUrl?: string): string {
     const options = {
       access_type: 'offline',
       scope: ['openid', 'email', 'profile', 'https://www.googleapis.com/auth/gmail.modify'],
       include_granted_scopes: true,
       prompt: 'consent',
+      ...(redirectUrl ? { redirect_uri: redirectUrl } : {}),
     };
     return this.googleapisService.oAuthClient.generateAuthUrl(options);
   }

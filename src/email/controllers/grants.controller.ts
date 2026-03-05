@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { Auth } from '@authentication/decorators/auth.decorator';
 import { Roles } from '@authentication/decorators/roles.decorator';
 import { AuthType } from '@authentication/enums/auth-type.enum';
@@ -13,8 +13,8 @@ export class GrantsController {
   constructor(private readonly grantsService: GrantsService) {}
 
   @Get()
-  getAuthUrl() {
-    return this.grantsService.generateAuthUrl();
+  getAuthUrl(@Query('redirectUrl') redirectUrl?: string) {
+    return this.grantsService.generateAuthUrl(redirectUrl);
   }
 
   @Post()

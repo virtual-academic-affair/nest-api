@@ -1,4 +1,6 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Post } from '@nestjs/common';
+import { ConfigType } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 import { GrpcMethod } from '@nestjs/microservices';
 import { ActiveUser } from '@authentication/decorators/active-user.decorator';
 import { Auth } from '@authentication/decorators/auth.decorator';
@@ -7,12 +9,15 @@ import { AuthType } from '@authentication/enums/auth-type.enum';
 import { ActiveUserData } from '@authentication/interfaces/active-user-data.interface';
 import { AuthService } from '@authentication/services/auth.service';
 import { UsersService } from '@authentication/services/users.service';
+import jwtConfig from '@shared/config/jwt.config';
 
 @Controller('authentication/auth')
 export class AuthenticationController {
   constructor(
     private readonly userService: UsersService,
     private readonly authService: AuthService,
+    private readonly jwtService: JwtService,
+    @Inject(jwtConfig.KEY) private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
   ) {}
 
   @Post('refresh')
@@ -22,7 +27,6 @@ export class AuthenticationController {
 
   @Get('me')
   @Auth(AuthType.Bearer)
-  @GrpcMethod('AuthService', 'Me')
   async findOne(@ActiveUser('sub') sub: ActiveUserData['sub']) {
     return this.userService.findOne(sub);
   }
@@ -31,5 +35,10 @@ export class AuthenticationController {
   async findOneByKeyword(@Body() { keyword }: { keyword?: string }) {
     const { items } = await this.userService.findAll({ keyword, limit: 1 });
     return { user: items[0] || null };
+  }
+
+  @GrpcMethod('AuthService', 'VerifyToken')
+  async verifyToken(@Body() { token }: { token: string }) {
+    return await this.jwtService.verifyAsync(token, this.jwtConfiguration);
   }
 }

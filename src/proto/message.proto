@@ -1,0 +1,14 @@
+syntax = "proto3";
+package app_server;
+
+import "google/protobuf/empty.proto";
+import "common.proto";
+
+message UpdateMessageLabelsRequest {
+  int32 id = 1;
+  repeated string systemLabels = 2;
+}
+
+service MessageService {
+  rpc UpdateLabels(UpdateMessageLabelsRequest) returns (app_server.SuccessResponse);
+}

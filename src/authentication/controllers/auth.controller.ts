@@ -34,11 +34,14 @@ export class AuthenticationController {
   @GrpcMethod('AuthService', 'FindOneByKeyword')
   async findOneByKeyword(@Body() { keyword }: { keyword?: string }) {
     const { items } = await this.userService.findAll({ keyword, limit: 1 });
-    return { user: items[0] || null };
+    return items[0] || {};
   }
 
   @GrpcMethod('AuthService', 'VerifyToken')
   async verifyToken(@Body() { token }: { token: string }) {
-    return await this.jwtService.verifyAsync(token, this.jwtConfiguration);
+    const data = await this.jwtService.verifyAsync(token, this.jwtConfiguration);
+    return {
+      payload: Object.fromEntries(Object.entries(data).map(([k, v]) => [k, String(v)])),
+    };
   }
 }

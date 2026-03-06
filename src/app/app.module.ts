@@ -1,8 +1,9 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { ClsModule, ClsService } from 'nestjs-cls';
+import { ClsGuard, ClsModule, ClsService } from 'nestjs-cls';
 import { AuthenticationModule } from '@authentication/authentication.module';
 import { ClassRegistrationModule } from '@class-registration/class-registration.module';
 import { EmailModule } from '@email/email.module';
@@ -13,6 +14,7 @@ import { TaskModule } from '@task/task.module';
 import { ClsServiceManager } from './cls-manager';
 
 @Module({
+  providers: [{ provide: APP_GUARD, useClass: ClsGuard }],
   imports: [
     ConfigModule.forRoot({ load: [appConfig] }),
     ScheduleModule.forRoot(),
@@ -28,7 +30,7 @@ import { ClsServiceManager } from './cls-manager';
     ClassRegistrationModule,
     TaskModule,
     InquiryModule,
-    ClsModule.forRoot({ global: true, middleware: { mount: true } }),
+    ClsModule.forRoot({ global: true, middleware: { mount: true }, interceptor: { mount: false } }),
   ],
 })
 export class AppModule implements OnModuleInit {

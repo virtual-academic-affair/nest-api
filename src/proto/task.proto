@@ -1,7 +1,7 @@
 syntax = "proto3";
 package app_server;
 
-import "common/v1/common.proto";
+import "common.proto";
 
 message CreateTaskRequest {
   int32 messageId = 1;
@@ -15,5 +15,5 @@ message CreateTaskRequest {
 }
 
 service TaskService {
-  rpc Create(CreateTaskRequest) returns (app_server.common.v1.SuccessResponse);
+  rpc Create(CreateTaskRequest) returns (app_server.SuccessResponse);
 }

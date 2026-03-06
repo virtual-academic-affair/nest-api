@@ -1,7 +1,7 @@
 syntax = "proto3";
 package app_server;
 
-import "common/v1/common.proto";
+import "common.proto";
 
 message CreateInquiryRequest {
   int32 messageId = 1;
@@ -11,5 +11,5 @@ message CreateInquiryRequest {
 }
 
 service InquiryService {
-  rpc Create(CreateInquiryRequest) returns (app_server.common.v1.SuccessResponse);
+  rpc Create(CreateInquiryRequest) returns (app_server.SuccessResponse);
 }

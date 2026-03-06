@@ -1,7 +1,7 @@
 syntax = "proto3";
 package app_server;
 
-import "common/v1/common.proto";
+import "common.proto";
 
 message CreateRegistrationItemRequest {
   string action = 1;
@@ -23,5 +23,5 @@ message CreateRegistrationRequest {
 }
 
 service ClassRegistrationService {
-  rpc Create(CreateRegistrationRequest) returns (app_server.common.v1.SuccessResponse);
+  rpc Create(CreateRegistrationRequest) returns (app_server.SuccessResponse);
 }

@@ -1,5 +1,5 @@
 syntax = "proto3";
-package app_server.auth.v1;
+package app_server;
 
 import "google/protobuf/empty.proto";
 import "google/protobuf/struct.proto";
@@ -23,7 +23,11 @@ message VerifyTokenRequest {
   string token = 1;
 }
 
+message VerifyTokenResponse {
+  map<string, string> payload = 1;
+}
+
 service AuthService {
-  rpc VerifyToken(VerifyTokenRequest) returns (google.protobuf.Struct);
+  rpc VerifyToken(VerifyTokenRequest) returns (VerifyTokenResponse);
   rpc FindOneByKeyword(FindOneByKeywordRequest) returns (UserResponse);
 }

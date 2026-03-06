@@ -1,7 +1,0 @@
-syntax = "proto3";
-
-import "common/v1/common.proto";
-import "auth/v1/auth.proto";
-import "task/v1/task.proto";
-import "inquiry/v1/inquiry.proto";
-import "class-registration/v1/class-registration.proto";

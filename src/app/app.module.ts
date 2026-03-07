@@ -1,7 +1,6 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
-import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ClsGuard, ClsModule, ClsService } from 'nestjs-cls';
 import { AuthenticationModule } from '@authentication/authentication.module';
@@ -17,7 +16,6 @@ import { ClsServiceManager } from './cls-manager';
   providers: [{ provide: APP_GUARD, useClass: ClsGuard }],
   imports: [
     ConfigModule.forRoot({ load: [appConfig] }),
-    ScheduleModule.forRoot(),
     TypeOrmModule.forRoot({
       url: process.env.DB_URL,
       type: process.env.DB_TYPE,

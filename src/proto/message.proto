@@ -5,7 +5,7 @@ import "google/protobuf/empty.proto";
 import "common.proto";
 
 message UpdateMessageLabelsRequest {
-  int32 id = 1;
+  int32 messageId = 1;
   repeated string systemLabels = 2;
 }
 

@@ -1,4 +1,5 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import { Role } from '@authentication/enums/role.enum';
 import { REQUEST_USER_KEY } from '@authentication/guards/authentication.guard';
 import { ActiveUserData } from '@authentication/interfaces/active-user-data.interface';
 
@@ -16,8 +17,8 @@ export function getActiveUser(
     const metadata = ctx.switchToRpc().getContext();
     user = {
       sub: +metadata?.get?.('x-user-id')?.[0],
-      email: metadata?.get?.('x-user-email')?.[0],
-      role: metadata?.get?.('x-user-role')?.[0],
+      email: metadata?.get?.('x-user-email')?.[0] ?? 'system@gmail.com',
+      role: metadata?.get?.('x-user-role')?.[0] ?? Role.Admin,
     } as ActiveUserData;
   } else {
     const request = ctx.switchToHttp().getRequest();

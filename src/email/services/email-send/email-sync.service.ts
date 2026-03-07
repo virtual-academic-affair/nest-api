@@ -55,6 +55,7 @@ export class EmailSyncService {
     do {
       const { data } = await gmail.users.messages.list({
         userId: 'me',
+        labelIds: ['INBOX'],
         q: `after:${afterTimestamp} -from:me (${allowedDomains?.map((d) => `from:*@${d}`)?.join(' OR ')})`,
         includeSpamTrash: false,
         pageToken,

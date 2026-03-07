@@ -1,4 +1,5 @@
 import { Body, Controller, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
+import { GrpcMethod } from '@nestjs/microservices';
 import { Auth } from '@authentication/decorators/auth.decorator';
 import { Roles } from '@authentication/decorators/roles.decorator';
 import { AuthType } from '@authentication/enums/auth-type.enum';
@@ -38,7 +39,8 @@ export class MessagesController extends ResourceController<Message> {
   }
 
   @Put(':id/labels')
-  async updateLabel(
+  @GrpcMethod('MessageService', 'UpdateLabels')
+  async updateLabels(
     @Body() data: { messageId: number; systemLabels: SystemLabel[] },
     @Param('id', ParseIntPipe) messageId?: number,
   ) {

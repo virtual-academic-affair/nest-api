@@ -101,6 +101,38 @@
               ]
             }
           }
+        },
+        {
+          "name": "updateLabels",
+          "request": {
+            "method": "PUT",
+            "body": {
+              "mode": "raw",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "raw": "{\n    \"systemLabels\": [\"task\", \"inquiry\"]\n}"
+            },
+            "url": {
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "email",
+                "messages",
+                ":id",
+                "labels"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
         }
       ]
     },
@@ -149,7 +181,7 @@
                   "language": "json"
                 }
               },
-              "raw": "{\n    \"labels\": [\n        {\n            \"name\": \"Label Name\",\n            \"id\": \"Label_123\"\n        }\n    ]\n}"
+              "raw": "{\n    \"classRegistration\": \"Label_123\",\n    \"task\": \"Label_456\",\n    \"inquiry\": \"Label_789\",\n    \"other\": \"Label_000\"\n}"
             },
             "url": {
               "host": [

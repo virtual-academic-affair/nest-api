@@ -31,8 +31,7 @@ export class MessageLabelsService {
       const toRemove = currentSystemLabels
         .filter((l) => !newSystemLabels.includes(l))
         .map((l) => labelMapping.value[l] as string);
-      console.log('toAdd', toAdd);
-      console.log('toRemove', toRemove);
+
       if (toAdd.length === 0 && toRemove.length === 0) {
         return message;
       }

@@ -1,272 +1,272 @@
 <!DOCTYPE html>
 <html lang="vi">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Login & Grant</title>
     <script src="https://cdn.tailwindcss.com"></script>
-  </head>
-  <body class="bg-gray-100 min-h-screen p-4">
-    <div class="max-w-2xl mx-auto space-y-4">
-      <h1 class="text-2xl font-bold">Login & Grant</h1>
+</head>
+<body class="bg-gray-100 min-h-screen p-4">
+<div class="max-w-2xl mx-auto space-y-4">
+    <h1 class="text-2xl font-bold">Login & Grant</h1>
 
-      <!-- Login Section -->
-      <div class="bg-white p-4 rounded shadow" id="loginSection">
+    <!-- Login Section -->
+    <div class="bg-white p-4 rounded shadow" id="loginSection">
         <h2 class="text-lg font-semibold mb-2">Login</h2>
         <button
-          onclick="login()"
-          class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                onclick="login()"
+                class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
         >
-          Login with Google
+            Login with Google
         </button>
-      </div>
-
-      <!-- Copy Token Section -->
-      <div class="bg-white p-4 rounded shadow hidden" id="copyTokenSection">
-        <h2 class="text-lg font-semibold mb-2">Access Token</h2>
-        <div class="flex items-center gap-2">
-          <button
-            onclick="copyAccessToken()"
-            class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 text-sm"
-          >
-            Copy Access Token
-          </button>
-          <span class="text-sm text-gray-600" id="copyStatus"></span>
-        </div>
-      </div>
-
-      <!-- Payload Display -->
-      <div class="bg-white p-4 rounded shadow hidden" id="payloadSection">
-        <h2 class="text-lg font-semibold mb-2">Token Response</h2>
-        <pre
-          class="bg-gray-50 p-2 rounded text-xs overflow-auto"
-          id="tokenPayload"
-        ></pre>
-      </div>
-
-      <!-- User Info -->
-      <div class="bg-white p-4 rounded shadow hidden" id="userSection">
-        <h2 class="text-lg font-semibold mb-2">User Info</h2>
-        <pre
-          class="bg-gray-50 p-2 rounded text-xs overflow-auto"
-          id="userInfo"
-        ></pre>
-      </div>
-
-      <!-- Grant Section (Admin only) -->
-      <div class="bg-white p-4 rounded shadow hidden" id="grantSection">
-        <h2 class="text-lg font-semibold mb-2">Grant Email Access (Admin)</h2>
-        <button
-          onclick="grant()"
-          class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-        >
-          Grant Gmail Access
-        </button>
-      </div>
     </div>
 
-    <script>
-      const API_BASE = 'http://localhost:3000';
-      let accessToken = localStorage.getItem('accessToken') || '';
+    <!-- Copy Token Section -->
+    <div class="bg-white p-4 rounded shadow hidden" id="copyTokenSection">
+        <h2 class="text-lg font-semibold mb-2">Access Token</h2>
+        <div class="flex items-center gap-2">
+            <button
+                    onclick="copyAccessToken()"
+                    class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 text-sm"
+            >
+                Copy Access Token
+            </button>
+            <span class="text-sm text-gray-600" id="copyStatus"></span>
+        </div>
+    </div>
 
-      const resolveError = (error) =>
+    <!-- Payload Display -->
+    <div class="bg-white p-4 rounded shadow hidden" id="payloadSection">
+        <h2 class="text-lg font-semibold mb-2">Token Response</h2>
+        <pre
+                class="bg-gray-50 p-2 rounded text-xs overflow-auto"
+                id="tokenPayload"
+        ></pre>
+    </div>
+
+    <!-- User Info -->
+    <div class="bg-white p-4 rounded shadow hidden" id="userSection">
+        <h2 class="text-lg font-semibold mb-2">User Info</h2>
+        <pre
+                class="bg-gray-50 p-2 rounded text-xs overflow-auto"
+                id="userInfo"
+        ></pre>
+    </div>
+
+    <!-- Grant Section (Admin only) -->
+    <div class="bg-white p-4 rounded shadow hidden" id="grantSection">
+        <h2 class="text-lg font-semibold mb-2">Grant Email Access (Admin)</h2>
+        <button
+                onclick="grant()"
+                class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+        >
+            Grant Gmail Access
+        </button>
+    </div>
+</div>
+
+<script>
+    const API_BASE = 'http://localhost:3000';
+    let accessToken = localStorage.getItem('accessToken') || '';
+
+    const resolveError = (error) =>
         typeof error === 'function' ? error() : error;
-      const throwIf = (condition, error) => {
+    const throwIf = (condition, error) => {
         if (condition) {
-          throw resolveError(error);
+            throw resolveError(error);
         }
-      };
-      const throwUnless = (condition, error) => {
+    };
+    const throwUnless = (condition, error) => {
         if (!condition) {
-          throw resolveError(error);
+            throw resolveError(error);
         }
-      };
+    };
 
-      // Check if returning from OAuth
-      const urlParams = new URLSearchParams(window.location.search);
-      const code = urlParams.get('code');
+    // Check if returning from OAuth
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
 
-      if (code) {
+    if (code) {
         // If already logged in (has token) → grant flow
         // If not logged in → login flow
         if (accessToken) {
-          handleGrantCallback(code);
+            handleGrantCallback(code);
         } else {
-          handleLoginCallback(code);
+            handleLoginCallback(code);
         }
-      } else if (accessToken) {
+    } else if (accessToken) {
         showCopyButton();
         loadUserInfo();
-      }
+    }
 
-      function showCopyButton() {
+    function showCopyButton() {
         if (accessToken) {
-          document
-            .getElementById('copyTokenSection')
-            .classList.remove('hidden');
+            document
+                .getElementById('copyTokenSection')
+                .classList.remove('hidden');
         }
-      }
+    }
 
-      async function copyAccessToken() {
+    async function copyAccessToken() {
         const token = localStorage.getItem('accessToken');
         if (!token) {
-          alert('No access token available');
-          return;
+            alert('No access token available');
+            return;
         }
         try {
-          await navigator.clipboard.writeText(token);
-          const statusEl = document.getElementById('copyStatus');
-          statusEl.textContent = 'Copied!';
-          statusEl.classList.add('text-green-600');
-          setTimeout(() => {
-            statusEl.textContent = '';
-            statusEl.classList.remove('text-green-600');
-          }, 2000);
-        } catch (e) {
-          // Fallback for older browsers
-          const textArea = document.createElement('textarea');
-          textArea.value = token;
-          textArea.style.position = 'fixed';
-          textArea.style.opacity = '0';
-          document.body.appendChild(textArea);
-          textArea.select();
-          try {
-            document.execCommand('copy');
+            await navigator.clipboard.writeText(token);
             const statusEl = document.getElementById('copyStatus');
             statusEl.textContent = 'Copied!';
             statusEl.classList.add('text-green-600');
             setTimeout(() => {
-              statusEl.textContent = '';
-              statusEl.classList.remove('text-green-600');
+                statusEl.textContent = '';
+                statusEl.classList.remove('text-green-600');
             }, 2000);
-          } catch (err) {
-            alert('Failed to copy: ' + err);
-          }
-          document.body.removeChild(textArea);
-        }
-      }
-
-      async function login() {
-        try {
-          const res = await fetch(`${API_BASE}/authentication/google`);
-          const { data: url } = await res.json();
-          window.location.href = url;
         } catch (e) {
-          alert('Error: ' + e.message);
-          console.error(e);
+            // Fallback for older browsers
+            const textArea = document.createElement('textarea');
+            textArea.value = token;
+            textArea.style.position = 'fixed';
+            textArea.style.opacity = '0';
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                const statusEl = document.getElementById('copyStatus');
+                statusEl.textContent = 'Copied!';
+                statusEl.classList.add('text-green-600');
+                setTimeout(() => {
+                    statusEl.textContent = '';
+                    statusEl.classList.remove('text-green-600');
+                }, 2000);
+            } catch (err) {
+                alert('Failed to copy: ' + err);
+            }
+            document.body.removeChild(textArea);
         }
-      }
+    }
 
-      async function handleLoginCallback(code) {
+    async function login() {
+        try {
+            const res = await fetch(`${API_BASE}/authentication/google`);
+            const {data: url} = await res.json();
+            window.location.href = url;
+        } catch (e) {
+            alert('Error: ' + e.message);
+            console.error(e);
+        }
+    }
+
+    async function handleLoginCallback(code) {
         const res = await fetch(`${API_BASE}/authentication/google`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ code }),
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({code}),
         });
-        const { data } = await res.json();
+        const {data} = await res.json();
         accessToken = data.accessToken;
         localStorage.setItem('accessToken', accessToken);
         document.getElementById('tokenPayload').textContent = JSON.stringify(
-          data,
-          null,
-          2
+            data,
+            null,
+            2
         );
         document.getElementById('payloadSection').classList.remove('hidden');
         showCopyButton();
         window.history.replaceState({}, '', window.location.pathname);
         await loadUserInfo();
-      }
+    }
 
-      async function loadUserInfo() {
+    async function loadUserInfo() {
         if (!accessToken) return;
         try {
-          const res = await fetch(`${API_BASE}/authentication/auth/me`, {
-            headers: { Authorization: `Bearer ${accessToken}` },
-          });
-          if (!res.ok) {
-            const error = await res
-              .json()
-              .catch(() => ({ message: 'Unknown error' }));
-            console.error('Failed to load user info:', error);
-            return;
-          }
-          const { data: user } = await res.json();
-          console.log('User info:', user);
-          document.getElementById('userInfo').textContent = JSON.stringify(
-            user,
-            null,
-            2
-          );
-          document.getElementById('userSection').classList.remove('hidden');
-          if (user.role === 'admin') {
-            document.getElementById('grantSection').classList.remove('hidden');
-          }
-        } catch (e) {
-          console.error('Error loading user info:', e);
-        }
-      }
-
-      async function grant() {
-        try {
-          throwUnless(
-            accessToken,
-            new Error('No access token. Please login first.')
-          );
-          const res = await fetch(`${API_BASE}/email/grants`, {
-            headers: { Authorization: `Bearer ${accessToken}` },
-          });
-          if (!res.ok) {
-            const errorData = await res
-              .json()
-              .catch(() => ({ message: 'Unknown error' }));
-            const error = errorData.data || errorData;
-            throwIf(
-              true,
-              new Error(
-                error.message || `HTTP ${res.status}: ${res.statusText}`
-              )
+            const res = await fetch(`${API_BASE}/authentication/auth/me`, {
+                headers: {Authorization: `Bearer ${accessToken}`},
+            });
+            if (!res.ok) {
+                const error = await res
+                    .json()
+                    .catch(() => ({message: 'Unknown error'}));
+                console.error('Failed to load user info:', error);
+                return;
+            }
+            const {data: user} = await res.json();
+            console.log('User info:', user);
+            document.getElementById('userInfo').textContent = JSON.stringify(
+                user,
+                null,
+                2
             );
-          }
-          const { data: url } = await res.json();
-          throwUnless(
-            url && url !== 'undefined',
-            new Error('Invalid URL returned from server')
-          );
-          console.log('Grant URL:', url);
-          window.location.href = url;
+            document.getElementById('userSection').classList.remove('hidden');
+            if (user.role === 'admin') {
+                document.getElementById('grantSection').classList.remove('hidden');
+            }
         } catch (e) {
-          alert('Error: ' + e.message);
-          console.error('Grant error:', e);
+            console.error('Error loading user info:', e);
         }
-      }
+    }
 
-      async function handleGrantCallback(code) {
+    async function grant() {
         try {
-          const res = await fetch(`${API_BASE}/email/grants`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${accessToken}`,
-            },
-            body: JSON.stringify({ code }),
-          });
-          if (!res.ok) {
-            const errorData = await res
-              .json()
-              .catch(() => ({ message: 'Unknown error' }));
-            const error = errorData.data || errorData;
-            const message =
-              error.message || errorData.message || 'Failed to grant access';
-            throwIf(true, new Error(message));
-          }
-          const result = await res.json();
-          alert('Granted successfully!');
-          window.history.replaceState({}, '', window.location.pathname);
+            throwUnless(
+                accessToken,
+                new Error('No access token. Please login first.')
+            );
+            const res = await fetch(`${API_BASE}/email/grants`, {
+                headers: {Authorization: `Bearer ${accessToken}`},
+            });
+            if (!res.ok) {
+                const errorData = await res
+                    .json()
+                    .catch(() => ({message: 'Unknown error'}));
+                const error = errorData.data || errorData;
+                throwIf(
+                    true,
+                    new Error(
+                        error.message || `HTTP ${res.status}: ${res.statusText}`
+                    )
+                );
+            }
+            const {data: url} = await res.json();
+            throwUnless(
+                url && url !== 'undefined',
+                new Error('Invalid URL returned from server')
+            );
+            console.log('Grant URL:', url);
+            window.location.href = url;
         } catch (e) {
-          alert('Error granting access: ' + e.message);
-          console.error('Grant callback error:', e);
+            alert('Error: ' + e.message);
+            console.error('Grant error:', e);
         }
-      }
-    </script>
-  </body>
+    }
+
+    async function handleGrantCallback(code) {
+        try {
+            const res = await fetch(`${API_BASE}/email/grants`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`,
+                },
+                body: JSON.stringify({code}),
+            });
+            if (!res.ok) {
+                const errorData = await res
+                    .json()
+                    .catch(() => ({message: 'Unknown error'}));
+                const error = errorData.data || errorData;
+                const message =
+                    error.message || errorData.message || 'Failed to grant access';
+                throwIf(true, new Error(message));
+            }
+            const result = await res.json();
+            alert('Granted successfully!');
+            window.history.replaceState({}, '', window.location.pathname);
+        } catch (e) {
+            alert('Error granting access: ' + e.message);
+            console.error('Grant callback error:', e);
+        }
+    }
+</script>
+</body>
 </html>

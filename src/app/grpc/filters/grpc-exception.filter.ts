@@ -28,6 +28,7 @@ export class GrpcExceptionFilter extends BaseRpcExceptionFilter {
       return;
     }
 
+    console.log(exception);
     const { code, message } = this.resolveError(exception);
     this.logger.error(`[gRPC Error] Code: ${code} | Message: ${message}`);
     return throwError(() => ({ code, message }));

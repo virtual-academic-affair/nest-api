@@ -13,7 +13,7 @@ export abstract class ResourceItemService<T> extends ResourceService<T> {
     @Inject(REQUEST) protected readonly request: Request,
   ) {
     super(repository);
-    this.parentId = +this.request.params.parentId;
+    this.parentId = +this.request.params?.parentId || 0;
   }
 
   protected get queryBuilder(): SelectQueryBuilder<T> {

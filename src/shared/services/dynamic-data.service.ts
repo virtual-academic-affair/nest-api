@@ -24,7 +24,7 @@ export class DynamicDataService {
       try {
         const [modulePath, fileName] = enumPath.split('.');
         result[enumPath] = EnumRegistry[modulePath]?.[fileName] || null;
-      } catch (error) {
+      } catch {
         result[enumPath] = null;
       }
     }

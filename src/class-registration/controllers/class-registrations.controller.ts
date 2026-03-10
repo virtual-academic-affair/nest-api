@@ -37,7 +37,7 @@ export class ClassRegistrationsController extends ResourceController<ClassRegist
 
   @Post(':id/reply')
   async reply(@Param('id', ParseIntPipe) id: number, @Body() dto: ReplyDto) {
-    return await this.service.sendReply(id, dto.content);
+    return await this.service.sendReply(id, dto.content, dto.isClose);
   }
 
   @Post()

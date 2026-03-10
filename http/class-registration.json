@@ -247,7 +247,7 @@
                   "language": "json"
                 }
               },
-              "raw": "{\n    \"html\": \"<p>Your registration has been approved.</p>\",\n    \"note\": \"Luu y: Phi duoc giam 50%\"\n}"
+              "raw": "{\n    \"content\": \"<p>Your registration has been approved.</p>\",\n    \"isClose\": false\n}"
             },
             "url": {
               "host": [

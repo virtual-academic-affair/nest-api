@@ -7,6 +7,7 @@ import { QueryDto } from '@class-registration/dtos/class-registrations/query.dto
 import { ClassRegistration } from '@class-registration/entities/class-registration.entity';
 import { ClassRegistrationItemsService } from '@class-registration/services/class-registration-items.service';
 import { ClassRegistrationTemplate } from '@class-registration/templates/class-registration.template';
+import { MessageStatus } from '@email/enums/message-status.enum';
 import { EmailReplyService } from '@email/services/email-send/email-reply.service';
 import { applyMessageFilters } from '@shared/resource/dtos/message-resource-query.dto';
 import { ResourceService } from '@shared/resource/services/resource.service';
@@ -82,12 +83,15 @@ export class ClassRegistrationsService extends ResourceService<ClassRegistration
     return { content: template.generate() };
   }
 
-  async sendReply(id: number, content?: string) {
+  async sendReply(id: number, content?: string, isClose = false) {
     const registration = await this.findOne(id);
     const message = registration.message;
     throwUnless(message, new ConflictException('Registration has no message'));
 
     content ??= await this.previewReply(id).then((res) => res.content);
-    return await this.emailReplyService.reply(message, content);
+    const sentMessageId = await this.emailReplyService.reply(message, content);
+    await this.update(id, { messageStatus: isClose ? MessageStatus.Closed : MessageStatus.Replied });
+
+    return sentMessageId;
   }
 }

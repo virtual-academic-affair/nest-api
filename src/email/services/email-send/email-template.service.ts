@@ -17,8 +17,8 @@ export function compile(path: string, data: Record<string, unknown>): string {
 
 export abstract class EmailTemplateService {
   protected readonly config: EmailTemplateConfig;
-  private readonly baseTemplatePath: string = 'base.hbs';
-  protected abstract templatePath: string;
+  protected baseTemplatePath: string = 'base.hbs';
+  protected templatePath: string | null = null;
 
   protected constructor(configService: ConfigService) {
     this.config = {
@@ -29,7 +29,8 @@ export abstract class EmailTemplateService {
   }
 
   generate(): string {
-    const content = compile(this.templatePath, this.getTemplateData());
+    const templateData = this.getTemplateData();
+    const content = this.templatePath ? compile(this.templatePath, templateData) : templateData?.content;
 
     return compile(this.baseTemplatePath, {
       title: this.getTitle(),

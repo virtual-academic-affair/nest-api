@@ -1,15 +1,23 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
+import { MessageStatus } from '@email/enums/message-status.enum';
+import { EmailReplyService } from '@email/services/email-send/email-reply.service';
 import { QueryDto } from '@inquiry/dtos/inquiries/query.dto';
 import { Inquiry } from '@inquiry/entities/inquiry.entity';
 import { InquiryType } from '@inquiry/enums/inquiry-type.enum';
+import { InquiryTemplate } from '@inquiry/templates/inquiry.template';
 import { applyMessageFilters } from '@shared/resource/dtos/message-resource-query.dto';
 import { ResourceService } from '@shared/resource/services/resource.service';
 
 @Injectable()
 export class InquiriesService extends ResourceService<Inquiry> {
-  constructor(@InjectRepository(Inquiry) repository: Repository<Inquiry>) {
+  constructor(
+    @InjectRepository(Inquiry) repository: Repository<Inquiry>,
+    private readonly emailReplyService: EmailReplyService,
+    private readonly configService: ConfigService,
+  ) {
     super(repository);
   }
 
@@ -50,5 +58,28 @@ export class InquiriesService extends ResourceService<Inquiry> {
       };
       return acc;
     }, {});
+  }
+
+  async previewReply(id: number) {
+    const inquiry = await this.findOne(id);
+    const template = new InquiryTemplate(this.configService, inquiry);
+    return { content: template.generate() };
+  }
+
+  async sendReply(id: number, content?: string, isClose = false) {
+    const inquiry = await this.findOne(id);
+    const message = inquiry.message;
+    throwUnless(message, new ConflictException('Inquiry has no message'));
+
+    content ??= await this.previewReply(id).then((res) => res.content);
+    throwUnless(content, new ConflictException('Reply content is required'));
+
+    const sentMessageId = await this.emailReplyService.reply(message, content);
+    await this.update(id, {
+      answer: content,
+      messageStatus: isClose ? MessageStatus.Closed : MessageStatus.Replied,
+    });
+
+    return sentMessageId;
   }
 }

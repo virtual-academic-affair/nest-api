@@ -1,10 +1,10 @@
-import { Body, Controller, Get, Inject, Post } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Post, Req, Res, UnauthorizedException } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { GrpcMethod } from '@nestjs/microservices';
+import { Request, Response } from 'express';
 import { ActiveUser } from '@authentication/decorators/active-user.decorator';
 import { Auth } from '@authentication/decorators/auth.decorator';
-import { RefreshTokenDto } from '@authentication/dtos/auth/refresh-token.dto';
 import { AuthType } from '@authentication/enums/auth-type.enum';
 import { ActiveUserData } from '@authentication/interfaces/active-user-data.interface';
 import { AuthService } from '@authentication/services/auth.service';
@@ -21,8 +21,31 @@ export class AuthenticationController {
   ) {}
 
   @Post('refresh')
-  async refresh(@Body() dto: RefreshTokenDto) {
-    return this.authService.refreshTokens(dto);
+  async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const refreshToken = req.cookies['refresh_token'];
+    throwUnless(refreshToken, new UnauthorizedException('Refresh token cookie is missing'));
+    const tokens = await this.authService.refreshTokens({ refreshToken });
+
+    res.cookie('refresh_token', tokens.refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      path: '/',
+      maxAge: this.jwtConfiguration.refreshTokenTtl * 1000,
+    });
+
+    return { accessToken: tokens.accessToken };
+  }
+
+  @Post('logout')
+  async logout(@Res({ passthrough: true }) res: Response) {
+    res.clearCookie('refresh_token', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      path: '/',
+    });
+    return { message: 'Logged out successfully' };
   }
 
   @Get('me')

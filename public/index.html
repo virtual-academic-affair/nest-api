@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8"/>
@@ -13,10 +13,7 @@
     <!-- Login Section -->
     <div class="bg-white p-4 rounded shadow" id="loginSection">
         <h2 class="text-lg font-semibold mb-2">Login</h2>
-        <button
-                onclick="login()"
-                class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-        >
+        <button onclick="login()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
             Login with Google
         </button>
     </div>
@@ -38,39 +35,29 @@
     <!-- Payload Display -->
     <div class="bg-white p-4 rounded shadow hidden" id="payloadSection">
         <h2 class="text-lg font-semibold mb-2">Token Response</h2>
-        <pre
-                class="bg-gray-50 p-2 rounded text-xs overflow-auto"
-                id="tokenPayload"
-        ></pre>
+        <pre class="bg-gray-50 p-2 rounded text-xs overflow-auto" id="tokenPayload"></pre>
     </div>
 
     <!-- User Info -->
     <div class="bg-white p-4 rounded shadow hidden" id="userSection">
         <h2 class="text-lg font-semibold mb-2">User Info</h2>
-        <pre
-                class="bg-gray-50 p-2 rounded text-xs overflow-auto"
-                id="userInfo"
-        ></pre>
+        <pre class="bg-gray-50 p-2 rounded text-xs overflow-auto" id="userInfo"></pre>
     </div>
 
     <!-- Grant Section (Admin only) -->
     <div class="bg-white p-4 rounded shadow hidden" id="grantSection">
         <h2 class="text-lg font-semibold mb-2">Grant Email Access (Admin)</h2>
-        <button
-                onclick="grant()"
-                class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-        >
+        <button onclick="grant()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
             Grant Gmail Access
         </button>
     </div>
 </div>
 
 <script>
-    const API_BASE = 'http://localhost:3000';
+    const API_BASE = 'https://api.hcmus.app';
     let accessToken = localStorage.getItem('accessToken') || '';
 
-    const resolveError = (error) =>
-        typeof error === 'function' ? error() : error;
+    const resolveError = (error) => (typeof error === 'function' ? error() : error);
     const throwIf = (condition, error) => {
         if (condition) {
             throw resolveError(error);
@@ -101,9 +88,7 @@
 
     function showCopyButton() {
         if (accessToken) {
-            document
-                .getElementById('copyTokenSection')
-                .classList.remove('hidden');
+            document.getElementById('copyTokenSection').classList.remove('hidden');
         }
     }
 
@@ -166,11 +151,7 @@
         const {data} = await res.json();
         accessToken = data.accessToken;
         localStorage.setItem('accessToken', accessToken);
-        document.getElementById('tokenPayload').textContent = JSON.stringify(
-            data,
-            null,
-            2
-        );
+        document.getElementById('tokenPayload').textContent = JSON.stringify(data, null, 2);
         document.getElementById('payloadSection').classList.remove('hidden');
         showCopyButton();
         window.history.replaceState({}, '', window.location.pathname);
@@ -184,19 +165,13 @@
                 headers: {Authorization: `Bearer ${accessToken}`},
             });
             if (!res.ok) {
-                const error = await res
-                    .json()
-                    .catch(() => ({message: 'Unknown error'}));
+                const error = await res.json().catch(() => ({message: 'Unknown error'}));
                 console.error('Failed to load user info:', error);
                 return;
             }
             const {data: user} = await res.json();
             console.log('User info:', user);
-            document.getElementById('userInfo').textContent = JSON.stringify(
-                user,
-                null,
-                2
-            );
+            document.getElementById('userInfo').textContent = JSON.stringify(user, null, 2);
             document.getElementById('userSection').classList.remove('hidden');
             if (user.role === 'admin') {
                 document.getElementById('grantSection').classList.remove('hidden');
@@ -208,30 +183,17 @@
 
     async function grant() {
         try {
-            throwUnless(
-                accessToken,
-                new Error('No access token. Please login first.')
-            );
+            throwUnless(accessToken, new Error('No access token. Please login first.'));
             const res = await fetch(`${API_BASE}/email/grants`, {
                 headers: {Authorization: `Bearer ${accessToken}`},
             });
             if (!res.ok) {
-                const errorData = await res
-                    .json()
-                    .catch(() => ({message: 'Unknown error'}));
+                const errorData = await res.json().catch(() => ({message: 'Unknown error'}));
                 const error = errorData.data || errorData;
-                throwIf(
-                    true,
-                    new Error(
-                        error.message || `HTTP ${res.status}: ${res.statusText}`
-                    )
-                );
+                throwIf(true, new Error(error.message || `HTTP ${res.status}: ${res.statusText}`));
             }
             const {data: url} = await res.json();
-            throwUnless(
-                url && url !== 'undefined',
-                new Error('Invalid URL returned from server')
-            );
+            throwUnless(url && url !== 'undefined', new Error('Invalid URL returned from server'));
             console.log('Grant URL:', url);
             window.location.href = url;
         } catch (e) {
@@ -251,12 +213,9 @@
                 body: JSON.stringify({code}),
             });
             if (!res.ok) {
-                const errorData = await res
-                    .json()
-                    .catch(() => ({message: 'Unknown error'}));
+                const errorData = await res.json().catch(() => ({message: 'Unknown error'}));
                 const error = errorData.data || errorData;
-                const message =
-                    error.message || errorData.message || 'Failed to grant access';
+                const message = error.message || errorData.message || 'Failed to grant access';
                 throwIf(true, new Error(message));
             }
             const result = await res.json();

@@ -23,9 +23,11 @@ export class InquiriesService extends ResourceService<Inquiry> {
 
   protected applyCustomFilters(
     queryBuilder: SelectQueryBuilder<Inquiry>,
-    { messageId, messageStatuses }: QueryDto,
+    { messageId, messageStatuses, types }: QueryDto,
   ): void {
     applyMessageFilters(queryBuilder, { messageId, messageStatuses });
+    types?.length &&
+      queryBuilder.andWhere(`${this.p('types')} && ARRAY[:...types]::"inquiry_inquiry_types_enum"[]`, { types });
   }
 
   protected withOne(queryBuilder: SelectQueryBuilder<Inquiry>): void {
@@ -39,7 +41,7 @@ export class InquiriesService extends ResourceService<Inquiry> {
         `DATE(${this.p('createdAt')}) AS date`,
         'COUNT(*) AS total',
         `SUM(CASE WHEN '${InquiryType.Graduation}' = ANY("${alias}"."types"::text[]) THEN 1 ELSE 0 END) AS graduation`,
-        `SUM(CASE WHEN '${InquiryType.Process}' = ANY("${alias}"."types"::text[]) THEN 1 ELSE 0 END) AS process`,
+        `SUM(CASE WHEN '${InquiryType.Training}' = ANY("${alias}"."types"::text[]) THEN 1 ELSE 0 END) AS training`,
         `SUM(CASE WHEN '${InquiryType.Procedure}' = ANY("${alias}"."types"::text[]) THEN 1 ELSE 0 END) AS procedure`,
       ])
       .where(`${this.p('createdAt')} BETWEEN :startDate AND :endDate`, { startDate, endDate })
@@ -52,7 +54,7 @@ export class InquiriesService extends ResourceService<Inquiry> {
         total: +row.total,
         types: {
           [InquiryType.Graduation]: +row.graduation,
-          [InquiryType.Process]: +row.process,
+          [InquiryType.Training]: +row.training,
           [InquiryType.Procedure]: +row.procedure,
         },
       };

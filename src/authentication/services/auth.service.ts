@@ -43,7 +43,6 @@ export class AuthService {
   }
 
   async refreshTokens(dto: RefreshTokenDto) {
-    throwUnless(dto.refreshToken, new UnauthorizedException('Refresh token is missing'));
     const payload = await this.jwtService.verifyAsync<{
       refreshTokenId: string;
     }>(dto.refreshToken, this.jwtConfiguration);

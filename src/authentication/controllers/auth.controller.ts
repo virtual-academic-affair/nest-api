@@ -5,7 +5,9 @@ import { GrpcMethod } from '@nestjs/microservices';
 import { Request, Response } from 'express';
 import { ActiveUser } from '@authentication/decorators/active-user.decorator';
 import { Auth } from '@authentication/decorators/auth.decorator';
+import { QueryDto } from '@authentication/dtos/users/query.dto';
 import { AuthType } from '@authentication/enums/auth-type.enum';
+import { Role } from '@authentication/enums/role.enum';
 import { ActiveUserData } from '@authentication/interfaces/active-user-data.interface';
 import { AuthService } from '@authentication/services/auth.service';
 import { UsersService } from '@authentication/services/users.service';
@@ -44,7 +46,7 @@ export class AuthenticationController {
 
   @GrpcMethod('AuthService', 'FindOneByKeyword')
   async findOneByKeyword(@Body() { keyword }: { keyword?: string }) {
-    const { items } = await this.userService.findAll({ keyword, limit: 1 });
+    const { items } = await this.userService.findAll({ keyword, limit: 1, roles: [Role.Admin] } as QueryDto);
     return items[0] || {};
   }
 

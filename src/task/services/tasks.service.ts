@@ -48,7 +48,7 @@ export class TasksService extends ResourceService<Task> {
     priorities?.length && queryBuilder.andWhere({ priority: In(priorities) });
     dueDateFrom && queryBuilder.andWhere({ due: MoreThanOrEqual(dueDateFrom) });
     dueDateTo && queryBuilder.andWhere({ due: LessThanOrEqual(dueDateTo) });
-    assigneeIds && queryBuilder.andWhere({ assignees: { assigneeId: In(assigneeIds) } });
+    queryBuilder.andWhere('assignees.assigneeId IN (:...assigneeIds)', { assigneeIds });
   }
 
   async stats(startDate: Date, endDate: Date) {
@@ -112,7 +112,6 @@ export class TasksService extends ResourceService<Task> {
         ...task,
         ...updateDto,
         assignees: this.enrichAssignees(newAssigneeIds),
-        id,
       });
 
       return await manager.save(updatedTask);

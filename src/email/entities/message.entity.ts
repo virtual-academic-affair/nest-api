@@ -1,4 +1,5 @@
 import { Column, Entity, Index, Unique } from 'typeorm';
+import { EncryptedColumn } from '@shared/encryption/decorators/encrypted-column.decorator';
 import { SystemLabel } from '@shared/enums/system-label.enum';
 import { BaseEntity } from '@shared/resource/entities/base.entity';
 
@@ -38,4 +39,7 @@ export class Message extends BaseEntity {
   @Index()
   @Column('text', { array: true, nullable: true })
   systemLabels: SystemLabel[];
+
+  @EncryptedColumn({ type: 'text', nullable: true })
+  content?: string;
 }

@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '@authentication/entities/user.entity';
 import { AllowedDomainsController } from '@email/controllers/allowed-domains.controller';
+import { CanSaveContentController } from '@email/controllers/can-save-content.controller';
 import { GrantsController } from '@email/controllers/grants.controller';
 import { LabelsController } from '@email/controllers/labels.controller';
 import { MessagesController } from '@email/controllers/messages.controller';
@@ -20,7 +21,13 @@ import googleConfig from '@shared/config/google.config';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Message, User]), ConfigModule.forFeature(googleConfig)],
-  controllers: [AllowedDomainsController, GrantsController, LabelsController, MessagesController],
+  controllers: [
+    AllowedDomainsController,
+    GrantsController,
+    LabelsController,
+    MessagesController,
+    CanSaveContentController,
+  ],
   providers: [
     GoogleapisService,
     LabelsService,

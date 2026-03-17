@@ -26,11 +26,12 @@ export class EmailSyncService {
   ) {}
 
   async run(): Promise<void> {
-    const [lastPullTimestamp, allowedDomains, gmail, superEmail] = await Promise.all([
+    const [lastPullTimestamp, allowedDomains, gmail, superEmail, canSaveContent] = await Promise.all([
       this.getLastPullTimestamp(),
       this.settingService.get<string[]>(SettingKey.EmailAllowedDomains),
       this.googleapisService.getGmailClient(),
       this.settingService.get<SuperEmailSetting>(SettingKey.EmailSuperEmail),
+      this.settingService.get<boolean>(SettingKey.EmailCanSaveContent),
     ]);
 
     const messageIds = await this.fetchMessageIdsSince(gmail, lastPullTimestamp, allowedDomains);
@@ -38,7 +39,7 @@ export class EmailSyncService {
     for (const messageId of messageIds) {
       try {
         this.logger.log(`Processing message ${messageId}`);
-        await this.processAndPublishMessage(gmail, messageId, superEmail.email);
+        await this.processAndPublishMessage(gmail, messageId, superEmail.email, !!canSaveContent);
       } catch (error) {
         this.logger.warn(`Skip message ${messageId}`, error);
       }
@@ -73,6 +74,7 @@ export class EmailSyncService {
     gmail: gmail_v1.Gmail,
     gmailMessageId: string,
     superEmail: string,
+    canSaveContent: boolean,
   ): Promise<void> {
     const exists = await this.messageRepository.findOne({
       where: { gmailMessageId },
@@ -90,6 +92,9 @@ export class EmailSyncService {
     const parsedMessage = parseMessage(gmailMessage);
     const senderEmail = parsedMessage.headers.from?.match(/<(.+)>/)?.[1];
 
+    const textContent = parsedMessage.textHtml ?? parsedMessage.textPlain ?? '';
+    const plainTextContent = htmlToText(textContent, { wordwrap: false });
+
     const message = await this.messageRepository.save({
       gmailMessageId,
       headerMessageId: parsedMessage.headers['message-id'],
@@ -100,10 +105,8 @@ export class EmailSyncService {
       senderEmail,
       senderName: parsedMessage.headers.from,
       superEmail,
+      content: canSaveContent ? plainTextContent : undefined,
     });
-
-    const textContent = parsedMessage.textHtml ?? parsedMessage.textPlain ?? '';
-    const plainTextContent = htmlToText(textContent, { wordwrap: false });
 
     this.client.emit(INGESTED, {
       messageId: message.id,

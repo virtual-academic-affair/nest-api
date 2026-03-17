@@ -21,6 +21,7 @@ export class EmailReplyService {
     let originalContent = '';
 
     try {
+      // Force fetch: Always sync with Gmail API to ensure it has the most up-to-date content
       const gmail = await this.googleapisService.getGmailClient();
       const { data } = await gmail.users.messages.get({ userId: 'me', id: message.gmailMessageId, format: 'full' });
       const parsedMessage = parseMessage(data);

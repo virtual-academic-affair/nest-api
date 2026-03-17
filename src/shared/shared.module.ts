@@ -10,6 +10,8 @@ import jwtConfig from '@shared/config/jwt.config';
 import rabbitmqConfig from '@shared/config/rabbitmq.config';
 import redisConfig from '@shared/config/redis.config';
 import { DynamicDataController } from '@shared/controllers/dynamic-data.controller';
+import { AesEncryptionService } from '@shared/encryption/aes-encryption.service';
+import { EncryptionService } from '@shared/encryption/encryption.service';
 import { BcryptService } from '@shared/hashing/bcrypt.service';
 import { HashingService } from '@shared/hashing/hashing.service';
 import { RestrictMethodsGuard } from '@shared/resource/guards/restrict-methods.guard';
@@ -45,11 +47,12 @@ import { SettingService } from '@shared/setting/services/setting.service';
   controllers: [DynamicDataController],
   providers: [
     { provide: HashingService, useClass: BcryptService },
+    { provide: EncryptionService, useClass: AesEncryptionService },
     { provide: APP_GUARD, useClass: RestrictMethodsGuard },
     SettingService,
     RedisService,
     DynamicDataService,
   ],
-  exports: [TypeOrmModule, HashingService, SettingService, RedisService, ClientsModule],
+  exports: [TypeOrmModule, HashingService, EncryptionService, SettingService, RedisService, ClientsModule],
 })
 export class SharedModule {}

@@ -3,4 +3,5 @@ export enum SettingKey {
   EmailSuperEmail = 'email.superEmail',
   EmailLastPullAt = 'email.lastPullAt',
   EmailAllowedDomains = 'email.allowedDomains',
+  EmailCanSaveContent = 'email.canSaveContent',
 }

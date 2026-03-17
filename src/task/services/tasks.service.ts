@@ -94,11 +94,8 @@ export class TasksService extends ResourceService<Task> {
     }
 
     return await this.dataSource.transaction(async (manager) => {
-      const task = await manager.findOneOrFail(Task, {
-        where: { id },
-        relations: ['assignees'],
-        lock: { mode: 'pessimistic_write' },
-      });
+      const task = await manager.findOneOrFail(Task, { where: { id }, lock: { mode: 'pessimistic_write' } });
+      task.assignees = await manager.find(TaskAssignee, { where: { taskId: id } });
 
       const newAssigneeIds = updateDto.assigneeIds;
       const currentAssigneeIds = task.assignees.map((a) => a.assigneeId);

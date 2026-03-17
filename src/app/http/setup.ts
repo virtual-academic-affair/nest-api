@@ -7,7 +7,6 @@ export async function setupHttpApp(port?: number): Promise<{ app: INestApplicati
   const app = await NestFactory.create(HttpAppModule);
   app.enableCors({ origin: true, credentials: true });
   app.getHttpAdapter().getInstance().set('query parser', 'extended');
-
   app.use(cookieParser());
 
   const HTTP_PORT = port || Number(process.env.HTTP_PORT) || 3000;

@@ -9,7 +9,7 @@ import { AuthType } from '@authentication/enums/auth-type.enum';
 import { ActiveUserData } from '@authentication/interfaces/active-user-data.interface';
 import { AuthService } from '@authentication/services/auth.service';
 import { UsersService } from '@authentication/services/users.service';
-import { REFRESH_COOKIE, clearCookieOptions, refreshCookieOptions } from '@authentication/utils/cookie.util';
+import { REFRESH_COOKIE, getRefreshCookieOptions, getClearCookieOptions } from '@authentication/utils/cookie.util';
 import jwtConfig from '@shared/config/jwt.config';
 
 @Controller('authentication/auth')
@@ -26,16 +26,14 @@ export class AuthenticationController {
     const refreshToken = req.cookies[REFRESH_COOKIE];
     throwUnless(refreshToken, new UnauthorizedException('Refresh token cookie is missing'));
     const tokens = await this.authService.refreshTokens({ refreshToken });
-
-    res.cookie(REFRESH_COOKIE, tokens.refreshToken, refreshCookieOptions(this.jwtConfiguration.refreshTokenTtl));
+    res.cookie(REFRESH_COOKIE, tokens.refreshToken, getRefreshCookieOptions(this.jwtConfiguration.refreshTokenTtl));
 
     return { accessToken: tokens.accessToken };
   }
 
   @Post('logout')
   async logout(@Res({ passthrough: true }) res: Response) {
-    res.clearCookie(REFRESH_COOKIE, clearCookieOptions);
-    return { message: 'Logged out successfully' };
+    return res.clearCookie(REFRESH_COOKIE, getClearCookieOptions());
   }
 
   @Get('me')

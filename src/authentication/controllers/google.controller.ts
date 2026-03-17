@@ -3,7 +3,7 @@ import { ConfigType } from '@nestjs/config';
 import { Response } from 'express';
 import { CodeDto } from '@authentication/dtos/google/code.dto';
 import { GoogleService } from '@authentication/services/google.service';
-import { REFRESH_COOKIE, refreshCookieOptions } from '@authentication/utils/cookie.util';
+import { REFRESH_COOKIE, getRefreshCookieOptions } from '@authentication/utils/cookie.util';
 import jwtConfig from '@shared/config/jwt.config';
 
 @Controller('authentication/google')
@@ -21,8 +21,7 @@ export class GoogleController {
   @Post()
   async authenticate(@Body() dto: CodeDto, @Res({ passthrough: true }) res: Response) {
     const tokens = await this.googleService.authenticate(dto);
-
-    res.cookie(REFRESH_COOKIE, tokens.refreshToken, refreshCookieOptions(this.jwtConfiguration.refreshTokenTtl));
+    res.cookie(REFRESH_COOKIE, tokens.refreshToken, getRefreshCookieOptions(this.jwtConfiguration.refreshTokenTtl));
 
     return { accessToken: tokens.accessToken };
   }

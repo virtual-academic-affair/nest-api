@@ -14,6 +14,9 @@ export const SystemLabelLang: Record<SystemLabel | 'parent', Record<string, stri
   parent: { vi: 'VAA', en: 'VAA', color: '#fb4c2f' },
 };
 
+const { parent: _, ...SystemLabelNesting } = SystemLabelLang;
+export { SystemLabelNesting };
+
 export function getLangLabel(label: SystemLabel | 'parent', lang = 'vi'): string {
   return SystemLabelLang[label]?.[lang] || label;
 }

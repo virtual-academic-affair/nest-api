@@ -1,10 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 
 @Injectable()
-export abstract class EncryptionService {
+export abstract class EncryptionService implements OnModuleInit {
   abstract encrypt(text: string): string;
 
   abstract decrypt(encryptedText: string): string;
+
+  onModuleInit() {
+    EncryptionManager.setService(this);
+  }
 }
 
 export class EncryptionManager {

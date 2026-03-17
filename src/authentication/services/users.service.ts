@@ -14,8 +14,9 @@ export class UsersService extends ResourceService<User> {
     super(repository);
   }
 
-  protected applyCustomFilters(queryBuilder: SelectQueryBuilder<User>, { roles }: QueryDto): void {
+  protected applyCustomFilters(queryBuilder: SelectQueryBuilder<User>, { roles, isActive }: QueryDto): void {
     roles?.length && queryBuilder.andWhere({ role: In(roles) });
+    isActive !== undefined && queryBuilder.andWhere({ isActive });
   }
 
   async assignRole({ email, role }: AssignRoleDto) {

@@ -33,7 +33,7 @@ export class GoogleService implements OnModuleInit {
   }
 
   async authenticate(dto: CodeDto) {
-    const { tokens } = await this.oAuthClient.getToken(dto.code);
+    const { tokens } = await this.oAuthClient.getToken({ code: dto.code, redirect_uri: dto.redirectUrl });
     throwUnless(tokens?.id_token, new UnauthorizedException('Google token is missing'));
 
     const loginTicket = await this.oAuthClient.verifyIdToken({ idToken: tokens.id_token });

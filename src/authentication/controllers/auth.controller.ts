@@ -46,7 +46,12 @@ export class AuthenticationController {
 
   @GrpcMethod('AuthService', 'FindOneByKeyword')
   async findOneByKeyword(@Body() { keyword }: { keyword?: string }) {
-    const { items } = await this.userService.findAll({ keyword, limit: 1, roles: [Role.Admin] } as QueryDto);
+    const { items } = await this.userService.findAll({
+      keyword,
+      limit: 1,
+      roles: [Role.Admin],
+      isActive: true,
+    } as QueryDto);
     return items[0] || {};
   }
 

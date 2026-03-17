@@ -44,6 +44,12 @@
                   "disabled": true
                 },
                 {
+                  "key": "types[]",
+                  "value": "",
+                  "description": "graduation | training | procedure",
+                  "disabled": true
+                },
+                {
                   "key": "messageId",
                   "value": "",
                   "disabled": true
@@ -96,11 +102,11 @@
             "body": {
               "mode": "raw",
               "options": {
-              "raw": {
-                "language": "json"
-              }
-            },
-              "raw": "{\n    \"messageId\": 1,\n    \"types\": [\"graduation\"],\n    \"question\": \"Bao gio co lich bao ve?\",\n    \"answer\": \"Du kien cuoi thang 6\"\n}"
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "raw": "{\n    \"messageId\": 1,\n    \"types\": [\"graduation\", \"training\"],\n    \"question\": \"Bao gio co lich bao ve?\",\n    \"answer\": \"Du kien cuoi thang 6\"\n}"
             },
             "url": {
               "host": [
@@ -124,7 +130,7 @@
                   "language": "json"
                 }
               },
-              "raw": "{\n    \"types\": [\"procedure\"],\n    \"question\": \"Cho em hoi thu tuc nop ho so?\",\n    \"answer\": \"Em nop tai phong giao vu\"\n}"
+              "raw": "{\n    \"types\": [\"training\"],\n    \"question\": \"Cho em hoi thu tuc nop ho so dao tao?\",\n    \"answer\": \"Em nop tai phong giao vu\"\n}"
             },
             "url": {
               "host": [

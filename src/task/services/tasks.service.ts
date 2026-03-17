@@ -48,7 +48,18 @@ export class TasksService extends ResourceService<Task> {
     priorities?.length && queryBuilder.andWhere({ priority: In(priorities) });
     dueDateFrom && queryBuilder.andWhere({ due: MoreThanOrEqual(dueDateFrom) });
     dueDateTo && queryBuilder.andWhere({ due: LessThanOrEqual(dueDateTo) });
-    assigneeIds && queryBuilder.andWhere({ assignees: { assigneeId: In(assigneeIds) } });
+
+    if (assigneeIds?.length) {
+      queryBuilder.andWhere(
+        (q) =>
+          `${q.alias}.id IN ${q
+            .subQuery()
+            .select('ta.taskId')
+            .from(TaskAssignee, 'ta')
+            .where({ assigneeId: In(assigneeIds) })
+            .getQuery()}`,
+      );
+    }
   }
 
   async stats(startDate: Date, endDate: Date) {
@@ -88,37 +99,38 @@ export class TasksService extends ResourceService<Task> {
     return assigneeIds?.map((id) => ({ assigneeId: id, assignerId: userId }));
   }
 
-  async update(id: number, updateDto: UpdateDto): Promise<Task> {
-    if (!updateDto?.assigneeIds) {
-      return super.update(id, updateDto);
+  async update(id: number, { assigneeIds, ...data }: UpdateDto): Promise<Task> {
+    if (!assigneeIds) {
+      return super.update(id, data);
     }
 
-    return await this.dataSource.transaction(async (manager) => {
-      const task = await manager.findOneOrFail(Task, {
-        where: { id },
-        relations: ['assignees'],
-        lock: { mode: 'pessimistic_write' },
-      });
+    return this.dataSource.transaction(async (manager) => {
+      await manager.findOneOrFail(Task, { where: { id }, lock: { mode: 'pessimistic_write' } });
 
-      const newAssigneeIds = updateDto.assigneeIds;
-      const currentAssigneeIds = task.assignees.map((a) => a.assigneeId);
-
-      const toDelete = currentAssigneeIds
-        .filter((c) => !newAssigneeIds.includes(c))
-        .map((c) => ({ taskId: id, assigneeId: c }));
-
-      if (toDelete.length > 0) {
-        await manager.delete(TaskAssignee, toDelete);
+      if (Object.keys(data).length > 0) {
+        await manager.update(Task, id, data);
       }
 
-      const updatedTask = manager.create(Task, {
-        ...task,
-        ...updateDto,
-        assignees: this.enrichAssignees(newAssigneeIds),
-        id,
-      });
+      const existingAssignees = await manager.find(TaskAssignee, { where: { taskId: id }, select: ['assigneeId'] });
+      const existingIds = existingAssignees.map((a) => a.assigneeId);
 
-      return await manager.save(updatedTask);
+      const toDeleteIds = existingIds.filter((eId) => !assigneeIds.includes(eId));
+      const toInsertIds = assigneeIds.filter((nId) => !existingIds.includes(nId));
+
+      const dbTasks: Promise<any>[] = [];
+
+      if (toDeleteIds.length > 0) {
+        dbTasks.push(manager.delete(TaskAssignee, { taskId: id, assigneeId: In(toDeleteIds) }));
+      }
+
+      if (toInsertIds.length > 0) {
+        const insertPayload = this.enrichAssignees(toInsertIds).map((a) => ({ ...a, taskId: id }));
+        dbTasks.push(manager.insert(TaskAssignee, insertPayload));
+      }
+
+      await Promise.all(dbTasks);
+
+      return manager.findOneOrFail(Task, { where: { id } });
     });
   }
 }

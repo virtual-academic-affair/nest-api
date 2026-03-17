@@ -1,5 +1,5 @@
 export enum InquiryType {
   Graduation = 'graduation',
-  Process = 'process',
+  Training = 'training',
   Procedure = 'procedure',
 }

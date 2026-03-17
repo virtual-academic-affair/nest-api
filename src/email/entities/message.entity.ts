@@ -40,6 +40,6 @@ export class Message extends BaseEntity {
   @Column('text', { array: true, nullable: true })
   systemLabels: SystemLabel[];
 
-  @EncryptedColumn({ type: 'text', nullable: true })
+  @EncryptedColumn({ type: 'text', nullable: true, select: false })
   content?: string;
 }

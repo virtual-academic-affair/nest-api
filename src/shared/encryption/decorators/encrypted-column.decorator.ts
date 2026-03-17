@@ -6,7 +6,7 @@ export function EncryptedColumn(options: ColumnOptions = {}): PropertyDecorator 
     ...options,
     transformer: {
       to: (value: string) => EncryptionManager.getService()?.encrypt(value) ?? value,
-      from: (value: string) => EncryptionManager.getService()?.decrypt(value) ?? value,
+      from: (value: string) => (value ? EncryptionManager.getService()?.decrypt(value) : value),
     },
   });
 }

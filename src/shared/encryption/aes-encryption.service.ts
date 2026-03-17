@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { EncryptionService } from './encryption.service';
 
 @Injectable()
-export class AesEncryptionService implements EncryptionService {
+export class AesEncryptionService extends EncryptionService {
   private readonly algorithm = 'aes-256-cbc';
   private readonly defaultKey = 'dev-encryption-key-32-chars-long!!';
 

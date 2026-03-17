@@ -14,6 +14,10 @@ export class MessagesService extends ResourceService<Message> {
     super(repository);
   }
 
+  protected withOne(queryBuilder: SelectQueryBuilder<Message>) {
+    queryBuilder.addSelect(this.p('content'));
+  }
+
   protected applyCustomFilters(queryBuilder: SelectQueryBuilder<Message>, { systemLabels }: QueryDto): void {
     systemLabels && queryBuilder.andWhere({ systemLabels: ArrayContainedBy(systemLabels) });
   }

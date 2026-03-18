@@ -16,6 +16,7 @@ export class MessagesService extends ResourceService<Message> {
   }
 
   protected withOne(queryBuilder: SelectQueryBuilder<Message>) {
+    this.withAll(queryBuilder);
     queryBuilder.addSelect(this.p('content'));
   }
 

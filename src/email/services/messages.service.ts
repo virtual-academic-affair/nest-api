@@ -19,6 +19,13 @@ export class MessagesService extends ResourceService<Message> {
     queryBuilder.addSelect(this.p('content'));
   }
 
+  protected withAll(queryBuilder: SelectQueryBuilder<Message>) {
+    queryBuilder
+      .loadRelationCountAndMap(this.p('tasksCount'), this.p('tasks'))
+      .loadRelationCountAndMap(this.p('hasInquiry'), this.p('inquiry'))
+      .loadRelationCountAndMap(this.p('hasClassRegistration'), this.p('classRegistration'));
+  }
+
   protected applyCustomFilters(queryBuilder: SelectQueryBuilder<Message>, { systemLabels }: QueryDto): void {
     systemLabels && queryBuilder.andWhere({ systemLabels: ArrayContainedBy(systemLabels) });
   }

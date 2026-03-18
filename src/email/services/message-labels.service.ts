@@ -16,7 +16,13 @@ export class MessageLabelsService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async run(messageId: number, newSystemLabels: SystemLabel[], deleteTasks?: boolean): Promise<void> {
+  async run(
+    messageId: number,
+    newSystemLabels: SystemLabel[] = [],
+    deleteTasks?: boolean,
+    addLabels: SystemLabel[] = [],
+    removeLabels: SystemLabel[] = [],
+  ): Promise<void> {
     await this.dataSource.transaction(async (manager) => {
       const message = await manager.findOneOrFail(Message, {
         where: { id: messageId },
@@ -27,6 +33,10 @@ export class MessageLabelsService {
         lock: { mode: 'pessimistic_write' },
       });
       const currentSystemLabels = message.systemLabels ?? [];
+
+      if (newSystemLabels.length === 0) {
+        newSystemLabels = [...new Set([...currentSystemLabels, ...addLabels])].filter((l) => !removeLabels.includes(l));
+      }
 
       const addedLabels = newSystemLabels.filter((l) => !currentSystemLabels.includes(l));
       const removedLabels = currentSystemLabels.filter((l) => !newSystemLabels.includes(l));

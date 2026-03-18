@@ -1,15 +1,18 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { Body, ConflictException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { MessageStatus } from '@email/enums/message-status.enum';
 import { EmailReplyService } from '@email/services/email-send/email-reply.service';
+import { MessageLabelsService } from '@email/services/message-labels.service';
 import { QueryDto } from '@inquiry/dtos/inquiries/query.dto';
 import { Inquiry } from '@inquiry/entities/inquiry.entity';
 import { InquiryType } from '@inquiry/enums/inquiry-type.enum';
 import { InquiryTemplate } from '@inquiry/templates/inquiry.template';
+import { SystemLabel } from '@shared/enums/system-label.enum';
 import { applyMessageFilters } from '@shared/resource/dtos/message-resource-query.dto';
 import { ResourceService } from '@shared/resource/services/resource.service';
+import { CreateDto } from '@task/dtos/tasks/create.dto';
 
 @Injectable()
 export class InquiriesService extends ResourceService<Inquiry> {
@@ -17,6 +20,7 @@ export class InquiriesService extends ResourceService<Inquiry> {
     @InjectRepository(Inquiry) repository: Repository<Inquiry>,
     private readonly emailReplyService: EmailReplyService,
     private readonly configService: ConfigService,
+    private readonly messageLabelsService: MessageLabelsService,
   ) {
     super(repository);
   }
@@ -28,6 +32,13 @@ export class InquiriesService extends ResourceService<Inquiry> {
     applyMessageFilters(queryBuilder, { messageId, messageStatuses });
     types?.length &&
       queryBuilder.andWhere(`${this.p('types')} && ARRAY[:...types]::"inquiry_inquiry_types_enum"[]`, { types });
+  }
+
+  async create(@Body() dto: CreateDto) {
+    const existing = dto?.messageId && (await this.repository.findOneBy({ messageId: dto.messageId }));
+    throwIf(existing, new ConflictException('Inquiry already exists'));
+    await this.messageLabelsService.run(dto.messageId, null, false, [SystemLabel.Inquiry]);
+    return await super.create(dto);
   }
 
   protected withOne(queryBuilder: SelectQueryBuilder<Inquiry>): void {

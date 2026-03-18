@@ -1,11 +1,11 @@
 import { Column, Entity, OneToMany } from 'typeorm';
-import { BelongsToMessage } from '@email/entities/belongs-to-message.entity';
+import { MayBelongsToMessage } from '@email/entities/belongs-to-message.entity';
 import { TaskPriority } from '../enums/task-priority.enum';
 import { TaskStatus } from '../enums/task-status.enum';
 import { TaskAssignee } from './task-assignee.entity';
 
 @Entity()
-export class Task extends BelongsToMessage {
+export class Task extends MayBelongsToMessage {
   @Column('text', { array: true, nullable: true })
   assigners: string[];
 

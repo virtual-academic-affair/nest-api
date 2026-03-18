@@ -18,7 +18,7 @@ export class MessageLabelsService {
 
   async run(
     messageId: number,
-    newSystemLabels: SystemLabel[] = [],
+    newSystemLabels: SystemLabel[],
     deleteTasks?: boolean,
     addLabels: SystemLabel[] = [],
     removeLabels: SystemLabel[] = [],
@@ -34,7 +34,7 @@ export class MessageLabelsService {
       });
       const currentSystemLabels = message.systemLabels ?? [];
 
-      if (newSystemLabels.length === 0) {
+      if (newSystemLabels === null) {
         newSystemLabels = [...new Set([...currentSystemLabels, ...addLabels])].filter((l) => !removeLabels.includes(l));
       }
 

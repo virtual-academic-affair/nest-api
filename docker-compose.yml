@@ -27,8 +27,8 @@ services:
     networks:
       - nest-network
 
-  rag-api:
-    image: ghcr.io/virtual-academic-affair/python_rag:latest
+  python-rag:
+    image: ghcr.io/virtual-academic-affair/python-rag:latest
     container_name: python-rag-container
     restart: always
     expose:

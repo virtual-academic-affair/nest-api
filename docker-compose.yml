@@ -21,7 +21,6 @@ services:
     container_name: nest-api-container
     restart: always
     expose:
-      - "3000"
       - "5000"
     env_file:
       - .env
@@ -29,11 +28,11 @@ services:
       - nest-network
 
   rag-api:
-    image: ghcr.io/virtual-academic-affair/email_langchain:latest
-    container_name: rag-api-container
+    image: ghcr.io/virtual-academic-affair/python_rag:latest
+    container_name: python-rag-container
     restart: always
     expose:
-      - "8000"
+      - "9000"
     env_file:
       - .env.rag
     networks:

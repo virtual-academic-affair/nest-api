@@ -1,16 +1,42 @@
-version: '3'
+version: '3.9'
 
 services:
+  proxy:
+    image: nginx:1.27-alpine
+    container_name: edge-proxy-container
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - nest-api
+      - rag-api
+    networks:
+      - nest-network
+
   nest-api:
     image: ghcr.io/virtual-academic-affair/nest-api:latest
     container_name: nest-api-container
     restart: always
-    ports:
-      - "80:3000"
-      - "443:3000"
-      - "5000:5000"
+    expose:
+      - "5000"
     env_file:
       - .env
+    networks:
+      - nest-network
+
+  python-rag:
+    image: ghcr.io/virtual-academic-affair/python-rag:latest
+    container_name: python-rag-container
+    restart: always
+    expose:
+      - "9000"
+    env_file:
+      - .env.rag
+    networks:
+      - nest-network
 
 networks:
   nest-network:

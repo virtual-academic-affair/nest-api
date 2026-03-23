@@ -24,6 +24,7 @@ import { MessagesService } from '@email/services/messages.service';
 import { ResourceController } from '@shared/resource/controllers/resource.controller';
 import { RestrictMethods } from '@shared/resource/decorators/restrict-methods.decorator';
 import { ResourceAction } from '@shared/resource/enums/resource-action.enum';
+import { SocketGateway } from 'src/socket/socket.gateway';
 
 @Auth(AuthType.Bearer)
 @Roles(Role.Admin)
@@ -36,6 +37,7 @@ export class MessagesController extends ResourceController<Message> {
     protected readonly service: MessagesService,
     private readonly emailSyncService: EmailSyncService,
     private readonly messageLabelsService: MessageLabelsService,
+    private readonly socketGateway: SocketGateway,
   ) {
     super(service);
   }
@@ -50,9 +52,14 @@ export class MessagesController extends ResourceController<Message> {
   }
 
   @Put(':id/labels')
+  async updateLabelsHttp(@Body() data: UpdateLabelsDto, @Param('id', ParseIntPipe) messageId: number) {
+    return await this.messageLabelsService.run(messageId, data.systemLabels, data.deleteTasks);
+  }
+
   @GrpcMethod('MessageService', 'UpdateLabels')
-  async updateLabels(@Body() data: UpdateLabelsDto, @Param('id', ParseIntPipe) messageId?: number) {
-    return await this.messageLabelsService.run(messageId || data.messageId, data.systemLabels, data.deleteTasks);
+  async updateLabels(@Body() data: UpdateLabelsDto) {
+    await this.messageLabelsService.run(data.messageId, data.systemLabels, false);
+    await this.socketGateway.emitMessageLabelsUpdated(data.messageId);
   }
 
   @Delete(':id')

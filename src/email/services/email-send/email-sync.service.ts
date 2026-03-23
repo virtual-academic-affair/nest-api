@@ -11,6 +11,7 @@ import { GoogleapisService } from '@email/services/googleapis.service';
 import { RABBIT_SERVICE } from '@shared/config/constants';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
 import { SettingService } from '@shared/setting/services/setting.service';
+import { SocketGateway } from 'src/socket/socket.gateway';
 
 export const INGESTED = 'ingested';
 
@@ -22,6 +23,7 @@ export class EmailSyncService {
     @Inject(RABBIT_SERVICE) private readonly client: ClientProxy,
     private readonly googleapisService: GoogleapisService,
     private readonly settingService: SettingService,
+    private readonly socketGateway: SocketGateway,
     @InjectRepository(Message) private readonly messageRepository: Repository<Message>,
   ) {}
 
@@ -35,16 +37,19 @@ export class EmailSyncService {
     ]);
 
     const messageIds = await this.fetchMessageIdsSince(gmail, lastPullTimestamp, allowedDomains);
+    const ingestedIds: number[] = [];
 
     for (const messageId of messageIds) {
       try {
         this.logger.log(`Processing message ${messageId}`);
-        await this.processAndPublishMessage(gmail, messageId, superEmail.email, !!canSaveContent);
+        const newId = await this.processAndPublishMessage(gmail, messageId, superEmail.email, !!canSaveContent);
+        newId && ingestedIds.push(newId);
       } catch (error) {
         this.logger.warn(`Skip message ${messageId}`, error);
       }
     }
 
+    await this.socketGateway.emitMessageIngested(ingestedIds);
     await this.updateLastPullTimestamp();
   }
 
@@ -75,12 +80,10 @@ export class EmailSyncService {
     gmailMessageId: string,
     superEmail: string,
     canSaveContent: boolean,
-  ): Promise<void> {
-    const exists = await this.messageRepository.findOne({
-      where: { gmailMessageId },
-    });
+  ): Promise<number | null> {
+    const exists = await this.messageRepository.findOne({ where: { gmailMessageId } });
     if (exists) {
-      return;
+      return null;
     }
 
     const { data: gmailMessage } = await gmail.users.messages.get({
@@ -115,6 +118,8 @@ export class EmailSyncService {
       senderName: message.senderName,
       content: plainTextContent,
     });
+
+    return message.id;
   }
 
   private async getLastPullTimestamp(): Promise<Date> {

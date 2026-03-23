@@ -28,7 +28,7 @@ export class GrantsService {
   async grant(dto: CodeDto) {
     const { tokens } = await this.googleapisService.oAuthClient.getToken({
       code: dto.code,
-      ...(dto.redirectUrl ? { redirect_uri: dto.redirectUrl } : {}),
+      redirect_uri: dto.redirectUrl,
     });
     throwUnless(tokens?.refresh_token, new BadRequestException('Missing refresh token'));
 

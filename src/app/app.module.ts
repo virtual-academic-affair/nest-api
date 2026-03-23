@@ -10,6 +10,7 @@ import { InquiryModule } from '@inquiry/inquiry.module';
 import { appConfig } from '@shared/config/app.config';
 import { SharedModule } from '@shared/shared.module';
 import { TaskModule } from '@task/task.module';
+import { SocketModule } from '../socket/socket.module';
 import { ClsServiceManager } from './cls-manager';
 
 @Module({
@@ -28,6 +29,7 @@ import { ClsServiceManager } from './cls-manager';
     ClassRegistrationModule,
     TaskModule,
     InquiryModule,
+    SocketModule,
     ClsModule.forRoot({ global: true, middleware: { mount: true }, interceptor: { mount: false } }),
   ],
 })

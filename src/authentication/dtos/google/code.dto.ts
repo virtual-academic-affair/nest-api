@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class CodeDto {
   @IsString()
@@ -6,6 +6,6 @@ export class CodeDto {
   code: string;
 
   @IsString()
-  @IsOptional()
-  redirectUrl?: string;
+  @IsNotEmpty()
+  redirectUrl: string;
 }

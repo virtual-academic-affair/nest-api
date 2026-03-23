@@ -5,8 +5,22 @@ import { BaseEntity } from '@shared/resource/entities/base.entity';
 
 export abstract class BelongsToMessage extends BaseEntity {
   @Index()
+  @Column()
+  messageId!: number;
+
+  @ManyToOne(() => Message, { onDelete: 'CASCADE' })
+  @JoinColumn()
+  message!: Message;
+
+  @Index()
+  @Column({ type: 'enum', enum: MessageStatus, default: MessageStatus.Opened })
+  messageStatus: MessageStatus;
+}
+
+export abstract class MayBelongsToMessage extends BaseEntity {
+  @Index()
   @Column({ nullable: true })
-  messageId: number | null = null;
+  messageId?: number | null = null;
 
   @ManyToOne(() => Message, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn()

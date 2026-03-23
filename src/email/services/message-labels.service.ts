@@ -1,9 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
+import { ClassRegistration } from '@class-registration/entities/class-registration.entity';
 import { Message } from '@email/entities/message.entity';
+import { Inquiry } from '@inquiry/entities/inquiry.entity';
 import { SystemLabel } from '@shared/enums/system-label.enum';
 import { Setting } from '@shared/setting/entities/setting.entity';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
+import { Task } from '@task/entities/task.entity';
 import { GoogleapisService } from './googleapis.service';
 
 @Injectable()
@@ -13,7 +16,13 @@ export class MessageLabelsService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async run(messageId: number, newSystemLabels: SystemLabel[]): Promise<void> {
+  async run(
+    messageId: number,
+    newSystemLabels: SystemLabel[],
+    deleteTasks?: boolean,
+    addLabels: SystemLabel[] = [],
+    removeLabels: SystemLabel[] = [],
+  ): Promise<void> {
     await this.dataSource.transaction(async (manager) => {
       const message = await manager.findOneOrFail(Message, {
         where: { id: messageId },
@@ -25,12 +34,15 @@ export class MessageLabelsService {
       });
       const currentSystemLabels = message.systemLabels ?? [];
 
-      const toAdd = newSystemLabels
-        .filter((l) => !currentSystemLabels.includes(l))
-        .map((l) => labelMapping.value[l] as string);
-      const toRemove = currentSystemLabels
-        .filter((l) => !newSystemLabels.includes(l))
-        .map((l) => labelMapping.value[l] as string);
+      if (newSystemLabels === null) {
+        newSystemLabels = [...new Set([...currentSystemLabels, ...addLabels])].filter((l) => !removeLabels.includes(l));
+      }
+
+      const addedLabels = newSystemLabels.filter((l) => !currentSystemLabels.includes(l));
+      const removedLabels = currentSystemLabels.filter((l) => !newSystemLabels.includes(l));
+
+      const toAdd = addedLabels.map((l) => labelMapping.value[l] as string);
+      const toRemove = removedLabels.map((l) => labelMapping.value[l] as string);
 
       if (toAdd.length === 0 && toRemove.length === 0) {
         return message;
@@ -42,6 +54,16 @@ export class MessageLabelsService {
         id: message.gmailMessageId,
         requestBody: { addLabelIds: toAdd, removeLabelIds: toRemove },
       });
+
+      if (removedLabels.includes(SystemLabel.ClassRegistration)) {
+        await manager.delete(ClassRegistration, { messageId });
+      }
+      if (removedLabels.includes(SystemLabel.Inquiry)) {
+        await manager.delete(Inquiry, { messageId });
+      }
+      if (removedLabels.includes(SystemLabel.Task) && deleteTasks) {
+        await manager.delete(Task, { messageId });
+      }
 
       await manager.update(Message, message.id, { systemLabels: newSystemLabels });
     });

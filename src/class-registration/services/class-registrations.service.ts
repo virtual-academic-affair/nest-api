@@ -9,6 +9,8 @@ import { ClassRegistrationItemsService } from '@class-registration/services/clas
 import { ClassRegistrationTemplate } from '@class-registration/templates/class-registration.template';
 import { MessageStatus } from '@email/enums/message-status.enum';
 import { EmailReplyService } from '@email/services/email-send/email-reply.service';
+import { MessageLabelsService } from '@email/services/message-labels.service';
+import { SystemLabel } from '@shared/enums/system-label.enum';
 import { applyMessageFilters } from '@shared/resource/dtos/message-resource-query.dto';
 import { ResourceService } from '@shared/resource/services/resource.service';
 
@@ -22,6 +24,7 @@ export class ClassRegistrationsService extends ResourceService<ClassRegistration
     private readonly classRegistrationItemsService: ClassRegistrationItemsService,
     private readonly configService: ConfigService,
     private readonly emailReplyService: EmailReplyService,
+    private readonly messageLabelsService: MessageLabelsService,
   ) {
     super(repository);
   }
@@ -55,7 +58,7 @@ export class ClassRegistrationsService extends ResourceService<ClassRegistration
   async create(@Body() dto: CreateDto) {
     const existing = dto?.messageId && (await this.repository.findOneBy({ messageId: dto.messageId }));
     throwIf(existing, new ConflictException('Registration already exists'));
-
+    await this.messageLabelsService.run(dto.messageId, null, false, [SystemLabel.ClassRegistration]);
     return await super.create(dto);
   }
 

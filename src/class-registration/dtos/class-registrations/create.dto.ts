@@ -1,10 +1,9 @@
-import { PartialType } from '@nestjs/mapped-types';
 import { Type } from 'class-transformer';
 import { IsArray, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { CreateDto as CreateItemDto } from '@class-registration/dtos/class-registration-items/create.dto';
 import { HasMessageIdDto } from '@email/dtos/messages/has-message-id.dto';
 
-export class CreateDto extends PartialType(HasMessageIdDto) {
+export class CreateDto extends HasMessageIdDto {
   @IsOptional()
   @IsString()
   studentCode?: string;

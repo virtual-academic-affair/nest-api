@@ -1,4 +1,15 @@
-import { BadRequestException, Body, Controller, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put,
+  Delete,
+  Query,
+  DefaultValuePipe,
+  ParseBoolPipe,
+} from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 import { Auth } from '@authentication/decorators/auth.decorator';
 import { Roles } from '@authentication/decorators/roles.decorator';
@@ -18,7 +29,7 @@ import { ResourceAction } from '@shared/resource/enums/resource-action.enum';
 @Roles(Role.Admin)
 @Controller('email/messages')
 @RestrictMethods({
-  only: [ResourceAction.FindAll, ResourceAction.FindOne],
+  only: [ResourceAction.FindAll, ResourceAction.FindOne, ResourceAction.Delete],
 })
 export class MessagesController extends ResourceController<Message> {
   constructor(
@@ -41,6 +52,14 @@ export class MessagesController extends ResourceController<Message> {
   @Put(':id/labels')
   @GrpcMethod('MessageService', 'UpdateLabels')
   async updateLabels(@Body() data: UpdateLabelsDto, @Param('id', ParseIntPipe) messageId?: number) {
-    return await this.messageLabelsService.run(messageId || data.messageId, data.systemLabels);
+    return await this.messageLabelsService.run(messageId || data.messageId, data.systemLabels, data.deleteTasks);
+  }
+
+  @Delete(':id')
+  async remove(
+    @Param('id') id: string,
+    @Query('deleteTasks', new DefaultValuePipe(false), ParseBoolPipe) deleteTasks?: boolean,
+  ) {
+    return await this.service.removeMessage(+id, deleteTasks);
   }
 }

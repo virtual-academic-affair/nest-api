@@ -1,6 +1,7 @@
 import { status as GrpcStatus } from '@grpc/grpc-js';
-import { ArgumentsHost, Catch, HttpException, HttpStatus, Logger } from '@nestjs/common';
-import { BaseRpcExceptionFilter, RpcException } from '@nestjs/microservices';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { RpcException } from '@nestjs/microservices';
+import { ApiExceptionFilter } from '@zabih-dev/nest-api-response/dist/api.exception';
 import { Observable, throwError } from 'rxjs';
 
 const httpToGrpcStatus: Record<number, GrpcStatus> = {
@@ -20,21 +21,27 @@ const httpToGrpcStatus: Record<number, GrpcStatus> = {
 };
 
 @Catch()
-export class GrpcExceptionFilter extends BaseRpcExceptionFilter {
-  private readonly logger = new Logger(GrpcExceptionFilter.name);
+@Injectable()
+export class UnifiedExceptionFilter implements ExceptionFilter {
+  private readonly logger = new Logger(UnifiedExceptionFilter.name);
+  private readonly httpExceptionFilter = new ApiExceptionFilter();
 
-  catch(exception: any, host: ArgumentsHost): Observable<any> {
-    if (host.getType() !== 'rpc') {
-      return;
+  catch(exception: any, host: ArgumentsHost): void | Observable<any> {
+    if (host.getType() === 'rpc') {
+      return this.handleGrpcException(exception, host);
     }
 
-    console.log(exception);
-    const { code, message } = this.resolveError(exception);
+    // HTTP: delegate to the library's ApiExceptionFilter
+    return this.httpExceptionFilter.catch(exception, host);
+  }
+
+  private handleGrpcException(exception: any, _host: ArgumentsHost): Observable<any> {
+    const { code, message } = this.resolveGrpcError(exception);
     this.logger.error(`[gRPC Error] Code: ${code} | Message: ${message}`);
     return throwError(() => ({ code, message }));
   }
 
-  private resolveError(exception: any): { code: GrpcStatus; message: string } {
+  private resolveGrpcError(exception: any): { code: GrpcStatus; message: string } {
     if (!exception) {
       return {
         code: GrpcStatus.INTERNAL,

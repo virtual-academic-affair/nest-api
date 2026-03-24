@@ -10,6 +10,7 @@ import {
   DefaultValuePipe,
   ParseBoolPipe,
 } from '@nestjs/common';
+import { Get } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 import { Auth } from '@authentication/decorators/auth.decorator';
 import { Roles } from '@authentication/decorators/roles.decorator';
@@ -24,6 +25,7 @@ import { MessagesService } from '@email/services/messages.service';
 import { ResourceController } from '@shared/resource/controllers/resource.controller';
 import { RestrictMethods } from '@shared/resource/decorators/restrict-methods.decorator';
 import { ResourceAction } from '@shared/resource/enums/resource-action.enum';
+import { RedisService } from '@shared/services/redis.service';
 import { SocketGateway } from 'src/socket/socket.gateway';
 
 @Auth(AuthType.Bearer)
@@ -38,6 +40,7 @@ export class MessagesController extends ResourceController<Message> {
     private readonly emailSyncService: EmailSyncService,
     private readonly messageLabelsService: MessageLabelsService,
     private readonly socketGateway: SocketGateway,
+    private readonly redisService: RedisService,
   ) {
     super(service);
   }
@@ -46,19 +49,31 @@ export class MessagesController extends ResourceController<Message> {
     return { query: QueryDto };
   }
 
+  @Get('processing-ids')
+  async getProcessingIds() {
+    const keys = await this.redisService.keys('message:processing:*');
+    const ids = keys
+      .map((k) => {
+        const parts = k.split(':');
+        return parseInt(parts[parts.length - 1], 10);
+      })
+      .filter((id) => !isNaN(id));
+    return { data: ids };
+  }
+
   @Post('sync')
   protected async sync() {
     return await this.emailSyncService.run();
   }
 
   @Put(':id/labels')
-  async updateLabelsHttp(@Body() data: UpdateLabelsDto, @Param('id', ParseIntPipe) messageId: number) {
+  async updateLabels(@Body() data: UpdateLabelsDto, @Param('id', ParseIntPipe) messageId: number) {
     return await this.messageLabelsService.run(messageId, data.systemLabels, data.deleteTasks);
   }
 
   @GrpcMethod('MessageService', 'UpdateLabels')
-  async updateLabels(@Body() data: UpdateLabelsDto) {
-    await this.messageLabelsService.run(data.messageId, data.systemLabels, false);
+  async updateLabelsGrpc(@Body() data: UpdateLabelsDto) {
+    await this.messageLabelsService.run(data.messageId, null, false, data.systemLabels);
     await this.socketGateway.emitMessageLabelsUpdated(data.messageId);
   }
 

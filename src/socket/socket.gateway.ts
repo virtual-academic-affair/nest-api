@@ -9,9 +9,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { RedisService } from '@shared/services/redis.service';
 
-@WebSocketGateway({
-  cors: { origin: '*' },
-})
+@WebSocketGateway({ cors: { origin: '*' } })
 export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   constructor(private readonly redisService: RedisService) {}
 

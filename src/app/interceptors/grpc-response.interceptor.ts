@@ -4,7 +4,11 @@ import { map } from 'rxjs/operators';
 
 @Injectable()
 export class GrpcResponseInterceptor implements NestInterceptor {
-  intercept(_context: ExecutionContext, next: CallHandler): Observable<any> {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+    if (context.getType() !== 'rpc') {
+      return next.handle();
+    }
+
     return next.handle().pipe(
       map((data) => {
         return { success: true, ...data };

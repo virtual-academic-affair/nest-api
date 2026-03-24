@@ -47,6 +47,10 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     return result === 1;
   }
 
+  async keys(pattern: string): Promise<string[]> {
+    return this.client.keys(pattern);
+  }
+
   // ============================
   // HASH (HSET, HGET, HDEL,...)
   // ============================

@@ -1,16 +1,16 @@
+import { AuthenticationModule } from '@authentication/authentication.module';
+import { ClassRegistrationModule } from '@class-registration/class-registration.module';
+import { EmailModule } from '@email/email.module';
+import { InquiryModule } from '@inquiry/inquiry.module';
 import { Module, OnModuleInit, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { ClsGuard, ClsModule, ClsService } from 'nestjs-cls';
-import { AuthenticationModule } from '@authentication/authentication.module';
-import { ClassRegistrationModule } from '@class-registration/class-registration.module';
-import { EmailModule } from '@email/email.module';
-import { InquiryModule } from '@inquiry/inquiry.module';
 import { appConfig } from '@shared/config/app.config';
 import { SharedModule } from '@shared/shared.module';
 import { TaskModule } from '@task/task.module';
+import { ClsGuard, ClsModule, ClsService } from 'nestjs-cls';
 import { SocketModule } from '../socket/socket.module';
 import { ClsServiceManager } from './cls-manager';
 import { UnifiedExceptionFilter } from './filters/unified-exception.filter';
@@ -41,6 +41,9 @@ import { HttpResponseInterceptor } from './interceptors/http-response.intercepto
       type: process.env.DB_TYPE,
       autoLoadEntities: true,
       synchronize: true,
+      ssl: {
+        rejectUnauthorized: false,
+      },
     } as TypeOrmModuleOptions),
     ScheduleModule.forRoot(),
     EmailModule,

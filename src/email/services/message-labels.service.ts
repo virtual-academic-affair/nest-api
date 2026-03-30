@@ -3,16 +3,19 @@ import { DataSource } from 'typeorm';
 import { ClassRegistration } from '@class-registration/entities/class-registration.entity';
 import { Message } from '@email/entities/message.entity';
 import { Inquiry } from '@inquiry/entities/inquiry.entity';
+import { InquiryType } from '@inquiry/enums/inquiry-type.enum';
 import { SystemLabel } from '@shared/enums/system-label.enum';
 import { Setting } from '@shared/setting/entities/setting.entity';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
 import { Task } from '@task/entities/task.entity';
 import { GoogleapisService } from './googleapis.service';
+import { LabelsService } from './labels.service';
 
 @Injectable()
 export class MessageLabelsService {
   constructor(
     private readonly googleapisService: GoogleapisService,
+    private readonly labelsService: LabelsService,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -40,16 +43,26 @@ export class MessageLabelsService {
 
       const addedLabels = newSystemLabels.filter((l) => !currentSystemLabels.includes(l));
       const removedLabels = currentSystemLabels.filter((l) => !newSystemLabels.includes(l));
+      const inquiry = removedLabels.includes(SystemLabel.Inquiry)
+        ? await manager.findOne(Inquiry, { where: { messageId } })
+        : null;
+      const inquiryTypes = inquiry?.types ?? [];
 
       const toAdd = addedLabels.map((l) => labelMapping.value[l] as string);
       const toRemove = removedLabels.map((l) => labelMapping.value[l] as string);
+
+      if (inquiryTypes.length) {
+        const inquiryTypeMapping = await this.labelsService.autoCreateInquiryTypeLabels();
+        const inquiryTypeLabelIds = inquiryTypes.map((type: InquiryType) => inquiryTypeMapping[type]).filter(Boolean);
+        toRemove.push(...inquiryTypeLabelIds);
+      }
 
       if (toAdd.length === 0 && toRemove.length === 0) {
         return message;
       }
 
       const gmail = await this.googleapisService.getGmailClient();
-      await gmail.users.messages.modify({
+      const { data } = await gmail.users.messages.modify({
         userId: 'me',
         id: message.gmailMessageId,
         requestBody: { addLabelIds: toAdd, removeLabelIds: toRemove },
@@ -65,7 +78,10 @@ export class MessageLabelsService {
         await manager.delete(Task, { messageId });
       }
 
-      await manager.update(Message, message.id, { systemLabels: newSystemLabels });
+      await manager.update(Message, message.id, {
+        systemLabels: newSystemLabels,
+        labelIds: data.labelIds ?? message.labelIds,
+      });
     });
   }
 }

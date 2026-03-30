@@ -1,5 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { UpdateDto } from '@email/dtos/labels/update.dto';
+import { getLangInquiryTypeLabel, InquiryType } from '@inquiry/enums/inquiry-type.enum';
 import { getLangLabel, SystemLabel } from '@shared/enums/system-label.enum';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
 import { SettingService } from '@shared/setting/services/setting.service';
@@ -7,7 +8,10 @@ import { GoogleapisService } from './googleapis.service';
 
 @Injectable()
 export class LabelsService {
-  constructor(private readonly settingService: SettingService, private readonly googleapisService: GoogleapisService) {}
+  constructor(
+    private readonly settingService: SettingService,
+    private readonly googleapisService: GoogleapisService,
+  ) {}
 
   async findAllGmailLabels() {
     const client = await this.googleapisService.getGmailClient();
@@ -66,6 +70,24 @@ export class LabelsService {
     Object.assign(labels, Object.fromEntries(newEntries));
 
     await this.update(labels);
+    await this.autoCreateInquiryTypeLabels();
     return labels;
+  }
+
+  async autoCreateInquiryTypeLabels(): Promise<Record<InquiryType, string>> {
+    await this.createGmailLabel(getLangLabel('parent'), getLangLabel('parent', 'color'));
+    await this.createGmailLabel(
+      `${getLangLabel('parent')}/${getLangLabel(SystemLabel.Inquiry)}`,
+      getLangLabel(SystemLabel.Inquiry, 'color'),
+    );
+
+    const parent = `${getLangLabel('parent')}/${getLangLabel(SystemLabel.Inquiry)}`;
+    const entries = await Promise.all(
+      Object.values(InquiryType).map(async (key) => [
+        key,
+        await this.createGmailLabel(`${parent}/${getLangInquiryTypeLabel(key)}`, getLangInquiryTypeLabel(key, 'color')),
+      ]),
+    );
+    return Object.fromEntries(entries) as Record<InquiryType, string>;
   }
 }

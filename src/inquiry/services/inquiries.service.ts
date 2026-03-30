@@ -1,18 +1,20 @@
-import { Body, ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { MessageStatus } from '@email/enums/message-status.enum';
 import { EmailReplyService } from '@email/services/email-send/email-reply.service';
+import { InquiryTypeLabelsService } from '@email/services/inquiry-type-labels.service';
 import { MessageLabelsService } from '@email/services/message-labels.service';
+import { CreateDto } from '@inquiry/dtos/inquiries/create.dto';
 import { QueryDto } from '@inquiry/dtos/inquiries/query.dto';
+import { UpdateDto } from '@inquiry/dtos/inquiries/update.dto';
 import { Inquiry } from '@inquiry/entities/inquiry.entity';
 import { InquiryType } from '@inquiry/enums/inquiry-type.enum';
 import { InquiryTemplate } from '@inquiry/templates/inquiry.template';
 import { SystemLabel } from '@shared/enums/system-label.enum';
 import { applyMessageFilters } from '@shared/resource/dtos/message-resource-query.dto';
 import { ResourceService } from '@shared/resource/services/resource.service';
-import { CreateDto } from '@task/dtos/tasks/create.dto';
 
 @Injectable()
 export class InquiriesService extends ResourceService<Inquiry> {
@@ -21,6 +23,7 @@ export class InquiriesService extends ResourceService<Inquiry> {
     private readonly emailReplyService: EmailReplyService,
     private readonly configService: ConfigService,
     private readonly messageLabelsService: MessageLabelsService,
+    private readonly inquiryTypeLabelsService: InquiryTypeLabelsService,
   ) {
     super(repository);
   }
@@ -34,11 +37,33 @@ export class InquiriesService extends ResourceService<Inquiry> {
       queryBuilder.andWhere(`${this.p('types')} && ARRAY[:...types]::"inquiry_inquiry_types_enum"[]`, { types });
   }
 
-  async create(@Body() dto: CreateDto) {
+  async create(dto: CreateDto) {
     const existing = dto?.messageId && (await this.repository.findOneBy({ messageId: dto.messageId }));
     throwIf(existing, new ConflictException('Inquiry already exists'));
     await this.messageLabelsService.run(dto.messageId, null, false, [SystemLabel.Inquiry]);
-    return await super.create(dto);
+    const inquiry = await super.create(dto);
+    await this.inquiryTypeLabelsService.run(dto.messageId, dto.types ?? []);
+    return inquiry;
+  }
+
+  async update(id: number, dto: UpdateDto) {
+    const inquiry = await this.findOne(id);
+    const oldTypes = inquiry.types ?? [];
+    const nextTypes = dto.types ?? oldTypes;
+    const updated = await super.update(id, dto);
+
+    if (dto.types !== undefined) {
+      await this.inquiryTypeLabelsService.run(inquiry.messageId, nextTypes, oldTypes);
+    }
+
+    return updated;
+  }
+
+  async remove(id: number) {
+    const inquiry = await this.findOne(id);
+    await this.inquiryTypeLabelsService.run(inquiry.messageId, [], inquiry.types ?? []);
+    await this.messageLabelsService.run(inquiry.messageId, null, false, [], [SystemLabel.Inquiry]);
+    return inquiry;
   }
 
   protected withOne(queryBuilder: SelectQueryBuilder<Inquiry>): void {

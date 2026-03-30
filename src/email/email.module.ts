@@ -14,6 +14,7 @@ import { EmailSendService } from '@email/services/email-send/email-send.service'
 import { EmailSyncService } from '@email/services/email-send/email-sync.service';
 import { GoogleapisService } from '@email/services/googleapis.service';
 import { GrantsService } from '@email/services/grants.service';
+import { InquiryTypeLabelsService } from '@email/services/inquiry-type-labels.service';
 import { LabelsService } from '@email/services/labels.service';
 import { MessageLabelsService } from '@email/services/message-labels.service';
 import { MessagesService } from '@email/services/messages.service';
@@ -31,6 +32,7 @@ import googleConfig from '@shared/config/google.config';
   providers: [
     GoogleapisService,
     LabelsService,
+    InquiryTypeLabelsService,
     GrantsService,
     EmailSyncService,
     EmailSendService,
@@ -39,6 +41,13 @@ import googleConfig from '@shared/config/google.config';
     MessageLabelsService,
     EmailSyncScheduler,
   ],
-  exports: [MessagesService, GoogleapisService, EmailSendService, EmailReplyService, MessageLabelsService],
+  exports: [
+    MessagesService,
+    GoogleapisService,
+    EmailSendService,
+    EmailReplyService,
+    MessageLabelsService,
+    InquiryTypeLabelsService,
+  ],
 })
 export class EmailModule {}

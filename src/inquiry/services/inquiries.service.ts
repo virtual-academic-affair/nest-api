@@ -56,8 +56,12 @@ export class InquiriesService extends ResourceService<Inquiry> {
 
   async remove(id: number) {
     const inquiry = await this.findOne(id);
-    await this.messageLabelsService.run(inquiry.messageId, null, false, [], [SystemLabel.Inquiry]);
-    return inquiry;
+
+    if (inquiry.types?.length) {
+      await this.messageLabelsService.run(inquiry.messageId, undefined, false, [], [], [], inquiry.types);
+    }
+
+    return await super.remove(id);
   }
 
   protected withOne(queryBuilder: SelectQueryBuilder<Inquiry>): void {

@@ -16,4 +16,9 @@ export class CreateDto extends HasMessageIdDto {
   @IsString()
   @MaxLength(5000)
   answer?: string;
+
+  @IsArray()
+  @IsOptional()
+  @IsString({ each: true })
+  sources?: string[];
 }

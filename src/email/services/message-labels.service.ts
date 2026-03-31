@@ -25,6 +25,8 @@ export class MessageLabelsService {
     deleteTasks?: boolean,
     addLabels: SystemLabel[] = [],
     removeLabels: SystemLabel[] = [],
+    newInquiryTypes?: InquiryType[],
+    oldInquiryTypes: InquiryType[] = [],
   ): Promise<void> {
     await this.dataSource.transaction(async (manager) => {
       const message = await manager.findOneOrFail(Message, {
@@ -41,8 +43,8 @@ export class MessageLabelsService {
         newSystemLabels = [...new Set([...currentSystemLabels, ...addLabels])].filter((l) => !removeLabels.includes(l));
       }
 
-      const addedLabels = newSystemLabels.filter((l) => !currentSystemLabels.includes(l));
-      const removedLabels = currentSystemLabels.filter((l) => !newSystemLabels.includes(l));
+      const addedLabels = newSystemLabels?.filter((l) => !currentSystemLabels.includes(l)) ?? [];
+      const removedLabels = newSystemLabels ? currentSystemLabels.filter((l) => !newSystemLabels.includes(l)) : [];
       const inquiry = removedLabels.includes(SystemLabel.Inquiry)
         ? await manager.findOne(Inquiry, { where: { messageId } })
         : null;
@@ -50,6 +52,15 @@ export class MessageLabelsService {
 
       const toAdd = addedLabels.map((l) => labelMapping.value[l] as string);
       const toRemove = removedLabels.map((l) => labelMapping.value[l] as string);
+
+      if (newInquiryTypes !== undefined) {
+        const inquiryTypeMapping = await this.labelsService.autoCreateInquiryTypeLabels();
+        const addedInquiryTypes = newInquiryTypes.filter((type) => !oldInquiryTypes.includes(type));
+        const removedInquiryTypes = oldInquiryTypes.filter((type) => !newInquiryTypes.includes(type));
+
+        toAdd.push(...addedInquiryTypes.map((type) => inquiryTypeMapping[type]).filter(Boolean));
+        toRemove.push(...removedInquiryTypes.map((type) => inquiryTypeMapping[type]).filter(Boolean));
+      }
 
       if (inquiryTypes.length) {
         const inquiryTypeMapping = await this.labelsService.autoCreateInquiryTypeLabels();
@@ -65,7 +76,10 @@ export class MessageLabelsService {
       const { data } = await gmail.users.messages.modify({
         userId: 'me',
         id: message.gmailMessageId,
-        requestBody: { addLabelIds: toAdd, removeLabelIds: toRemove },
+        requestBody: {
+          addLabelIds: [...new Set(toAdd)],
+          removeLabelIds: [...new Set(toRemove)],
+        },
       });
 
       if (removedLabels.includes(SystemLabel.ClassRegistration)) {
@@ -79,7 +93,7 @@ export class MessageLabelsService {
       }
 
       await manager.update(Message, message.id, {
-        systemLabels: newSystemLabels,
+        systemLabels: newSystemLabels ?? message.systemLabels,
         labelIds: data.labelIds ?? message.labelIds,
       });
     });

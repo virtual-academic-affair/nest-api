@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
+import { Body, ConflictException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
@@ -7,8 +7,6 @@ import { EmailReplyService } from '@email/services/email-send/email-reply.servic
 import { MessageLabelsService } from '@email/services/message-labels.service';
 import { CreateDto } from '@inquiry/dtos/inquiries/create.dto';
 import { QueryDto } from '@inquiry/dtos/inquiries/query.dto';
-import { ReferenceMaterialDto } from '@inquiry/dtos/inquiries/reference-material.dto';
-import { UpdateDto } from '@inquiry/dtos/inquiries/update.dto';
 import { Inquiry } from '@inquiry/entities/inquiry.entity';
 import { InquiryType } from '@inquiry/enums/inquiry-type.enum';
 import { InquiryTemplate } from '@inquiry/templates/inquiry.template';
@@ -36,68 +34,11 @@ export class InquiriesService extends ResourceService<Inquiry> {
       queryBuilder.andWhere(`${this.p('types')} && ARRAY[:...types]::"inquiry_inquiry_types_enum"[]`, { types });
   }
 
-  private normalizeSources(dto: CreateDto | UpdateDto): ReferenceMaterialDto[] | undefined {
-    if (dto.sources === undefined) {
-      return undefined;
-    }
-
-    return dto.sources
-      .map((source) => {
-        try {
-          const parsed = JSON.parse(source) as {
-            fileId?: string;
-            displayName?: string;
-            text?: string;
-          };
-          return {
-            fileId: parsed.fileId ?? '',
-            displayName: parsed.displayName ?? '',
-            text: parsed.text ?? '',
-          };
-        } catch {
-          throw new BadRequestException('Invalid inquiry source payload');
-        }
-      })
-      .filter((item) => item.fileId || item.displayName || item.text);
-  }
-
-  async create(dto: CreateDto) {
-    const existing = dto?.messageId && (await this.repository.findOneBy({ messageId: dto.messageId }));
+  async create(@Body() dto: CreateDto) {
+    const existing = await this.repository.findOneBy({ messageId: dto.messageId });
     throwIf(existing, new ConflictException('Inquiry already exists'));
-    await this.messageLabelsService.run(dto.messageId, null, false, [SystemLabel.Inquiry], [], dto.types ?? []);
-    const normalizedSources = this.normalizeSources(dto) ?? [];
-    const payload = {
-      ...dto,
-      sources: normalizedSources,
-    };
-    const created = await super.create(payload);
-    return created;
-  }
-
-  async update(id: number, dto: UpdateDto) {
-    const inquiry = await this.findOne(id);
-    const oldTypes = inquiry.types ?? [];
-    const sources = this.normalizeSources(dto);
-    const updated = await super.update(id, {
-      ...dto,
-      ...(sources !== undefined ? { sources } : {}),
-    });
-
-    if (dto.types !== undefined) {
-      await this.messageLabelsService.run(inquiry.messageId, undefined, false, [], [], dto.types, oldTypes);
-    }
-
-    return updated;
-  }
-
-  async remove(id: number) {
-    const inquiry = await this.findOne(id);
-
-    if (inquiry.types?.length) {
-      await this.messageLabelsService.run(inquiry.messageId, undefined, false, [], [], [], inquiry.types);
-    }
-
-    return await super.remove(id);
+    await this.messageLabelsService.run(dto.messageId, null, false, [SystemLabel.Inquiry]);
+    return await super.create(dto);
   }
 
   protected withOne(queryBuilder: SelectQueryBuilder<Inquiry>): void {

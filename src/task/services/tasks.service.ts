@@ -1,11 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ClsService } from 'nestjs-cls';
 import { DataSource, In, LessThanOrEqual, MoreThanOrEqual, Repository, SelectQueryBuilder } from 'typeorm';
 import { REQUEST_USER_KEY } from '@authentication/guards/authentication.guard';
 import { ActiveUserData } from '@authentication/interfaces/active-user-data.interface';
+import { MessageLabelsService } from '@email/services/message-labels.service';
+import { SystemLabel } from '@shared/enums/system-label.enum';
 import { applyMessageFilters } from '@shared/resource/dtos/message-resource-query.dto';
 import { ResourceService } from '@shared/resource/services/resource.service';
+import { CreateDto } from '@task/dtos/tasks/create.dto';
 import { QueryDto } from '@task/dtos/tasks/query.dto';
 import { UpdateDto } from '@task/dtos/tasks/update.dto';
 import { TaskAssignee } from '@task/entities/task-assignee.entity';
@@ -21,6 +24,7 @@ export class TasksService extends ResourceService<Task> {
     @InjectRepository(Task) repository: Repository<Task>,
     private readonly cls: ClsService,
     private readonly dataSource: DataSource,
+    private readonly messageLabelsService: MessageLabelsService,
   ) {
     super(repository);
   }
@@ -87,11 +91,14 @@ export class TasksService extends ResourceService<Task> {
     }, {});
   }
 
-  async create(createDto: any): Promise<Task> {
-    return super.create({
-      ...createDto,
-      assignees: this.enrichAssignees(createDto.assigneeIds),
-    });
+  async create(dto: CreateDto): Promise<Task> {
+    if (dto?.messageId) {
+      const existing = await this.repository.findOneBy({ messageId: dto.messageId });
+      throwIf(existing, new ConflictException('Task already exists'));
+      await this.messageLabelsService.run(dto.messageId, null, false, [SystemLabel.Inquiry]);
+    }
+
+    return super.create({ ...dto, assignees: this.enrichAssignees(dto.assigneeIds) });
   }
 
   enrichAssignees(assigneeIds: number[]) {

@@ -1,6 +1,6 @@
 import { IsString } from 'class-validator';
 
-export class ReferenceMaterialDto {
+export class CitationDto {
   @IsString()
   fileId: string;
 

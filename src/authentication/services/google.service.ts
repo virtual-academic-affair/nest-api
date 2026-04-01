@@ -5,6 +5,7 @@ import { OAuth2Client } from 'google-auth-library';
 import { Repository } from 'typeorm';
 import { CodeDto } from '@authentication/dtos/google/code.dto';
 import { User } from '@authentication/entities/user.entity';
+import { resolveEmail } from '@authentication/utils/resolve-email.util';
 import googleConfig from '@shared/config/google.config';
 import { AuthService } from './auth.service';
 
@@ -41,7 +42,11 @@ export class GoogleService implements OnModuleInit {
     throwUnless(payload?.email, new UnauthorizedException('Google email is missing'));
 
     const email = payload.email;
-    let user = await this.userRepository.findOneBy({ email });
+    let user: Partial<User> = await this.userRepository.findOneBy({ email });
+
+    if (!user) {
+      user = resolveEmail(email);
+    }
 
     user = await this.userRepository.save({
       ...user,
@@ -51,6 +56,6 @@ export class GoogleService implements OnModuleInit {
       picture: payload.picture,
     });
 
-    return this.authService.generateTokens(user);
+    return this.authService.generateTokens(user as User);
   }
 }

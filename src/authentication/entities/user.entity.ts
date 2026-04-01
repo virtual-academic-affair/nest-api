@@ -17,9 +17,20 @@ export class User extends BaseEntity {
   @Column({ type: 'enum', enum: Role, default: Role.Student })
   role: Role;
 
+  @Column({ type: 'jsonb', nullable: true })
+  profile?: Profile;
+
   @Column({ nullable: true })
   picture?: string;
 
   @Column({ type: 'boolean', default: true })
   isActive: boolean;
 }
+
+export type Profile = {
+  cohort: string;
+  enrollmentYear: number;
+  classNo?: string;
+  major?: string;
+  classAdvisor?: string;
+};

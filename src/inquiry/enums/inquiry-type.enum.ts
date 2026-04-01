@@ -10,8 +10,6 @@ export const InquiryTypeLang: Record<InquiryType, Record<string, string>> = {
   [InquiryType.Procedure]: { vi: 'Thủ tục', en: 'Procedure', color: '#fad165' },
 };
 
-export const InquiryTypeNesting = InquiryTypeLang;
-
-export function getLangInquiryTypeLabel(type: InquiryType, lang = 'vi'): string {
+export function getLangInquiryType(type: InquiryType, lang = 'vi'): string {
   return InquiryTypeLang[type]?.[lang] || type;
 }

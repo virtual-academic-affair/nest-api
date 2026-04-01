@@ -5,7 +5,7 @@ export enum SystemLabel {
   Other = 'other',
 }
 
-export const SystemLabelLang: Record<SystemLabel | 'parent', Record<string, string>> = {
+export const SystemLabelLang: Record<SystemLabel | any, Record<string, string>> = {
   [SystemLabel.ClassRegistration]: { vi: 'Đăng ký lớp', en: 'Class Registration', color: '#4986e7' },
   [SystemLabel.Task]: { vi: 'Công tác', en: 'Task', color: '#ffad46' },
   [SystemLabel.Inquiry]: { vi: 'Thắc mắc', en: 'Inquiry', color: '#16a765' },

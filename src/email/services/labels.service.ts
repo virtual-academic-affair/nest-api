@@ -1,6 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { UpdateDto } from '@email/dtos/labels/update.dto';
-import { getLangInquiryTypeLabel, InquiryType } from '@inquiry/enums/inquiry-type.enum';
+import { getLangInquiryType, InquiryType } from '@inquiry/enums/inquiry-type.enum';
 import { getLangLabel, SystemLabel } from '@shared/enums/system-label.enum';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
 import { SettingService } from '@shared/setting/services/setting.service';
@@ -64,7 +64,7 @@ export class LabelsService {
     const newEntries = await Promise.all(
       missingKeys.map(async (key) => [
         key,
-        await this.createGmailLabel(`${parent}/${getLangLabel(key)}`, getLangLabel(key, 'color')),
+        await this.createGmailLabel(parent + getLangLabel(key), getLangLabel(key, 'color')),
       ]),
     );
     Object.assign(labels, Object.fromEntries(newEntries));
@@ -75,17 +75,11 @@ export class LabelsService {
   }
 
   async autoCreateInquiryTypeLabels(): Promise<Record<InquiryType, string>> {
-    await this.createGmailLabel(getLangLabel('parent'), getLangLabel('parent', 'color'));
-    await this.createGmailLabel(
-      `${getLangLabel('parent')}/${getLangLabel(SystemLabel.Inquiry)}`,
-      getLangLabel(SystemLabel.Inquiry, 'color'),
-    );
-
     const parent = `${getLangLabel('parent')}/${getLangLabel(SystemLabel.Inquiry)}`;
     const entries = await Promise.all(
       Object.values(InquiryType).map(async (key) => [
         key,
-        await this.createGmailLabel(`${parent}/${getLangInquiryTypeLabel(key)}`, getLangInquiryTypeLabel(key, 'color')),
+        await this.createGmailLabel(parent + getLangInquiryType(key), getLangInquiryType(key, 'color')),
       ]),
     );
     return Object.fromEntries(entries) as Record<InquiryType, string>;

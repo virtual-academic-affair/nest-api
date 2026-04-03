@@ -7,6 +7,7 @@ export enum SystemLabel {
   Other = 'other',
 }
 
+export type LabelKey = keyof typeof LabelLang;
 export const LabelLang: Record<string, Record<string, string>> = {
   [SystemLabel.ClassRegistration]: { vi: 'Đăng ký lớp', en: 'Class Registration', color: '#4986e7' },
   [SystemLabel.Task]: { vi: 'Công tác', en: 'Task', color: '#ffad46' },

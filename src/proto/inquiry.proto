@@ -3,7 +3,7 @@ package app_server;
 
 import "common.proto";
 
-message InquiryCitation {
+message Citation {
   string fileId = 1;
   string displayName = 2;
   string text = 3;
@@ -14,7 +14,7 @@ message CreateInquiryRequest {
   repeated string types = 2;
   string question = 3;
   string answer = 4;
-  repeated InquiryCitation citations = 5;
+  repeated Citation citations = 5;
 }
 
 service InquiryService {

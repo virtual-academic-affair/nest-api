@@ -9,7 +9,3 @@ export const InquiryTypeLang: Record<InquiryType, Record<string, string>> = {
   [InquiryType.Training]: { vi: 'Đào tạo', en: 'Training', color: '#2da2bb' },
   [InquiryType.Procedure]: { vi: 'Thủ tục', en: 'Procedure', color: '#fad165' },
 };
-
-export function getLangInquiryType(type: InquiryType, lang = 'vi'): string {
-  return InquiryTypeLang[type]?.[lang] || type;
-}

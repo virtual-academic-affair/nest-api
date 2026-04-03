@@ -1,6 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { UpdateDto } from '@email/dtos/labels/update.dto';
-import { getLangInquiryType, InquiryType } from '@inquiry/enums/inquiry-type.enum';
 import { getLangLabel, SystemLabel } from '@shared/enums/system-label.enum';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
 import { SettingService } from '@shared/setting/services/setting.service';
@@ -70,18 +69,6 @@ export class LabelsService {
     Object.assign(labels, Object.fromEntries(newEntries));
 
     await this.update(labels);
-    await this.autoCreateInquiryTypeLabels();
     return labels;
-  }
-
-  async autoCreateInquiryTypeLabels(): Promise<Record<InquiryType, string>> {
-    const parent = `${getLangLabel('parent')}/${getLangLabel(SystemLabel.Inquiry)}`;
-    const entries = await Promise.all(
-      Object.values(InquiryType).map(async (key) => [
-        key,
-        await this.createGmailLabel(parent + getLangInquiryType(key), getLangInquiryType(key, 'color')),
-      ]),
-    );
-    return Object.fromEntries(entries) as Record<InquiryType, string>;
   }
 }

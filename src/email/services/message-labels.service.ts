@@ -51,7 +51,7 @@ export class MessageLabelsService {
     });
   }
 
-  private async syncGmailLabels(
+  async syncGmailLabels(
     gmailMessageId: string,
     addedLabels: LabelKey[],
     removedLabels: LabelKey[],

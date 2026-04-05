@@ -5,12 +5,13 @@ import { RegistrationStatus } from '@class-registration/enums/registration-statu
 import { EmailTemplateService } from '@email/services/email-send/email-template.service';
 
 export class ClassRegistrationTemplate extends EmailTemplateService {
-  private readonly classRegistration: ClassRegistration;
   protected templatePath = 'class-registration.hbs';
 
-  constructor(configService: ConfigService, classRegistration: ClassRegistration) {
+  constructor(
+    configService: ConfigService,
+    private readonly classRegistration: ClassRegistration,
+  ) {
     super(configService);
-    this.classRegistration = classRegistration;
   }
 
   private readonly actionConfig: Record<string, { label: string; color: string }> = {
@@ -54,15 +55,15 @@ export class ClassRegistrationTemplate extends EmailTemplateService {
             statusLabel: status.label,
             statusColor: status.color,
             statusBg: status.color + '1A',
-            rejectReasons: item.rejectReasons || [],
+            note: item.note ?? '',
           };
         })
       : [];
 
     return {
-      studentCode: this.classRegistration.studentCode ?? '--',
-      studentName: this.classRegistration.studentName ?? '--',
-      academicYear: this.classRegistration.academicYear ?? '--',
+      studentCode: this.classRegistration.studentCode ?? '—',
+      studentName: this.classRegistration.studentName ?? '—',
+      academicYear: this.classRegistration.academicYear ?? '—',
       note: this.classRegistration.note,
       hasItems,
       items: items.map((item, index) => ({

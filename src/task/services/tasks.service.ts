@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ClsService } from 'nestjs-cls';
 import { DataSource, In, LessThanOrEqual, MoreThanOrEqual, Repository, SelectQueryBuilder } from 'typeorm';
@@ -93,9 +93,7 @@ export class TasksService extends ResourceService<Task> {
 
   async create(dto: CreateDto): Promise<Task> {
     if (dto?.messageId) {
-      const existing = await this.repository.findOneBy({ messageId: dto.messageId });
-      throwIf(existing, new ConflictException('Task already exists'));
-      await this.messageLabelsService.run(dto.messageId, null, false, [SystemLabel.Inquiry]);
+      await this.messageLabelsService.run(dto.messageId, null, false, [SystemLabel.Task]);
     }
 
     return super.create({ ...dto, assignees: this.enrichAssignees(dto.assigneeIds) });

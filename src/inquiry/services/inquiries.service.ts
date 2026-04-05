@@ -1,7 +1,7 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository, SelectQueryBuilder } from 'typeorm';
+import { ArrayOverlap, DataSource, Repository, SelectQueryBuilder } from 'typeorm';
 import { Message } from '@email/entities/message.entity';
 import { MessageStatus } from '@email/enums/message-status.enum';
 import { EmailReplyService } from '@email/services/email-send/email-reply.service';
@@ -33,8 +33,7 @@ export class InquiriesService extends ResourceService<Inquiry> {
     { messageId, messageStatuses, types }: QueryDto,
   ): void {
     applyMessageFilters(queryBuilder, { messageId, messageStatuses });
-    types?.length &&
-      queryBuilder.andWhere(`${this.p('types')} && ARRAY[:...types]::"inquiry_inquiry_types_enum"[]`, { types });
+    types?.length && queryBuilder.andWhere({ types: ArrayOverlap(types) } as any);
   }
 
   protected withOne(queryBuilder: SelectQueryBuilder<Inquiry>): void {

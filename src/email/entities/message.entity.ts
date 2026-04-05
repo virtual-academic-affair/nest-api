@@ -1,4 +1,4 @@
-import { Column, Entity, Index, OneToMany, Unique } from 'typeorm';
+import { AfterLoad, Column, Entity, Index, OneToMany, Unique } from 'typeorm';
 import { ClassRegistration } from '@class-registration/entities/class-registration.entity';
 import { Inquiry } from '@inquiry/entities/inquiry.entity';
 import { EncryptedColumn } from '@shared/encryption/decorators/encrypted-column.decorator';
@@ -48,13 +48,27 @@ export class Message extends BaseEntity {
 
   @OneToMany(() => Task, (task) => task.message)
   tasks: Task[];
-  tasksCount: number;
 
   @OneToMany(() => Inquiry, (inquiry) => inquiry.message)
-  inquiry: Inquiry;
-  hasInquiry: boolean;
+  inquiry: Inquiry[];
 
   @OneToMany(() => ClassRegistration, (classRegistration) => classRegistration.message)
-  classRegistration: ClassRegistration;
-  hasClassRegistration: boolean;
+  classRegistration: ClassRegistration[];
+
+  taskIds: number[];
+  inquiryId: number | null;
+  classRegistrationId: number | null;
+  inquiryIds?: number[];
+  classRegistrationIds?: number[];
+
+  @AfterLoad()
+  hydrateLinkedBusinessIds(): void {
+    if (!this.taskIds) {
+      this.taskIds = [];
+    }
+    this.inquiryId = this.inquiryIds?.length ? this.inquiryIds[0]! : null;
+    this.classRegistrationId = this.classRegistrationIds?.length ? this.classRegistrationIds[0]! : null;
+    delete this.inquiryIds;
+    delete this.classRegistrationIds;
+  }
 }

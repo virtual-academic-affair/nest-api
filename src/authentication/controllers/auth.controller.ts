@@ -1,18 +1,19 @@
-import { Body, Controller, Get, Inject, Post, Req, Res, UnauthorizedException } from '@nestjs/common';
-import { ConfigType } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
-import { GrpcMethod } from '@nestjs/microservices';
-import { Request, Response } from 'express';
 import { ActiveUser } from '@authentication/decorators/active-user.decorator';
 import { Auth } from '@authentication/decorators/auth.decorator';
 import { QueryDto } from '@authentication/dtos/users/query.dto';
+import { UpdateProfileDto } from '@authentication/dtos/users/update-profile.dto';
 import { AuthType } from '@authentication/enums/auth-type.enum';
 import { Role } from '@authentication/enums/role.enum';
 import { ActiveUserData } from '@authentication/interfaces/active-user-data.interface';
 import { AuthService } from '@authentication/services/auth.service';
 import { UsersService } from '@authentication/services/users.service';
-import { REFRESH_COOKIE, getRefreshCookieOptions, getClearCookieOptions } from '@authentication/utils/cookie.util';
+import { REFRESH_COOKIE, getClearCookieOptions, getRefreshCookieOptions } from '@authentication/utils/cookie.util';
+import { Body, Controller, Get, Inject, Post, Put, Req, Res, UnauthorizedException } from '@nestjs/common';
+import { ConfigType } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
+import { GrpcMethod } from '@nestjs/microservices';
 import jwtConfig from '@shared/config/jwt.config';
+import { Request, Response } from 'express';
 
 @Controller('authentication/auth')
 export class AuthenticationController {
@@ -42,6 +43,12 @@ export class AuthenticationController {
   @Auth(AuthType.Bearer)
   async findOne(@ActiveUser('sub') sub: ActiveUserData['sub']) {
     return this.userService.findOne(sub);
+  }
+
+  @Put('me')
+  @Auth(AuthType.Bearer)
+  async updateMe(@ActiveUser('sub') sub: ActiveUserData['sub'], @Body() dto: UpdateProfileDto) {
+    return this.userService.update(sub, dto);
   }
 
   @GrpcMethod('AuthService', 'FindOneByKeyword')

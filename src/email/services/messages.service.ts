@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ArrayContainedBy, Repository, SelectQueryBuilder } from 'typeorm';
+import { ArrayOverlap, Repository, SelectQueryBuilder } from 'typeorm';
 import { QueryDto } from '@email/dtos/messages/query.dto';
 import { Message } from '@email/entities/message.entity';
 import { ResourceService } from '@shared/resource/services/resource.service';
@@ -22,13 +22,13 @@ export class MessagesService extends ResourceService<Message> {
 
   protected withAll(queryBuilder: SelectQueryBuilder<Message>) {
     queryBuilder
-      .loadRelationCountAndMap(this.p('tasksCount'), this.p('tasks'))
-      .loadRelationCountAndMap(this.p('hasInquiry'), this.p('inquiry'))
-      .loadRelationCountAndMap(this.p('hasClassRegistration'), this.p('classRegistration'));
+      .loadRelationIdAndMap(this.p('taskIds'), this.p('tasks'))
+      .loadRelationIdAndMap(this.p('inquiryIds'), this.p('inquiry'))
+      .loadRelationIdAndMap(this.p('classRegistrationIds'), this.p('classRegistration'));
   }
 
   protected applyCustomFilters(queryBuilder: SelectQueryBuilder<Message>, { systemLabels }: QueryDto): void {
-    systemLabels && queryBuilder.andWhere({ systemLabels: ArrayContainedBy(systemLabels) });
+    systemLabels?.length && queryBuilder.andWhere({ systemLabels: ArrayOverlap(systemLabels) });
   }
 
   async removeMessage(id: number, deleteTasks?: boolean) {

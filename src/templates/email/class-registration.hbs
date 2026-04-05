@@ -43,10 +43,8 @@
                             {{item.statusLabel}}
                         </span>
                     </td>
-                    <td style="padding: 12px; width: 200px;">
-                        {{#each item.rejectReasons as |reason|}}
-                            <div>- {{reason}}</div>
-                        {{/each}}
+                    <td style="padding: 12px; width: 200px; font-size: 13px; line-height: 1.6;">
+                        {{{item.note}}}
                     </td>
                 </tr>
             {{/each}}

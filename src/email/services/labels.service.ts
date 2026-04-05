@@ -1,13 +1,16 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { UpdateDto } from '@email/dtos/labels/update.dto';
-import { getLangLabel, SystemLabel } from '@shared/enums/system-label.enum';
+import { getLangLabel, LabelKey, LabelLang } from '@shared/enums/system-label.enum';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
 import { SettingService } from '@shared/setting/services/setting.service';
 import { GoogleapisService } from './googleapis.service';
 
 @Injectable()
 export class LabelsService {
-  constructor(private readonly settingService: SettingService, private readonly googleapisService: GoogleapisService) {}
+  constructor(
+    private readonly settingService: SettingService,
+    private readonly googleapisService: GoogleapisService,
+  ) {}
 
   async findAllGmailLabels() {
     const client = await this.googleapisService.getGmailClient();
@@ -50,11 +53,11 @@ export class LabelsService {
     await this.settingService.set(SettingKey.EmailLabels, dto);
   }
 
-  async autoCreateLabels(): Promise<UpdateDto> {
+  async autoCreateLabels(): Promise<void> {
     await this.createGmailLabel(getLangLabel('parent'), getLangLabel('parent', 'color'));
 
-    const labels = (await this.findAll()) || ({} as UpdateDto);
-    const missingKeys = Object.values(SystemLabel).filter((key) => !labels[key]);
+    const labels = (await this.findAll()) || ({} as Record<LabelKey, string>);
+    const missingKeys = (Object.keys(LabelLang) as LabelKey[]).filter((key) => !labels[key] && key !== 'parent');
 
     const parent = getLangLabel('parent');
     const newEntries = await Promise.all(
@@ -66,6 +69,5 @@ export class LabelsService {
     Object.assign(labels, Object.fromEntries(newEntries));
 
     await this.update(labels);
-    return labels;
   }
 }

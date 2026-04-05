@@ -56,7 +56,7 @@ export class ClassRegistrationsService extends ResourceService<ClassRegistration
   }
 
   async create(@Body() dto: CreateDto) {
-    const existing = dto?.messageId && (await this.repository.findOneBy({ messageId: dto.messageId }));
+    const existing = await this.repository.findOneBy({ messageId: dto.messageId });
     throwIf(existing, new ConflictException('Registration already exists'));
     await this.messageLabelsService.run(dto.messageId, null, false, [SystemLabel.ClassRegistration]);
     return await super.create(dto);

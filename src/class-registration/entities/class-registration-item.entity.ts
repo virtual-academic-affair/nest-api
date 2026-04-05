@@ -40,6 +40,6 @@ export class ClassRegistrationItem extends BaseEntity {
   @Column({ type: 'enum', enum: RegistrationStatus, default: RegistrationStatus.Pending })
   status: RegistrationStatus;
 
-  @Column('text', { array: true, nullable: true })
-  rejectReasons?: string[];
+  @Column('text', { nullable: true })
+  note?: string;
 }

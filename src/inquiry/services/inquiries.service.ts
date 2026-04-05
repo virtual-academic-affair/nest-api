@@ -1,18 +1,20 @@
-import { Body, ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { ArrayOverlap, DataSource, Repository, SelectQueryBuilder } from 'typeorm';
+import { Message } from '@email/entities/message.entity';
 import { MessageStatus } from '@email/enums/message-status.enum';
 import { EmailReplyService } from '@email/services/email-send/email-reply.service';
 import { MessageLabelsService } from '@email/services/message-labels.service';
+import { CreateDto } from '@inquiry/dtos/inquiries/create.dto';
 import { QueryDto } from '@inquiry/dtos/inquiries/query.dto';
+import { UpdateDto } from '@inquiry/dtos/inquiries/update.dto';
 import { Inquiry } from '@inquiry/entities/inquiry.entity';
 import { InquiryType } from '@inquiry/enums/inquiry-type.enum';
 import { InquiryTemplate } from '@inquiry/templates/inquiry.template';
-import { SystemLabel } from '@shared/enums/system-label.enum';
+import { LabelKey, SystemLabel } from '@shared/enums/system-label.enum';
 import { applyMessageFilters } from '@shared/resource/dtos/message-resource-query.dto';
 import { ResourceService } from '@shared/resource/services/resource.service';
-import { CreateDto } from '@task/dtos/tasks/create.dto';
 
 @Injectable()
 export class InquiriesService extends ResourceService<Inquiry> {
@@ -21,6 +23,7 @@ export class InquiriesService extends ResourceService<Inquiry> {
     private readonly emailReplyService: EmailReplyService,
     private readonly configService: ConfigService,
     private readonly messageLabelsService: MessageLabelsService,
+    private readonly dataSource: DataSource,
   ) {
     super(repository);
   }
@@ -30,19 +33,34 @@ export class InquiriesService extends ResourceService<Inquiry> {
     { messageId, messageStatuses, types }: QueryDto,
   ): void {
     applyMessageFilters(queryBuilder, { messageId, messageStatuses });
-    types?.length &&
-      queryBuilder.andWhere(`${this.p('types')} && ARRAY[:...types]::"inquiry_inquiry_types_enum"[]`, { types });
-  }
-
-  async create(@Body() dto: CreateDto) {
-    const existing = dto?.messageId && (await this.repository.findOneBy({ messageId: dto.messageId }));
-    throwIf(existing, new ConflictException('Inquiry already exists'));
-    await this.messageLabelsService.run(dto.messageId, null, false, [SystemLabel.Inquiry]);
-    return await super.create(dto);
+    types?.length && queryBuilder.andWhere({ types: ArrayOverlap(types) } as any);
   }
 
   protected withOne(queryBuilder: SelectQueryBuilder<Inquiry>): void {
     queryBuilder.leftJoinAndSelect(this.p('message'), 'message');
+  }
+
+  async create(dto: CreateDto) {
+    throwIf(
+      await this.repository.findOneBy({ messageId: dto.messageId }),
+      new ConflictException('Inquiry already exists'),
+    );
+    await this.messageLabelsService.run(dto.messageId, null, false, [SystemLabel.Inquiry]);
+    dto.types?.length && (await this.syncTypeLabels(dto.messageId, dto.types, []));
+    return await super.create(dto);
+  }
+
+  async update(id: number, updateDto: UpdateDto) {
+    const { messageId, types: prevTypes = [] } = await this.findOne(id);
+    if (updateDto.types !== undefined) {
+      const nextTypes = updateDto.types ?? [];
+      await this.syncTypeLabels(
+        messageId,
+        nextTypes.filter((t) => !prevTypes.includes(t)) as LabelKey[],
+        prevTypes.filter((t) => !nextTypes.includes(t)) as LabelKey[],
+      );
+    }
+    return await super.update(id, updateDto);
   }
 
   async stats(startDate: Date, endDate: Date) {
@@ -75,8 +93,7 @@ export class InquiriesService extends ResourceService<Inquiry> {
 
   async previewReply(id: number) {
     const inquiry = await this.findOne(id);
-    const template = new InquiryTemplate(this.configService, inquiry);
-    return { content: template.generate() };
+    return { content: new InquiryTemplate(this.configService, inquiry).generate() };
   }
 
   async sendReply(id: number, content?: string, isClose = false) {
@@ -84,7 +101,7 @@ export class InquiriesService extends ResourceService<Inquiry> {
     const message = inquiry.message;
     throwUnless(message, new ConflictException('Inquiry has no message'));
 
-    content ??= await this.previewReply(id).then((res) => res.content);
+    content ??= (await this.previewReply(id)).content;
     throwUnless(content, new ConflictException('Reply content is required'));
 
     const sentMessageId = await this.emailReplyService.reply(message, content);
@@ -94,5 +111,19 @@ export class InquiriesService extends ResourceService<Inquiry> {
     });
 
     return sentMessageId;
+  }
+
+  private async syncTypeLabels(messageId: number, toAdd: LabelKey[], toRemove: LabelKey[]): Promise<void> {
+    if (toAdd.length === 0 && toRemove.length === 0) {
+      return;
+    }
+
+    await this.dataSource.transaction(async (manager) => {
+      const message = await manager.findOneOrFail(Message, {
+        where: { id: messageId },
+        lock: { mode: 'pessimistic_write' },
+      });
+      await this.messageLabelsService.syncGmailLabels(message.gmailMessageId, toAdd, toRemove, manager);
+    });
   }
 }

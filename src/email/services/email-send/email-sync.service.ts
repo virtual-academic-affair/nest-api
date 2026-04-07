@@ -18,14 +18,6 @@ import { SocketGateway } from 'src/socket/socket.gateway';
 
 export const INGESTED = 'ingested';
 
-interface SyncContext {
-  allowedDomains: string[];
-  gmail: gmail_v1.Gmail;
-  superEmail: SuperEmailSetting;
-  canSaveContent: boolean;
-  syncState: EmailSyncState;
-}
-
 @Injectable()
 export class EmailSyncService {
   private readonly logger = new Logger(EmailSyncService.name);
@@ -49,16 +41,13 @@ export class EmailSyncService {
     ]);
     throwUnless(superEmail?.email, new NotFoundException('Super email is not configured'));
 
-    const context: SyncContext = {
-      allowedDomains: (allowedDomains ?? []).map((domain) => domain.trim().toLowerCase()).filter(Boolean),
-      gmail,
-      superEmail,
-      canSaveContent: !!canSaveContent,
-      syncState: syncState ?? { historyId: null, watchExpirationAt: null },
-    };
+    const normalizedAllowedDomains = (allowedDomains ?? [])
+      .map((domain) => domain.trim().toLowerCase())
+      .filter(Boolean);
+    const currentSyncState = syncState ?? { historyId: null, watchExpirationAt: null };
 
     let messageIds: string[] = [];
-    let nextHistoryId = context.syncState.historyId;
+    let nextHistoryId = currentSyncState.historyId;
     if (nextHistoryId) {
       try {
         const history = await this.fetchMessageIdsFromHistory(gmail, nextHistoryId);
@@ -76,17 +65,23 @@ export class EmailSyncService {
     }
 
     if (!nextHistoryId) {
-      messageIds = await this.fetchRecentMessageIds(gmail, context.allowedDomains);
+      messageIds = await this.fetchRecentMessageIds(gmail, normalizedAllowedDomains);
       const profile = await gmail.users.getProfile({ userId: 'me' });
       nextHistoryId = profile.data.historyId ?? null;
     }
 
     if (messageIds.length) {
-      const ingestedIds = await this.processMessageIds(context, messageIds);
+      const ingestedIds = await this.processMessageIds(
+        gmail,
+        messageIds,
+        superEmail.email,
+        !!canSaveContent,
+        normalizedAllowedDomains,
+      );
       await this.socketGateway.emitMessageIngested(ingestedIds);
     }
 
-    await this.setSyncState({ ...context.syncState, historyId: nextHistoryId });
+    await this.setSyncState({ ...currentSyncState, historyId: nextHistoryId });
   }
 
   async watch(force = false): Promise<EmailSyncState | void> {
@@ -126,16 +121,6 @@ export class EmailSyncService {
       historyId: data.historyId ?? syncState?.historyId ?? null,
       watchExpirationAt: data.expiration ? new Date(Number(data.expiration)).toISOString() : null,
     });
-  }
-
-  async push(emailAddress: string): Promise<{ ignored: boolean }> {
-    const superEmail = await this.settingService.get<SuperEmailSetting>(SettingKey.EmailSuperEmail);
-    if (!superEmail?.email || superEmail.email !== emailAddress) {
-      return { ignored: true };
-    }
-
-    await this.run();
-    return { ignored: false };
   }
 
   private async fetchMessageIdsFromHistory(
@@ -199,18 +184,24 @@ export class EmailSyncService {
     return messageIds;
   }
 
-  private async processMessageIds(context: SyncContext, messageIds: string[]): Promise<number[]> {
+  private async processMessageIds(
+    gmail: gmail_v1.Gmail,
+    messageIds: string[],
+    superEmail: string,
+    canSaveContent: boolean,
+    allowedDomains: string[],
+  ): Promise<number[]> {
     const ingestedIds: number[] = [];
 
     for (const gmailMessageId of messageIds) {
       try {
         this.logger.log(`Processing message ${gmailMessageId}`);
         const messageId = await this.processAndPublishMessage(
-          context.gmail,
+          gmail,
           gmailMessageId,
-          context.superEmail.email,
-          context.canSaveContent,
-          context.allowedDomains,
+          superEmail,
+          canSaveContent,
+          allowedDomains,
         );
         messageId && ingestedIds.push(messageId);
       } catch (error) {

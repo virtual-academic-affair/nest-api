@@ -1,8 +1,11 @@
 import { BadRequestException, Body, Controller, Headers, Post } from '@nestjs/common';
 import { Auth } from '@authentication/decorators/auth.decorator';
 import { AuthType } from '@authentication/enums/auth-type.enum';
+import { SuperEmailSetting } from '@email/interfaces/super-email-setting.type';
 import { EmailSyncService } from '@email/services/email-send/email-sync.service';
 import { PubsubPushAuthService } from '@email/services/pubsub-push-auth.service';
+import { SettingKey } from '@shared/setting/enums/setting-key.enum';
+import { SettingService } from '@shared/setting/services/setting.service';
 
 interface PubsubPushEnvelope {
   message?: {
@@ -12,7 +15,6 @@ interface PubsubPushEnvelope {
 
 interface GmailPushPayload {
   emailAddress?: string;
-  historyId?: string;
 }
 
 @Controller('email/pubsub')
@@ -20,6 +22,7 @@ export class PubsubController {
   constructor(
     private readonly pubsubPushAuthService: PubsubPushAuthService,
     private readonly emailSyncService: EmailSyncService,
+    private readonly settingService: SettingService,
   ) {}
 
   @Post('push')
@@ -38,8 +41,13 @@ export class PubsubController {
     }
 
     throwUnless(payload.emailAddress, new BadRequestException('Missing Gmail push emailAddress'));
-    throwUnless(payload.historyId, new BadRequestException('Missing Gmail push historyId'));
 
-    return await this.emailSyncService.push(payload.emailAddress);
+    const superEmail = await this.settingService.get<SuperEmailSetting>(SettingKey.EmailSuperEmail);
+    if (!superEmail?.email || superEmail.email !== payload.emailAddress) {
+      return { ignored: true };
+    }
+
+    await this.emailSyncService.run();
+    return { ignored: false };
   }
 }

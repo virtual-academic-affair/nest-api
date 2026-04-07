@@ -8,16 +8,16 @@ export class EmailSyncScheduler {
 
   constructor(private readonly emailSyncService: EmailSyncService) {}
 
-  @Cron(CronExpression.EVERY_10_SECONDS)
+  @Cron(CronExpression.EVERY_DAY_AT_1AM)
   public async handleSyncJob() {
-    this.logger.log('Email sync job started');
+    this.logger.log('Email watch job started');
 
     try {
-      await this.emailSyncService.run();
+      await this.emailSyncService.watch();
     } catch (error) {
-      this.logger.error('Email sync job failed', error instanceof Error ? error.stack : String(error));
+      this.logger.error('Email watch job failed', error instanceof Error ? error.stack : String(error));
     } finally {
-      this.logger.log('Email sync job finished');
+      this.logger.log('Email watch job finished');
     }
   }
 }

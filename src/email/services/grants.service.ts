@@ -45,6 +45,11 @@ export class GrantsService {
       picture: profile.picture,
     });
 
-    this.emailSyncService.run().then(() => 1);
+    await this.settingService.set(SettingKey.EmailSyncState, {
+      historyId: null,
+      watchExpirationAt: null,
+    });
+    await this.emailSyncService.run();
+    await this.emailSyncService.watch(true);
   }
 }

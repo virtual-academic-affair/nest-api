@@ -7,6 +7,7 @@ const BASE_COOKIE_OPTIONS: CookieOptions = {
   secure: true,
   sameSite: 'none',
   path: '/',
+  partitioned: true,
 };
 
 export function getRefreshCookieOptions(ttlSeconds: number): CookieOptions {

@@ -12,4 +12,8 @@ export class QueryDto extends ResourceQueryDto {
   @IsOptional()
   @IsString()
   gmailMessageId?: string;
+
+  @IsOptional()
+  @IsString()
+  threadId?: string;
 }

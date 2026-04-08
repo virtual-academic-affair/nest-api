@@ -29,10 +29,11 @@ export class MessagesService extends ResourceService<Message> {
 
   protected applyCustomFilters(
     queryBuilder: SelectQueryBuilder<Message>,
-    { systemLabels, gmailMessageId }: QueryDto,
+    { systemLabels, gmailMessageId, threadId }: QueryDto,
   ): void {
     systemLabels?.length && queryBuilder.andWhere({ systemLabels: ArrayOverlap(systemLabels) });
     gmailMessageId && queryBuilder.andWhere({ gmailMessageId });
+    threadId && queryBuilder.andWhere({ threadId });
   }
 
   async removeMessage(id: number, deleteTasks?: boolean) {

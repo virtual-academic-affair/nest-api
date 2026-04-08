@@ -10,6 +10,7 @@ import { Message } from '@email/entities/message.entity';
 import { EmailSyncState } from '@email/interfaces/email-sync-state.type';
 import { SuperEmailSetting } from '@email/interfaces/super-email-setting.type';
 import { GoogleapisService } from '@email/services/googleapis.service';
+import { MessageLabelsService } from '@email/services/message-labels.service';
 import { RABBIT_SERVICE } from '@shared/config/constants';
 import googleConfig from '@shared/config/google.config';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
@@ -26,6 +27,7 @@ export class EmailSyncService {
     @Inject(RABBIT_SERVICE) private readonly client: ClientProxy,
     @Inject(googleConfig.KEY) private readonly googleConfiguration: ConfigType<typeof googleConfig>,
     private readonly googleapisService: GoogleapisService,
+    private readonly messageLabelsService: MessageLabelsService,
     private readonly settingService: SettingService,
     private readonly socketGateway: SocketGateway,
     @InjectRepository(Message) private readonly messageRepository: Repository<Message>,
@@ -48,10 +50,14 @@ export class EmailSyncService {
 
     let messageIds: string[] = [];
     let nextHistoryId = currentSyncState.historyId;
+    let addedLabels: { gmailMessageId: string; labelIds: string[] }[] = [];
+    let removedLabels: { gmailMessageId: string; labelIds: string[] }[] = [];
     if (nextHistoryId) {
       try {
         const history = await this.fetchMessageIdsFromHistory(gmail, nextHistoryId);
         messageIds = history.messageIds;
+        addedLabels = history.addedLabels;
+        removedLabels = history.removedLabels;
         nextHistoryId = history.historyId;
       } catch (error: any) {
         const status = error?.response?.status ?? error?.code ?? error?.status;
@@ -79,6 +85,10 @@ export class EmailSyncService {
         normalizedAllowedDomains,
       );
       await this.socketGateway.emitMessageIngested(ingestedIds);
+    }
+
+    if (addedLabels.length || removedLabels.length) {
+      await this.messageLabelsService.syncFromGmail(addedLabels, removedLabels);
     }
 
     await this.setSyncState({ ...currentSyncState, historyId: nextHistoryId });
@@ -126,8 +136,15 @@ export class EmailSyncService {
   private async fetchMessageIdsFromHistory(
     gmail: gmail_v1.Gmail,
     startHistoryId: string,
-  ): Promise<{ messageIds: string[]; historyId: string | null }> {
+  ): Promise<{
+    messageIds: string[];
+    historyId: string | null;
+    addedLabels: { gmailMessageId: string; labelIds: string[] }[];
+    removedLabels: { gmailMessageId: string; labelIds: string[] }[];
+  }> {
     const messageIds = new Set<string>();
+    const addedLabels = new Map<string, Set<string>>();
+    const removedLabels = new Map<string, Set<string>>();
     let pageToken: string | undefined;
     let latestHistoryId: string | null = startHistoryId;
 
@@ -136,7 +153,7 @@ export class EmailSyncService {
         userId: 'me',
         startHistoryId,
         pageToken,
-        historyTypes: ['messageAdded'],
+        historyTypes: ['messageAdded', 'labelAdded', 'labelRemoved'],
       });
 
       if (data.historyId) {
@@ -148,12 +165,49 @@ export class EmailSyncService {
           const gmailMessageId = added.message?.id;
           gmailMessageId && messageIds.add(gmailMessageId);
         }
+
+        for (const added of history.labelsAdded ?? []) {
+          const gmailMessageId = added.message?.id;
+          if (!gmailMessageId) {
+            continue;
+          }
+
+          const labelIds = addedLabels.get(gmailMessageId) ?? new Set<string>();
+          for (const labelId of added.labelIds ?? []) {
+            labelId && labelIds.add(labelId);
+          }
+          labelIds.size && addedLabels.set(gmailMessageId, labelIds);
+        }
+
+        for (const removed of history.labelsRemoved ?? []) {
+          const gmailMessageId = removed.message?.id;
+          if (!gmailMessageId) {
+            continue;
+          }
+
+          const labelIds = removedLabels.get(gmailMessageId) ?? new Set<string>();
+          for (const labelId of removed.labelIds ?? []) {
+            labelId && labelIds.add(labelId);
+          }
+          labelIds.size && removedLabels.set(gmailMessageId, labelIds);
+        }
       }
 
       pageToken = data.nextPageToken ?? undefined;
     } while (pageToken);
 
-    return { messageIds: [...messageIds], historyId: latestHistoryId };
+    return {
+      messageIds: [...messageIds],
+      historyId: latestHistoryId,
+      addedLabels: [...addedLabels.entries()].map(([gmailMessageId, labelIds]) => ({
+        gmailMessageId,
+        labelIds: [...labelIds],
+      })),
+      removedLabels: [...removedLabels.entries()].map(([gmailMessageId, labelIds]) => ({
+        gmailMessageId,
+        labelIds: [...labelIds],
+      })),
+    };
   }
 
   private async fetchRecentMessageIds(gmail: gmail_v1.Gmail, allowedDomains: string[]): Promise<string[]> {

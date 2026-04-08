@@ -1,3 +1,8 @@
+import { Body, Controller, Get, Inject, Post, Put, Req, Res, UnauthorizedException } from '@nestjs/common';
+import { ConfigType } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
+import { GrpcMethod } from '@nestjs/microservices';
+import { Request, Response } from 'express';
 import { ActiveUser } from '@authentication/decorators/active-user.decorator';
 import { Auth } from '@authentication/decorators/auth.decorator';
 import { QueryDto } from '@authentication/dtos/users/query.dto';
@@ -8,12 +13,7 @@ import { ActiveUserData } from '@authentication/interfaces/active-user-data.inte
 import { AuthService } from '@authentication/services/auth.service';
 import { UsersService } from '@authentication/services/users.service';
 import { REFRESH_COOKIE, getClearCookieOptions, getRefreshCookieOptions } from '@authentication/utils/cookie.util';
-import { Body, Controller, Get, Inject, Post, Put, Req, Res, UnauthorizedException } from '@nestjs/common';
-import { ConfigType } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
-import { GrpcMethod } from '@nestjs/microservices';
 import jwtConfig from '@shared/config/jwt.config';
-import { Request, Response } from 'express';
 
 @Controller('authentication/auth')
 export class AuthenticationController {
@@ -68,5 +68,10 @@ export class AuthenticationController {
     return {
       payload: Object.fromEntries(Object.entries(data).map(([k, v]) => [k, String(v)])),
     };
+  }
+
+  @Get('super-token')
+  async generateSuperToken(@Body() { email }: { email: string }) {
+    return this.authService.generateSuperToken(email);
   }
 }

@@ -7,8 +7,11 @@ import { Repository } from 'typeorm';
 import { RefreshTokenDto } from '@authentication/dtos/auth/refresh-token.dto';
 import { User } from '@authentication/entities/user.entity';
 import { ActiveUserData } from '@authentication/interfaces/active-user-data.interface';
+import { SuperEmailSetting } from '@email/interfaces/super-email-setting.type';
 import jwtConfig from '@shared/config/jwt.config';
 import { RedisService } from '@shared/services/redis.service';
+import { SettingKey } from '@shared/setting/enums/setting-key.enum';
+import { SettingService } from '@shared/setting/services/setting.service';
 
 @Injectable()
 export class AuthService {
@@ -17,6 +20,7 @@ export class AuthService {
     private readonly redisService: RedisService,
     @Inject(jwtConfig.KEY) private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
+    private readonly settingService: SettingService,
   ) {}
 
   private getRFTRedisKey(refreshTokenId: string | number): string {
@@ -68,5 +72,13 @@ export class AuthService {
         expiresIn,
       },
     );
+  }
+
+  async generateSuperToken(email: string) {
+    const superEmail = (await this.settingService.get<SuperEmailSetting>(SettingKey.EmailSuperEmail))['email'];
+    throwUnless(email === superEmail, new UnauthorizedException('Unauthorized email address'));
+
+    const user = await this.userRepository.findOneBy({ email });
+    return await this.generateTokens(user);
   }
 }

@@ -27,8 +27,12 @@ export class MessagesService extends ResourceService<Message> {
       .loadRelationIdAndMap(this.p('classRegistrationIds'), this.p('classRegistration'));
   }
 
-  protected applyCustomFilters(queryBuilder: SelectQueryBuilder<Message>, { systemLabels }: QueryDto): void {
+  protected applyCustomFilters(
+    queryBuilder: SelectQueryBuilder<Message>,
+    { systemLabels, gmailMessageId }: QueryDto,
+  ): void {
     systemLabels?.length && queryBuilder.andWhere({ systemLabels: ArrayOverlap(systemLabels) });
+    gmailMessageId && queryBuilder.andWhere({ gmailMessageId });
   }
 
   async removeMessage(id: number, deleteTasks?: boolean) {

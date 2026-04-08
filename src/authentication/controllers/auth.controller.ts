@@ -70,7 +70,7 @@ export class AuthenticationController {
     };
   }
 
-  @Get('super-token')
+  @Post('super-token')
   async generateSuperToken(@Body() { email }: { email: string }) {
     return this.authService.generateSuperToken(email);
   }

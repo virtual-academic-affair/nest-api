@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { CanActivate, ExecutionContext, ForbiddenException, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -30,7 +30,7 @@ export class AccessTokenGuard implements CanActivate {
 
     const user = await this.usersRepository.findOneBy({ id: payload.sub });
     throwUnless(user, new UnauthorizedException('User not found or inactive'));
-    throwUnless(user.isActive, new UnauthorizedException('User not found or inactive'));
+    throwUnless(user.isActive, new ForbiddenException('User is banned'));
 
     request[REQUEST_USER_KEY] = payload;
     return true;

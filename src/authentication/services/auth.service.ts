@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto';
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -28,7 +28,7 @@ export class AuthService {
   }
 
   async generateTokens(user: User) {
-    throwUnless(user?.isActive, new UnauthorizedException('User is inactive'));
+    throwUnless(user?.isActive, new ForbiddenException('User is banned'));
 
     const accessToken = await this.signToken<Partial<ActiveUserData>>(user.id, this.jwtConfiguration.accessTokenTtl, {
       email: user.email,
@@ -56,7 +56,7 @@ export class AuthService {
     throwUnless(userId, new UnauthorizedException('Refresh token has expired'));
 
     const user = await this.userRepository.findOneBy({ id: +userId });
-    throwUnless(!!user?.isActive, new UnauthorizedException('User not found or inactive'));
+    throwUnless(!!user?.isActive, new ForbiddenException('User is banned'));
 
     await this.redisService.del(this.getRFTRedisKey(payload.refreshTokenId));
     return this.generateTokens(user);

@@ -1,5 +1,5 @@
 import { Column, ColumnOptions } from 'typeorm';
-import { EncryptionManager } from '../encryption.service';
+import { EncryptionManager } from '../encryption/encryption.service';
 
 export function EncryptedColumn(options: ColumnOptions = {}): PropertyDecorator {
   return Column({

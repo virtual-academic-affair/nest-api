@@ -9,7 +9,7 @@ import { ClassRegistrationTemplate } from '@email/templates/class-registration.t
 import { Body, ConflictException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { applyMessageFilters } from '@shared/resource/dtos/message-resource-query.dto';
+import { applyMessageFilters } from '@email/dtos/messages/message-resource-query.dto';
 import { ResourceService } from '@shared/resource/services/resource.service';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 

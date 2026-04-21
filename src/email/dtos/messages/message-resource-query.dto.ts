@@ -22,3 +22,4 @@ export function applyMessageFilters<T extends ObjectLiteral>(
   messageId && queryBuilder.andWhere({ messageId } as ObjectLiteral);
   messageStatuses?.length && queryBuilder.andWhere({ messageStatus: In(messageStatuses) } as ObjectLiteral);
 }
+

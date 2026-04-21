@@ -1,5 +1,5 @@
-import { IsOptional, IsString } from 'class-validator';
 import { EmailLabel } from '@email/enums/email-label.enum';
+import { IsOptional, IsString } from 'class-validator';
 
 export class UpdateDto {
   @IsOptional()
@@ -13,8 +13,4 @@ export class UpdateDto {
   @IsOptional()
   @IsString()
   [EmailLabel.Graduation]?: string | null;
-
-  @IsOptional()
-  @IsString()
-  [EmailLabel.Pending]?: string | null;
 }

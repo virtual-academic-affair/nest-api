@@ -1,6 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common';
-import { QueryDto } from '@shared/dtos/dynamic-data/query.dto';
-import { DynamicDataService } from '@shared/services/dynamic-data.service';
+import { QueryDto } from '@shared/setting/dtos/query.dto';
+import { DynamicDataService } from '../services/dynamic-data.service';
 
 @Controller('shared/dynamic-data')
 export class DynamicDataController {

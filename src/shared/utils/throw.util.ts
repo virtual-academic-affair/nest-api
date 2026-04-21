@@ -17,9 +17,7 @@ export function throwUnless(condition: unknown, error: ErrorFactory): void {
 }
 
 declare global {
-  // eslint-disable-next-line no-var
   let throwIf: (condition: unknown, error: ErrorFactory) => void;
-  // eslint-disable-next-line no-var
   let throwUnless: (condition: unknown, error: ErrorFactory) => void;
 }
 

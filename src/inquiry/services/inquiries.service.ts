@@ -11,7 +11,7 @@ import { CreateDto, QueryDto, UpdateDto } from '@inquiry/dtos/inquiries/resource
 import { Inquiry } from '@inquiry/entities/inquiry.entity';
 import { InquiryType } from '@inquiry/enums/inquiry-type.enum';
 import { InquiryTemplate } from '@email/templates/inquiry.template';
-import { applyMessageFilters } from '@shared/resource/dtos/message-resource-query.dto';
+import { applyMessageFilters } from '@email/dtos/messages/message-resource-query.dto';
 import { ResourceService } from '@shared/resource/services/resource.service';
 
 @Injectable()

@@ -1,9 +1,9 @@
-import { AfterLoad, Column, Entity, Index, OneToMany, Unique } from 'typeorm';
 import { ClassRegistration } from '@class-registration/entities/class-registration.entity';
 import { EmailLabel } from '@email/enums/email-label.enum';
 import { Inquiry } from '@inquiry/entities/inquiry.entity';
-import { EncryptedColumn } from '@shared/encryption/decorators/encrypted-column.decorator';
+import { EncryptedColumn } from '@shared/decorators/encrypted-column.decorator';
 import { BaseEntity } from '@shared/resource/entities/base.entity';
+import { AfterLoad, Column, Entity, Index, OneToMany, Unique } from 'typeorm';
 
 @Entity()
 @Unique(['gmailMessageId'])

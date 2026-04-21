@@ -1,7 +1,7 @@
 import { CreateDto as CreateItemDto } from '@class-registration/dtos/class-registration-items/resource.dto';
 import { HasMessageIdDto } from '@email/dtos/messages/has-message-id.dto';
 import { OmitType, PartialType } from '@nestjs/mapped-types';
-import { MessageResourceQueryDto } from '@shared/resource/dtos/message-resource-query.dto';
+import { MessageResourceQueryDto } from '@email/dtos/messages/message-resource-query.dto';
 import { Type } from 'class-transformer';
 import { IsArray, IsBoolean, IsInt, IsOptional, IsString, ValidateNested } from 'class-validator';
 

@@ -1,1 +1,11 @@
-export { StatsQueryDto as StatsDto } from '@shared/resource/dtos/stats-query.dto';
+import { CompareField } from '@shared/decorators/compare-field.decorator';
+import { IsDateString } from 'class-validator';
+
+export class StatsDto {
+  @IsDateString()
+  from: string;
+
+  @IsDateString()
+  @CompareField<StatsDto>('>=', 'from')
+  to: string;
+}

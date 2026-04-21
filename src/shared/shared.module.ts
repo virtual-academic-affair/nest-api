@@ -9,15 +9,15 @@ import grpcConfig from '@shared/config/grpc.config';
 import jwtConfig from '@shared/config/jwt.config';
 import rabbitmqConfig from '@shared/config/rabbitmq.config';
 import redisConfig from '@shared/config/redis.config';
-import { DynamicDataController } from '@shared/controllers/dynamic-data.controller';
 import { AesEncryptionService } from '@shared/encryption/aes-encryption.service';
 import { EncryptionService } from '@shared/encryption/encryption.service';
 import { BcryptService } from '@shared/hashing/bcrypt.service';
 import { HashingService } from '@shared/hashing/hashing.service';
-import { RestrictMethodsGuard } from '@shared/resource/guards/restrict-methods.guard';
 import { RedisService } from '@shared/redis/redis.service';
-import { DynamicDataService } from '@shared/services/dynamic-data.service';
+import { RestrictMethodsGuard } from '@shared/resource/guards/restrict-methods.guard';
+import { DynamicDataController } from '@shared/setting/controllers/dynamic-data.controller';
 import { Setting } from '@shared/setting/entities/setting.entity';
+import { DynamicDataService } from '@shared/setting/services/dynamic-data.service';
 import { SettingService } from '@shared/setting/services/setting.service';
 
 @Global()

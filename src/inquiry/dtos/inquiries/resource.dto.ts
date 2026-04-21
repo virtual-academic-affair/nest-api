@@ -2,7 +2,7 @@ import { IsArray, IsEnum, IsOptional, IsString, MaxLength } from 'class-validato
 import { OmitType, PartialType } from '@nestjs/mapped-types';
 import { HasMessageIdDto } from '@email/dtos/messages/has-message-id.dto';
 import { InquiryType } from '@inquiry/enums/inquiry-type.enum';
-import { MessageResourceQueryDto } from '@shared/resource/dtos/message-resource-query.dto';
+import { MessageResourceQueryDto } from '@email/dtos/messages/message-resource-query.dto';
 
 export class QueryDto extends MessageResourceQueryDto {
   @IsEnum(InquiryType, { each: true })

@@ -3,7 +3,6 @@ import { gmail_v1 } from 'googleapis';
 import { EmailLabel } from '@email/enums/email-label.enum';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
 import { SettingService } from '@shared/setting/services/setting.service';
-import { SocketGateway } from 'src/app/socket/socket.gateway';
 import { GmailApiService } from './gmail-api.service';
 import { GmailChangeSyncService, LabelChangeEvent } from './gmail-change-sync.service';
 import { GmailRabbitPublisherService } from './gmail-rabbit-publisher.service';
@@ -19,6 +18,7 @@ type GmailPushData = {
 };
 
 const WATCH_RENEW_INTERVAL_MS = 1000 * 60 * 60 * 24;
+const GMAIL_USER_ID = 'me';
 
 @Injectable()
 export class GmailWebhookService implements OnModuleInit, OnModuleDestroy {
@@ -30,7 +30,6 @@ export class GmailWebhookService implements OnModuleInit, OnModuleDestroy {
     private readonly gmailChangeSyncService: GmailChangeSyncService,
     private readonly gmailRabbitPublisherService: GmailRabbitPublisherService,
     private readonly settingService: SettingService,
-    private readonly socketGateway: SocketGateway,
   ) {}
 
   onModuleInit(): void {
@@ -49,65 +48,62 @@ export class GmailWebhookService implements OnModuleInit, OnModuleDestroy {
   }
 
   async setupAndWatch(): Promise<void> {
-    const topicName = this.getWatchTopicName();
-    if (!topicName) {
-      this.logger.warn('Skip Gmail watch setup: missing GMAIL_WATCH_TOPIC_NAME');
+    const topicName = this.resolveWatchTopicName();
+    if (!topicName) return;
+
+    const gmail = await this.gmailApiService.getGmailClient();
+    const labelIds = await this.getWatchLabelIds();
+    const { data } = await gmail.users.watch({
+      userId: GMAIL_USER_ID,
+      requestBody: { topicName, labelIds, labelFilterAction: 'include' },
+    });
+
+    if (!data.historyId) {
+      this.logger.warn('Gmail watch registered but missing historyId');
       return;
     }
 
-    const labelIds = await this.getWatchLabelIds();
-    const gmail = await this.gmailApiService.getGmailClient();
-    const response = await gmail.users.watch({
-      userId: 'me',
-      requestBody: {
-        topicName,
-        labelIds,
-        labelFilterAction: 'include',
-      },
-    });
-    this.logger.log(`Gmail watch registered. historyId=${response.data.historyId}`);
-    response.data.historyId && (await this.settingService.set(SettingKey.EmailGmailHistoryId, response.data.historyId));
+    this.logger.log(`Gmail watch registered. historyId=${data.historyId}`);
+    await this.settingService.set(SettingKey.EmailGmailHistoryId, data.historyId);
   }
 
   async handleWebhook(payload: GmailPushPayload): Promise<void> {
-    const data = this.parsePayload(payload);
-    if (!data?.historyId) {
-      this.logger.warn('Skip webhook without historyId');
-      return;
-    }
+    const pushData = this.decodePushData(payload);
+    const incomingHistoryId = pushData?.historyId;
+    if (!incomingHistoryId) return;
 
     const previousHistoryId = await this.settingService.get<string>(SettingKey.EmailGmailHistoryId);
     if (!previousHistoryId) {
-      await this.settingService.set(SettingKey.EmailGmailHistoryId, data.historyId);
+      await this.settingService.set(SettingKey.EmailGmailHistoryId, incomingHistoryId);
       return;
     }
 
     const gmail = await this.gmailApiService.getGmailClient();
-    const { messageIds, labelChanges, latestHistoryId } = await this.fetchHistoryDiff(gmail, previousHistoryId);
-    const { ingestedIds, ingestedEvents } = await this.gmailChangeSyncService.applyHistoryChanges(
-      gmail,
-      messageIds,
-      labelChanges,
-    );
+    const { messageIds, labelChanges, latestHistoryId } = await this.diffHistoryFrom(gmail, previousHistoryId);
+
+    const { ingestedEvents } = await this.gmailChangeSyncService.applyHistoryChanges(gmail, messageIds, labelChanges);
     await this.gmailRabbitPublisherService.publishIngested(ingestedEvents);
-    await this.socketGateway.emitMessageIngested(ingestedIds);
-    await this.settingService.set(SettingKey.EmailGmailHistoryId, latestHistoryId ?? data.historyId);
+
+    await this.settingService.set(SettingKey.EmailGmailHistoryId, latestHistoryId ?? incomingHistoryId);
   }
 
-  private parsePayload(payload: GmailPushPayload): GmailPushData | null {
-    const encoded = payload?.message?.data;
+  private decodePushData(payload: GmailPushPayload): GmailPushData | null {
+    const encoded = payload?.message?.data?.trim();
     if (!encoded) {
+      this.logger.warn('Skip webhook: missing message.data');
       return null;
     }
 
     try {
-      return JSON.parse(Buffer.from(encoded, 'base64').toString('utf-8')) as GmailPushData;
-    } catch {
+      const json = Buffer.from(encoded, 'base64').toString('utf-8');
+      return JSON.parse(json) as GmailPushData;
+    } catch (error) {
+      this.logger.warn(`Skip webhook: invalid message.data (${error instanceof Error ? error.message : String(error)})`);
       return null;
     }
   }
 
-  private async fetchHistoryDiff(
+  private async diffHistoryFrom(
     gmail: gmail_v1.Gmail,
     startHistoryId: string,
   ): Promise<{ messageIds: string[]; labelChanges: LabelChangeEvent[]; latestHistoryId?: string }> {
@@ -116,63 +112,63 @@ export class GmailWebhookService implements OnModuleInit, OnModuleDestroy {
     const messageIds = new Set<string>();
     const labelChanges: LabelChangeEvent[] = [];
 
-    do {
-      const { data } = await gmail.users.history.list({
-        userId: 'me',
-        startHistoryId,
-        historyTypes: ['messageAdded', 'labelAdded', 'labelRemoved'],
-        pageToken,
-      });
+    try {
+      do {
+        const { data } = await gmail.users.history.list({
+          userId: GMAIL_USER_ID,
+          startHistoryId,
+          historyTypes: ['messageAdded', 'labelAdded', 'labelRemoved'],
+          pageToken,
+        });
 
-      latestHistoryId = data.historyId ?? latestHistoryId;
-      for (const history of data.history ?? []) {
-        for (const added of history.messagesAdded ?? []) {
-          added.message?.id && messageIds.add(added.message.id);
-        }
-
-        for (const labelsAdded of history.labelsAdded ?? []) {
-          if (!labelsAdded.message?.id) {
-            continue;
+        latestHistoryId = data.historyId ?? latestHistoryId;
+        for (const history of data.history ?? []) {
+          for (const added of history.messagesAdded ?? []) {
+            if (added.message?.id) messageIds.add(added.message.id);
           }
 
-          labelChanges.push({
-            gmailMessageId: labelsAdded.message.id,
-            addLabelIds: labelsAdded.labelIds ?? [],
-            removeLabelIds: [],
-          });
-        }
-
-        for (const labelsRemoved of history.labelsRemoved ?? []) {
-          if (!labelsRemoved.message?.id) {
-            continue;
+          for (const labelsAdded of history.labelsAdded ?? []) {
+            const id = labelsAdded.message?.id;
+            if (!id) continue;
+            labelChanges.push({ gmailMessageId: id, addLabelIds: labelsAdded.labelIds ?? [], removeLabelIds: [] });
           }
 
-          labelChanges.push({
-            gmailMessageId: labelsRemoved.message.id,
-            addLabelIds: [],
-            removeLabelIds: labelsRemoved.labelIds ?? [],
-          });
+          for (const labelsRemoved of history.labelsRemoved ?? []) {
+            const id = labelsRemoved.message?.id;
+            if (!id) continue;
+            labelChanges.push({ gmailMessageId: id, addLabelIds: [], removeLabelIds: labelsRemoved.labelIds ?? [] });
+          }
         }
+
+        pageToken = data.nextPageToken ?? undefined;
+      } while (pageToken);
+    } catch (error: any) {
+      const status = typeof error?.code === 'number' ? error.code : undefined;
+      if (status === 404) {
+        this.logger.warn(`Gmail historyId is too old/invalid, skipping diff from ${startHistoryId}`);
+        return { messageIds: [], labelChanges: [], latestHistoryId: undefined };
       }
-      pageToken = data.nextPageToken ?? undefined;
-    } while (pageToken);
+      throw error;
+    }
 
     return { messageIds: [...messageIds], labelChanges, latestHistoryId };
   }
 
-  private getWatchTopicName(): string | null {
-    const directTopicName = process.env.GMAIL_WATCH_TOPIC_NAME?.trim();
-    if (directTopicName?.startsWith('projects/')) {
-      return directTopicName;
+  private resolveWatchTopicName(): string | null {
+    const topic = process.env.GMAIL_WATCH_TOPIC_NAME?.trim();
+    if (!topic) {
+      this.logger.warn('Skip Gmail watch setup: missing GMAIL_WATCH_TOPIC_NAME');
+      return null;
     }
+    if (topic.startsWith('projects/')) return topic;
 
     const projectId = process.env.GMAIL_WATCH_PROJECT_ID?.trim();
-    const topicName = directTopicName;
-    if (!projectId || !topicName) {
+    if (!projectId) {
+      this.logger.warn('Skip Gmail watch setup: missing GMAIL_WATCH_PROJECT_ID');
       return null;
     }
 
-    return `projects/${projectId}/topics/${topicName}`;
+    return `projects/${projectId}/topics/${topic}`;
   }
 
   private async getWatchLabelIds(): Promise<string[]> {

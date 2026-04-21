@@ -10,7 +10,6 @@ export class RedisService implements OnModuleDestroy {
     this.client = new Redis(this.config.getOrThrow<string>('redis.url'));
   }
 
-  /** Shared ioredis connection for the app. */
   getOrThrow(): Redis {
     return this.client;
   }

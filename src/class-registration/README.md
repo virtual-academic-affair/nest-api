@@ -11,7 +11,6 @@ Module quản lý đăng ký môn học của sinh viên qua email. Sinh viên g
 |-------------------------|--------------------------------------------------|
 | `ClassRegistration`     | Đơn đăng ký (liên kết với Message qua messageId) |
 | `ClassRegistrationItem` | Chi tiết từng môn trong đơn (đăng ký/hủy)        |
-| `CancelReason`          | Danh sách lý do từ chối                          |
 
 ## API Endpoints
 
@@ -36,23 +35,12 @@ Module quản lý đăng ký môn học của sinh viên qua email. Sinh viên g
 | `/classRegistrations/:registrationId/items/:id` | PUT    | Admin | Cập nhật item   |
 | `/classRegistrations/:registrationId/items/:id` | DELETE | Admin | Xóa item        |
 
-### Cancel Reasons
-
-| Endpoint                                | Method | Role  | Chức năng       |
-|-----------------------------------------|--------|-------|-----------------|
-| `/classRegistrations/cancelReasons`     | GET    | Admin | Danh sách lý do |
-| `/classRegistrations/cancelReasons/:id` | GET    | Admin | Chi tiết lý do  |
-| `/classRegistrations/cancelReasons`     | POST   | Admin | Tạo lý do mới   |
-| `/classRegistrations/cancelReasons/:id` | PUT    | Admin | Cập nhật lý do  |
-| `/classRegistrations/cancelReasons/:id` | DELETE | Admin | Xóa lý do       |
-
 ## Services
 
 | Service                         | Chức năng                           |
 |---------------------------------|-------------------------------------|
 | `ClassRegistrationsService`     | CRUD đơn, gửi email reply, thống kê |
 | `ClassRegistrationItemsService` | CRUD items                          |
-| `CancelReasonsService`          | CRUD lý do                          |
 
 ## Query Parameters
 
@@ -60,7 +48,7 @@ Module quản lý đăng ký môn học của sinh viên qua email. Sinh viên g
 |-----------|-----------------------------------|
 | `page`    | Số trang                          |
 | `limit`   | Số item/trang                     |
-| `keyword` | Tìm theo studentCode, studentName |
+| `keyword` | (deprecated) |
 | `status`  | PENDING, APPROVED, REJECTED       |
 | `action`  | REGISTER, CANCEL, REQUEST_OPEN    |
 | `orderBy` | Sắp xếp (vd: `priority`)          |
@@ -69,6 +57,6 @@ Module quản lý đăng ký môn học của sinh viên qua email. Sinh viên g
 
 Khi `orderBy=priority`:
 
-1. academicYear ASC - SV năm cuối trước
+1. cohort ASC (lay tu email student) - SV năm cuối trước
 2. isInCurriculum DESC - Môn trong CTDT trước
 3. message.sentAt ASC - Email gửi trước

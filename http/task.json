@@ -79,7 +79,7 @@
                 {
                   "key": "messageStatuses[]",
                   "value": "",
-                  "description": "opened | replied | closed | resolved",
+                  "description": "opened | replied",
                   "disabled": true
                 },
                 {

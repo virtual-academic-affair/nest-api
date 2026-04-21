@@ -1,19 +1,19 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { UpdateDto } from '@email/dtos/labels/update.dto';
-import { getLangLabel, LabelKey, LabelLang } from '@shared/enums/system-label.enum';
+import { getLangLabel, LabelKey, LabelLang } from '@email/enums/email-label.enum';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
 import { SettingService } from '@shared/setting/services/setting.service';
-import { GoogleapisService } from './googleapis.service';
+import { GmailApiService } from './gmail/gmail-api.service';
 
 @Injectable()
 export class LabelsService {
   constructor(
     private readonly settingService: SettingService,
-    private readonly googleapisService: GoogleapisService,
+    private readonly gmailApiService: GmailApiService,
   ) {}
 
   async findAllGmailLabels() {
-    const client = await this.googleapisService.getGmailClient();
+    const client = await this.gmailApiService.getGmailClient();
     const { data } = await client.users.labels.list({ userId: 'me' });
     return (data.labels ?? [])
       .filter((label) => label.type !== 'system')
@@ -21,7 +21,7 @@ export class LabelsService {
   }
 
   private async createGmailLabel(name: string, color: string): Promise<string> {
-    const client = await this.googleapisService.getGmailClient();
+    const client = await this.gmailApiService.getGmailClient();
 
     try {
       const { data } = await client.users.labels.create({

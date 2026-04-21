@@ -1,20 +1,20 @@
 import { IsOptional, IsString } from 'class-validator';
-import { SystemLabel } from '@shared/enums/system-label.enum';
+import { EmailLabel } from '@email/enums/email-label.enum';
 
 export class UpdateDto {
   @IsOptional()
   @IsString()
-  [SystemLabel.ClassRegistration]?: string | null;
+  [EmailLabel.ClassRegistration]?: string | null;
 
   @IsOptional()
   @IsString()
-  [SystemLabel.Inquiry]?: string | null;
+  [EmailLabel.Training]?: string | null;
 
   @IsOptional()
   @IsString()
-  [SystemLabel.Task]?: string | null;
+  [EmailLabel.Graduation]?: string | null;
 
   @IsOptional()
   @IsString()
-  [SystemLabel.Other]?: string | null;
+  [EmailLabel.Pending]?: string | null;
 }

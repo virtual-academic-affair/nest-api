@@ -22,8 +22,8 @@
       "@email/*": ["src/email/*"],
       "@shared/*": ["src/shared/*"],
       "@class-registration/*": ["src/class-registration/*"],
-      "@task/*": ["src/task/*"],
-      "@inquiry/*": ["src/inquiry/*"]
+      "@inquiry/*": ["src/inquiry/*"],
+      "@app/*": ["src/app/*"]
     }
   }
 }

@@ -4,11 +4,8 @@ import { Auth } from '@authentication/decorators/auth.decorator';
 import { Roles } from '@authentication/decorators/roles.decorator';
 import { AuthType } from '@authentication/enums/auth-type.enum';
 import { Role } from '@authentication/enums/role.enum';
-import { CreateDto } from '@inquiry/dtos/inquiries/create.dto';
-import { QueryDto } from '@inquiry/dtos/inquiries/query.dto';
-import { ReplyDto } from '@inquiry/dtos/inquiries/reply.dto';
+import { ResourceDto } from '@inquiry/dtos/inquiries/resource.dto';
 import { StatsDto } from '@inquiry/dtos/inquiries/stats.dto';
-import { UpdateDto } from '@inquiry/dtos/inquiries/update.dto';
 import { Inquiry } from '@inquiry/entities/inquiry.entity';
 import { InquiriesService } from '@inquiry/services/inquiries.service';
 import { ResourceController } from '@shared/resource/controllers/resource.controller';
@@ -22,7 +19,7 @@ export class InquiriesController extends ResourceController<Inquiry> {
   }
 
   protected getDtoClasses() {
-    return { query: QueryDto, create: CreateDto, update: UpdateDto };
+    return ResourceDto;
   }
 
   @Get('stats')
@@ -36,8 +33,8 @@ export class InquiriesController extends ResourceController<Inquiry> {
   }
 
   @Post(':id/reply')
-  async reply(@Param('id', ParseIntPipe) id: number, @Body() dto: ReplyDto) {
-    return await this.service.sendReply(id, dto.content, dto.isClose);
+  async reply(@Param('id', ParseIntPipe) id: number) {
+    return await this.service.sendReply(id);
   }
 
   @Post()

@@ -4,11 +4,8 @@ import { Auth } from '@authentication/decorators/auth.decorator';
 import { Roles } from '@authentication/decorators/roles.decorator';
 import { AuthType } from '@authentication/enums/auth-type.enum';
 import { Role } from '@authentication/enums/role.enum';
-import { CreateDto } from '@class-registration/dtos/class-registrations/create.dto';
-import { QueryDto } from '@class-registration/dtos/class-registrations/query.dto';
-import { ReplyDto } from '@class-registration/dtos/class-registrations/reply.dto';
+import { ResourceDto } from '@class-registration/dtos/class-registrations/resource.dto';
 import { StatsDto } from '@class-registration/dtos/class-registrations/stats.dto';
-import { UpdateDto } from '@class-registration/dtos/class-registrations/update.dto';
 import { ClassRegistration } from '@class-registration/entities/class-registration.entity';
 import { ClassRegistrationsService } from '@class-registration/services/class-registrations.service';
 import { ResourceController } from '@shared/resource/controllers/resource.controller';
@@ -22,12 +19,12 @@ export class ClassRegistrationsController extends ResourceController<ClassRegist
   }
 
   protected getDtoClasses() {
-    return { query: QueryDto, create: CreateDto, update: UpdateDto };
+    return ResourceDto;
   }
 
   @Get('stats')
   async getStats(@Query() query: StatsDto) {
-    return await this.service.stats(new Date(query.from), new Date(query.to), query.isDetail);
+    return await this.service.stats(new Date(query.from), new Date(query.to));
   }
 
   @Get(':id/reply')
@@ -36,8 +33,8 @@ export class ClassRegistrationsController extends ResourceController<ClassRegist
   }
 
   @Post(':id/reply')
-  async reply(@Param('id', ParseIntPipe) id: number, @Body() dto: ReplyDto) {
-    return await this.service.sendReply(id, dto.content, dto.isClose);
+  async reply(@Param('id', ParseIntPipe) id: number) {
+    return await this.service.sendReply(id);
   }
 
   @Post()

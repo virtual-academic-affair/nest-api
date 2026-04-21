@@ -1,6 +1,6 @@
 import { Type } from 'class-transformer';
-import { ArrayUnique, IsArray, IsEnum, IsInt, IsOptional, Min, IsBoolean } from 'class-validator';
-import { SystemLabel } from '@shared/enums/system-label.enum';
+import { ArrayUnique, IsArray, IsEnum, IsInt, IsOptional, Min } from 'class-validator';
+import { EmailLabel } from '@email/enums/email-label.enum';
 
 export class UpdateLabelsDto {
   @IsOptional()
@@ -11,10 +11,6 @@ export class UpdateLabelsDto {
 
   @IsArray()
   @ArrayUnique()
-  @IsEnum(SystemLabel, { each: true })
-  systemLabels!: SystemLabel[];
-
-  @IsOptional()
-  @IsBoolean()
-  deleteTasks?: boolean;
+  @IsEnum(EmailLabel, { each: true })
+  systemLabels!: EmailLabel[];
 }

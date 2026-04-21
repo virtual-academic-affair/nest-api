@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Role } from '@authentication/enums/role.enum';
-import { SystemLabelNesting } from '@shared/enums/system-label.enum';
+import { SystemLabelNesting } from '@email/enums/email-label.enum';
 import { SettingService } from '@shared/setting/services/setting.service';
 
 const EnumRegistry = {

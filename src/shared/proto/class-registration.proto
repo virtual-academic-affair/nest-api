@@ -1,0 +1,23 @@
+syntax = "proto3";
+package app_server;
+
+import "common.proto";
+
+message CreateRegistrationItemRequest {
+  string action = 1;
+  string subjectName = 2;
+  string className = 3;
+  string subjectCode = 4;
+  bool isInCurriculum = 6;
+}
+
+message CreateRegistrationRequest {
+  int32 messageId = 1;
+  string status = 2;
+  string note = 3;
+  repeated CreateRegistrationItemRequest items = 4;
+}
+
+service ClassRegistrationService {
+  rpc Create(CreateRegistrationRequest) returns (app_server.SuccessResponse);
+}

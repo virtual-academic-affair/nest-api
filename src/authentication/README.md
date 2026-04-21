@@ -1,119 +1,27 @@
 # Authentication Module
 
-## Introduction
+## Muc tieu
 
-Module **Authentication** xử lý xác thực người dùng thông qua Google OAuth 2.0 và quản lý phân quyền. Module cung cấp
-JWT tokens (access & refresh) để bảo mật các API endpoints.
+Module `authentication` xu ly dang nhap Google OAuth theo Passport, phat hanh JWT, va phan quyen theo role.
 
-## Flow
+## Luong nghiep vu
 
-```text
-┌──────────────────────────────────────────────────────────────────┐
-│                          1. LOGIN (First Time)                   │
-└──────────────────────────────────────────────────────────────────┘
+1. User goi `GET /authentication/google` -> Passport redirect sang Google.
+2. Google callback vao `GET /authentication/google/redirect`.
+3. `GoogleStrategy` tra profile, `GoogleService` upsert user theo email/domain mapping (`setting key: auth.emailDomains`).
+4. `AuthService` phat hanh access/refresh token, refresh token duoc luu cookie.
+5. Cac API private dung `AuthenticationGuard` + `AccessTokenGuard` (Passport JWT), khong verify JWT thu cong.
 
-Frontend → Google OAuth URL → Google Login → OAuth Code
-    ↓
-GoogleService → Get User Info → UsersService (Create/Update User)
-    ↓
-AuthService → Generate Tokens → Frontend (Save tokens)
+## Role theo email domain
 
+- Cau hinh: setting `auth.emailDomains` trong bang `setting` voi format `{ role: string[] }`.
+- `resolveEmail()` map domain -> role.
+- Neu role la `student`, cohort duoc suy ra tu 2 chu so dau local-part email.
 
-┌──────────────────────────────────────────────────────────────────┐
-│                     2. AUTHENTICATED REQUEST                     │
-└──────────────────────────────────────────────────────────────────┘
+## Thanh phan chinh
 
-Frontend (Header: Bearer <accessToken>)
-    ↓
-AuthenticationGuard (Verify Token) → RolesGuard (Check Role)
-    ↓
-Controller/Service (Process Request)
-
-
-┌──────────────────────────────────────────────────────────────────┐
-│                    3. TOKEN EXPIRED (Refresh)                    │
-└──────────────────────────────────────────────────────────────────┘
-
-Frontend (401 Error) → POST /authentication/auth/refresh {refreshToken}
-    ↓
-AuthService (Verify & Generate New Tokens) → Frontend (Save & Retry)
-```
-
-## Features
-
-### 1. Google OAuth Login
-
-- Người dùng đăng nhập bằng tài khoản Google
-- Tự động tạo user mới nếu chưa tồn tại
-- Mặc định role là `student`
-
-### 2. JWT Token Management
-
-- **Access Token**: Dùng để xác thực request
-- **Refresh Token**: Dùng để gia hạn access token
-- Tokens được sign và verify bằng JWT secret
-
-### 3. Role-Based Access Control (RBAC)
-
-- Mỗi user có một role: `student`, `admin`, hoặc `lecture`
-- Guard `RolesGuard` kiểm tra quyền truy cập theo role
-- Admin có thể gán role cho user khác
-
-### 4. User Management
-
-- Admin xem danh sách users
-- Admin cập nhật thông tin user
-- Admin gán/thay đổi role
-- Admin có thể active/deactive user (`isActive`)
-
-### 5. Guards & Decorators
-
-Module cung cấp các guards và decorators cho authentication và authorization:
-
-**Guards:**
-
-- **AuthenticationGuard**: Guard toàn cục kiểm tra xác thực người dùng
-- **AccessTokenGuard**: Xác thực access token (JWT)
-- **RolesGuard**: Phân quyền theo role (Admin, Student, Lecture)
-
-**Decorators:**
-
-- **@Auth(authType)**: Chỉ định loại xác thực (Bearer hoặc None)
-- **@Roles(...roles)**: Chỉ định role được phép truy cập
-- **@ActiveUser()**: Lấy thông tin user hiện tại từ request
-
-## Services
-
-| Service           | Chức năng                                        |
-|-------------------|--------------------------------------------------|
-| **GoogleService** | Xử lý Google OAuth flow, lấy user info từ Google |
-| **AuthService**   | Generate và verify JWT tokens (access & refresh) |
-| **UsersService**  | CRUD users, assign roles, quản lý user data      |
-
-## API Endpoints
-
-### Google OAuth (Public)
-
-| Endpoint                 | Method | Role   | Chức năng                             |
-|--------------------------|--------|--------|---------------------------------------|
-| `/authentication/google` | GET    | Public | Lấy Google OAuth URL để redirect user |
-| `/authentication/google` | POST   | Public | Login bằng OAuth code, trả về tokens  |
-
-### Auth Management (Public/Authenticated)
-
-| Endpoint                       | Method | Role          | Chức năng                               |
-|--------------------------------|--------|---------------|-----------------------------------------|
-| `/authentication/auth/refresh` | POST   | Public        | Refresh access token bằng refresh token |
-| `/authentication/auth/me`      | GET    | Authenticated | Lấy thông tin user hiện tại             |
-
-### User Management (Admin Only)
-
-| Endpoint                           | Method | Role  | Chức năng                                   |
-|------------------------------------|--------|-------|---------------------------------------------|
-| `/authentication/users`            | GET    | Admin | Lấy danh sách users (có pagination, filter) |
-| `/authentication/users/:id`        | GET    | Admin | Lấy chi tiết một user                       |
-| `/authentication/users/:id`        | PUT    | Admin | Cập nhật thông tin user                     |
-| `/authentication/users/assignRole` | POST   | Admin | Gán role cho user                           |
-
-> **Lưu ý**: Users controller kế thừa `ResourceController` nhưng bị giới hạn không cho phép `Create` và `Delete` (chỉ
-> tạo user qua OAuth).
+- `AccessTokenStrategy`: validate JWT va user active.
+- `GoogleStrategy`: OAuth profile provider.
+- `GoogleOAuthGuard`: guard cho flow login Google.
+- `GoogleService`: business login/upsert/token.
+- `AuthService`: token lifecycle (issue/refresh/super-token).

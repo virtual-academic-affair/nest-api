@@ -2,8 +2,7 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { Auth } from '@authentication/decorators/auth.decorator';
 import { Roles } from '@authentication/decorators/roles.decorator';
 import { AssignRoleDto } from '@authentication/dtos/auth/assign-role.dto';
-import { QueryDto } from '@authentication/dtos/users/query.dto';
-import { UpdateDto } from '@authentication/dtos/users/update.dto';
+import { ResourceDto } from '@authentication/dtos/users/resource.dto';
 import { User } from '@authentication/entities/user.entity';
 import { AuthType } from '@authentication/enums/auth-type.enum';
 import { Role } from '@authentication/enums/role.enum';
@@ -22,7 +21,7 @@ export class UsersController extends ResourceController<User> {
   }
 
   protected getDtoClasses() {
-    return { query: QueryDto, update: UpdateDto };
+    return ResourceDto;
   }
 
   @Post('assignRole')

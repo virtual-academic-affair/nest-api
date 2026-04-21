@@ -1,7 +1,11 @@
-import { Body, Controller, Get, Inject, Post, Query, Res } from '@nestjs/common';
+import { Controller, Get, Inject, Req, Res, UseGuards } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { Response } from 'express';
-import { CodeDto } from '@authentication/dtos/google/code.dto';
+import { Request } from 'express';
+import { Auth } from '@authentication/decorators/auth.decorator';
+import { AuthType } from '@authentication/enums/auth-type.enum';
+import { GoogleOAuthGuard } from '@authentication/guards/google-oauth.guard';
+import { GoogleProfile } from '@authentication/strategies/google.strategy';
 import { GoogleService } from '@authentication/services/google.service';
 import { REFRESH_COOKIE, getRefreshCookieOptions } from '@authentication/utils/cookie.util';
 import jwtConfig from '@shared/config/jwt.config';
@@ -14,15 +18,18 @@ export class GoogleController {
   ) {}
 
   @Get()
-  getGoogleUrl(@Query('redirectUrl') redirectUrl?: string) {
-    return this.googleService.generateAuthUrl(redirectUrl);
+  @UseGuards(GoogleOAuthGuard)
+  authenticateGoogle() {
+    return;
   }
 
-  @Post()
-  async authenticate(@Body() dto: CodeDto, @Res({ passthrough: true }) res: Response) {
-    const tokens = await this.googleService.authenticate(dto);
+  @Auth(AuthType.None)
+  @Get('redirect')
+  @UseGuards(GoogleOAuthGuard)
+  async googleRedirect(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const profile = req.user as GoogleProfile;
+    const tokens = await this.googleService.login(profile);
     res.cookie(REFRESH_COOKIE, tokens.refreshToken, getRefreshCookieOptions(this.jwtConfiguration.refreshTokenTtl));
-
     return { accessToken: tokens.accessToken };
   }
 }

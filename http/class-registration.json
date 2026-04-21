@@ -41,7 +41,7 @@
                 {
                   "key": "keyword",
                   "value": "",
-                  "description": "studentCode | studentName",
+                  "description": "studentCode",
                   "disabled": true
                 },
                 {
@@ -50,7 +50,7 @@
                   "disabled": true
                 },
                 {
-                  "key": "academicYear",
+                  "key": "cohort",
                   "value": "",
                   "disabled": true
                 },
@@ -67,13 +67,13 @@
                 {
                   "key": "messageStatuses[]",
                   "value": "",
-                  "description": "opened | replied | closed | resolved",
+                  "description": "opened | replied",
                   "disabled": true
                 },
                 {
                   "key": "orderCol",
-                  "value": "academicYear",
-                  "description": "academicYear"
+                  "value": "id",
+                  "description": "id"
                 },
                 {
                   "key": "orderDir",
@@ -117,7 +117,7 @@
                   "language": "json"
                 }
               },
-              "raw": "{\n    \"studentCode\": \"2212000\",\n    \"studentName\": \"Nguyen Van A\",\n    \"academicYear\": 2025,\n    \"note\": \"Ghi chu thanh toan\",\n    \"messageId\": 1,\n    \"items\": [\n        {\n            \"action\": \"register\",\n            \"subjectName\": \"Toan cao cap\",\n            \"subjectCode\": \"MATH101\",\n            \"className\": \"TH1\",\n            \"slotInfo\": \"Thu 2, tiet 1-3\",\n            \"isInCurriculum\": true\n        }\n    ]\n}"
+              "raw": "{\n    \"note\": \"Ghi chu thanh toan\",\n    \"messageId\": 1,\n    \"items\": [\n        {\n            \"action\": \"register\",\n            \"subjectName\": \"Toan cao cap\",\n            \"subjectCode\": \"MATH101\",\n            \"className\": \"TH1\",\n            \"isInCurriculum\": true\n        }\n    ]\n}"
             },
             "url": {
               "host": [
@@ -141,7 +141,7 @@
                   "language": "json"
                 }
               },
-              "raw": "{\n    \"studentCode\": \"2212000\",\n    \"studentName\": \"Nguyen Van A\",\n    \"academicYear\": 2025,\n    \"note\": \"Ghi chu cap nhat\"\n}"
+              "raw": "{\n    \"note\": \"Ghi chu cap nhat\"\n}"
             },
             "url": {
               "host": [
@@ -199,15 +199,11 @@
               "query": [
                 {
                   "key": "from",
-                  "value": "2025-01-01"
+                  "value": "2024-01-01"
                 },
                 {
                   "key": "to",
-                  "value": "2025-01-31"
-                },
-                {
-                  "key": "isDetail",
-                  "value": "true"
+                  "value": "2026-12-31"
                 }
               ]
             }
@@ -240,15 +236,6 @@
           "name": "reply",
           "request": {
             "method": "POST",
-            "body": {
-              "mode": "raw",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              },
-              "raw": "{\n    \"content\": \"<p>Your registration has been approved.</p>\",\n    \"isClose\": false\n}"
-            },
             "url": {
               "host": [
                 "{{baseUrl}}"
@@ -284,7 +271,7 @@
                   "language": "json"
                 }
               },
-              "raw": "{\n    \"action\": \"register\",\n    \"subjectName\": \"Toan cao cap\",\n    \"subjectCode\": \"MATH101\",\n    \"className\": \"TH1\",\n    \"slotInfo\": \"Thu 2, tiet 1-3\",\n    \"isInCurriculum\": true\n}"
+              "raw": "{\n    \"action\": \"register\",\n    \"subjectName\": \"Toan cao cap\",\n    \"subjectCode\": \"MATH101\",\n    \"className\": \"TH1\",\n    \"isInCurriculum\": true\n}"
             },
             "url": {
               "host": [
@@ -362,156 +349,6 @@
                   "key": "parentId",
                   "value": "1"
                 },
-                {
-                  "key": "id",
-                  "value": "1"
-                }
-              ]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "CancelReasons",
-      "item": [
-        {
-          "name": "findAll",
-          "request": {
-            "method": "GET",
-            "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "classRegistration",
-                "cancelReasons"
-              ],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "1"
-                },
-                {
-                  "key": "limit",
-                  "value": "10"
-                },
-                {
-                  "key": "keyword",
-                  "value": "",
-                  "description": "content",
-                  "disabled": true
-                },
-                {
-                  "key": "isActive",
-                  "value": "",
-                  "description": "true | false",
-                  "disabled": true
-                },
-                {
-                  "key": "orderCol",
-                  "value": "id"
-                },
-                {
-                  "key": "orderDir",
-                  "value": "DESC",
-                  "description": "ASC | DESC"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "findOne",
-          "request": {
-            "method": "GET",
-            "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "classRegistration",
-                "cancelReasons",
-                ":id"
-              ],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "1"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "create",
-          "request": {
-            "method": "POST",
-            "body": {
-              "mode": "raw",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              },
-              "raw": "{\n    \"content\": \"Lop da day\",\n    \"isActive\": true\n}"
-            },
-            "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "classRegistration",
-                "cancelReasons"
-              ]
-            }
-          }
-        },
-        {
-          "name": "update",
-          "request": {
-            "method": "PUT",
-            "body": {
-              "mode": "raw",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              },
-              "raw": "{\n    \"content\": \"Lop da day - cap nhat\",\n    \"isActive\": false\n}"
-            },
-            "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "classRegistration",
-                "cancelReasons",
-                ":id"
-              ],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "1"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "remove",
-          "request": {
-            "method": "DELETE",
-            "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "classRegistrations",
-                "cancelReasons",
-                ":id"
-              ],
-              "variable": [
                 {
                   "key": "id",
                   "value": "1"

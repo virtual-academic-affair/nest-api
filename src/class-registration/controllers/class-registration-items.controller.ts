@@ -3,8 +3,7 @@ import { Auth } from '@authentication/decorators/auth.decorator';
 import { Roles } from '@authentication/decorators/roles.decorator';
 import { AuthType } from '@authentication/enums/auth-type.enum';
 import { Role } from '@authentication/enums/role.enum';
-import { CreateDto } from '@class-registration/dtos/class-registration-items/create.dto';
-import { UpdateDto } from '@class-registration/dtos/class-registration-items/update.dto';
+import { ResourceDto } from '@class-registration/dtos/class-registration-items/resource.dto';
 import { ClassRegistrationItem } from '@class-registration/entities/class-registration-item.entity';
 import { ClassRegistrationItemsService } from '@class-registration/services/class-registration-items.service';
 import { ResourceController } from '@shared/resource/controllers/resource.controller';
@@ -21,6 +20,6 @@ export class ClassRegistrationItemsController extends ResourceController<ClassRe
   }
 
   protected getDtoClasses() {
-    return { create: CreateDto, update: UpdateDto };
+    return ResourceDto;
   }
 }

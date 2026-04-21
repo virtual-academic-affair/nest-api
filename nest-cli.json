@@ -5,8 +5,8 @@
   "compilerOptions": {
     "deleteOutDir": true,
     "assets": [
-      "proto/**/*.proto",
-      "**/*.hbs"
+      "shared/proto/**/*.proto",
+      "email/templates/**/*.hbs"
     ],
     "watchAssets": true
   }

@@ -1,23 +1,22 @@
-import { Body, ConflictException, Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, SelectQueryBuilder } from 'typeorm';
-import { CreateDto } from '@class-registration/dtos/class-registrations/create.dto';
-import { QueryDto } from '@class-registration/dtos/class-registrations/query.dto';
+import { CreateDto, QueryDto } from '@class-registration/dtos/class-registrations/resource.dto';
 import { ClassRegistration } from '@class-registration/entities/class-registration.entity';
 import { ClassRegistrationItemsService } from '@class-registration/services/class-registration-items.service';
-import { ClassRegistrationTemplate } from '@class-registration/templates/class-registration.template';
+import { EmailLabel } from '@email/enums/email-label.enum';
 import { MessageStatus } from '@email/enums/message-status.enum';
 import { EmailReplyService } from '@email/services/email-send/email-reply.service';
 import { MessageLabelsService } from '@email/services/message-labels.service';
-import { SystemLabel } from '@shared/enums/system-label.enum';
+import { ClassRegistrationTemplate } from '@email/templates/class-registration.template';
+import { Body, ConflictException, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { InjectRepository } from '@nestjs/typeorm';
 import { applyMessageFilters } from '@shared/resource/dtos/message-resource-query.dto';
 import { ResourceService } from '@shared/resource/services/resource.service';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 
 @Injectable()
 export class ClassRegistrationsService extends ResourceService<ClassRegistration> {
-  protected searchableColumns = ['studentCode', 'studentName'];
-  protected orderableColumns = ['academicYear'];
+  protected searchableColumns: string[] = [];
+  protected orderableColumns: string[] = [];
 
   constructor(
     @InjectRepository(ClassRegistration) repository: Repository<ClassRegistration>,
@@ -39,17 +38,24 @@ export class ClassRegistrationsService extends ResourceService<ClassRegistration
 
   protected applyCustomFilters(
     queryBuilder: SelectQueryBuilder<ClassRegistration>,
-    { studentCode, academicYear, smartOrder, messageId, messageStatuses }: QueryDto,
+    { studentCode, cohort, smartOrder, messageId, messageStatuses }: QueryDto,
   ): void {
     applyMessageFilters(queryBuilder, { messageId, messageStatuses });
-    studentCode && queryBuilder.andWhere({ studentCode });
-    academicYear && queryBuilder.andWhere({ academicYear });
+    const requiresMessageJoin = Boolean(studentCode || cohort || smartOrder);
+    requiresMessageJoin && queryBuilder.leftJoin(this.p('message'), 'message');
+    studentCode &&
+      queryBuilder.andWhere(`message.studentInfo ->> 'studentCode' = :studentCode`, {
+        studentCode,
+      });
+    cohort &&
+      queryBuilder.andWhere(`CAST(message.studentInfo ->> 'cohort' AS INTEGER) = :cohort`, {
+        cohort,
+      });
 
     if (smartOrder) {
       queryBuilder
         .leftJoin(this.p('items'), 'items')
-        .leftJoin(this.p('message'), 'message')
-        .orderBy(this.p('academicYear'), 'ASC')
+        .orderBy(`CAST(message.studentInfo ->> 'cohort' AS INTEGER)`, 'ASC', 'NULLS LAST')
         .addOrderBy('items.isInCurriculum', 'DESC')
         .addOrderBy(`COALESCE(message.sentAt, ${this.p('createdAt')})`, 'ASC');
     }
@@ -58,26 +64,12 @@ export class ClassRegistrationsService extends ResourceService<ClassRegistration
   async create(@Body() dto: CreateDto) {
     const existing = await this.repository.findOneBy({ messageId: dto.messageId });
     throwIf(existing, new ConflictException('Registration already exists'));
-    await this.messageLabelsService.run(dto.messageId, null, false, [SystemLabel.ClassRegistration]);
+    await this.messageLabelsService.run(dto.messageId, null, false, [EmailLabel.ClassRegistration]);
     return await super.create(dto);
   }
 
-  async stats(startDate: Date, endDate: Date, isDetail?: boolean) {
-    if (isDetail) {
-      return this.classRegistrationItemsService.stats(startDate, endDate);
-    }
-
-    const stats = await this.queryBuilder
-      .select([`DATE(${this.p('createdAt')}) AS date`, 'COUNT(*) AS total'])
-      .where(`${this.p('createdAt')} BETWEEN :startDate AND :endDate`, { startDate, endDate })
-      .groupBy(`DATE(${this.p('createdAt')})`)
-      .orderBy('date', 'ASC')
-      .getRawMany();
-
-    return stats.reduce((acc, { date, total }) => {
-      acc[new Date(date).toISOString()] = +total;
-      return acc;
-    }, {});
+  async stats(startDate: Date, endDate: Date) {
+    return this.classRegistrationItemsService.stats(startDate, endDate);
   }
 
   async previewReply(id: number) {
@@ -86,14 +78,14 @@ export class ClassRegistrationsService extends ResourceService<ClassRegistration
     return { content: template.generate() };
   }
 
-  async sendReply(id: number, content?: string, isClose = false) {
+  async sendReply(id: number) {
     const registration = await this.findOne(id);
     const message = registration.message;
     throwUnless(message, new ConflictException('Registration has no message'));
 
-    content ??= await this.previewReply(id).then((res) => res.content);
+    const content = await this.previewReply(id).then((res) => res.content);
     const sentMessageId = await this.emailReplyService.reply(message, content);
-    await this.update(id, { messageStatus: isClose ? MessageStatus.Closed : MessageStatus.Replied });
+    await this.update(id, { messageStatus: MessageStatus.Replied });
 
     return sentMessageId;
   }

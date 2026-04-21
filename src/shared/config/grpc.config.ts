@@ -10,7 +10,7 @@ export default registerAs('grpc', () => ({
   options: {
     url: process.env.GRPC_URL ?? 'localhost:5000',
     package: process.env.GRPC_PACKAGE ?? 'app_server',
-    protoPath: process.env.GRPC_PROTO_PATH ?? join(process.cwd(), 'src/proto/app_server.proto'),
+    protoPath: process.env.GRPC_PROTO_PATH ?? join(process.cwd(), 'src/shared/proto/app_server.proto'),
     onLoadPackageDefinition: (packageDefinition: PackageDefinition, server: Pick<Server, 'addService'>) => {
       new ReflectionService(packageDefinition).addToServer(server);
     },
@@ -18,7 +18,7 @@ export default registerAs('grpc', () => ({
     loader: {
       keepCase: true,
       alternateCommentMode: true,
-      includeDirs: [join(process.cwd(), 'src/proto'), join(process.cwd(), 'dist/proto')],
+      includeDirs: [join(process.cwd(), 'src/shared/proto'), join(process.cwd(), 'dist/shared/proto')],
     },
   },
 }));

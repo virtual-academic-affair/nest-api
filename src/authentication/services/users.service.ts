@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository, SelectQueryBuilder } from 'typeorm';
 import { AssignRoleDto } from '@authentication/dtos/auth/assign-role.dto';
-import { QueryDto } from '@authentication/dtos/users/query.dto';
+import { QueryDto } from '@authentication/dtos/users/resource.dto';
 import { User } from '@authentication/entities/user.entity';
 import { ResourceService } from '@shared/resource/services/resource.service';
 

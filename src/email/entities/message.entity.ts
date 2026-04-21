@@ -1,10 +1,9 @@
 import { AfterLoad, Column, Entity, Index, OneToMany, Unique } from 'typeorm';
 import { ClassRegistration } from '@class-registration/entities/class-registration.entity';
+import { EmailLabel } from '@email/enums/email-label.enum';
 import { Inquiry } from '@inquiry/entities/inquiry.entity';
 import { EncryptedColumn } from '@shared/encryption/decorators/encrypted-column.decorator';
-import { SystemLabel } from '@shared/enums/system-label.enum';
 import { BaseEntity } from '@shared/resource/entities/base.entity';
-import { Task } from '@task/entities/task.entity';
 
 @Entity()
 @Unique(['gmailMessageId'])
@@ -32,6 +31,9 @@ export class Message extends BaseEntity {
   @Column()
   superEmail?: string;
 
+  @Column({ type: 'jsonb', nullable: true })
+  studentInfo?: StudentInfo;
+
   @Index()
   @Column({ type: 'timestamp', nullable: true })
   sentAt?: Date;
@@ -41,13 +43,10 @@ export class Message extends BaseEntity {
 
   @Index()
   @Column('text', { array: true, nullable: true })
-  systemLabels: SystemLabel[];
+  systemLabels: EmailLabel[];
 
   @EncryptedColumn({ type: 'text', nullable: true, select: false })
   content?: string;
-
-  @OneToMany(() => Task, (task) => task.message)
-  tasks: Task[];
 
   @OneToMany(() => Inquiry, (inquiry) => inquiry.message)
   inquiry: Inquiry[];
@@ -55,7 +54,6 @@ export class Message extends BaseEntity {
   @OneToMany(() => ClassRegistration, (classRegistration) => classRegistration.message)
   classRegistration: ClassRegistration[];
 
-  taskIds: number[];
   inquiryId: number | null;
   classRegistrationId: number | null;
   inquiryIds?: number[];
@@ -63,12 +61,14 @@ export class Message extends BaseEntity {
 
   @AfterLoad()
   hydrateLinkedBusinessIds(): void {
-    if (!this.taskIds) {
-      this.taskIds = [];
-    }
     this.inquiryId = this.inquiryIds?.length ? this.inquiryIds[0]! : null;
     this.classRegistrationId = this.classRegistrationIds?.length ? this.classRegistrationIds[0]! : null;
     delete this.inquiryIds;
     delete this.classRegistrationIds;
   }
 }
+
+export type StudentInfo = {
+  studentCode?: string;
+  cohort?: number;
+};

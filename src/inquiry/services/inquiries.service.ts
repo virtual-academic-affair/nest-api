@@ -4,15 +4,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ArrayOverlap, DataSource, Repository, SelectQueryBuilder } from 'typeorm';
 import { Message } from '@email/entities/message.entity';
 import { MessageStatus } from '@email/enums/message-status.enum';
+import { EmailLabel, LabelKey } from '@email/enums/email-label.enum';
 import { EmailReplyService } from '@email/services/email-send/email-reply.service';
 import { MessageLabelsService } from '@email/services/message-labels.service';
-import { CreateDto } from '@inquiry/dtos/inquiries/create.dto';
-import { QueryDto } from '@inquiry/dtos/inquiries/query.dto';
-import { UpdateDto } from '@inquiry/dtos/inquiries/update.dto';
+import { CreateDto, QueryDto, UpdateDto } from '@inquiry/dtos/inquiries/resource.dto';
 import { Inquiry } from '@inquiry/entities/inquiry.entity';
 import { InquiryType } from '@inquiry/enums/inquiry-type.enum';
-import { InquiryTemplate } from '@inquiry/templates/inquiry.template';
-import { LabelKey, SystemLabel } from '@shared/enums/system-label.enum';
+import { InquiryTemplate } from '@email/templates/inquiry.template';
 import { applyMessageFilters } from '@shared/resource/dtos/message-resource-query.dto';
 import { ResourceService } from '@shared/resource/services/resource.service';
 
@@ -45,8 +43,9 @@ export class InquiriesService extends ResourceService<Inquiry> {
       await this.repository.findOneBy({ messageId: dto.messageId }),
       new ConflictException('Inquiry already exists'),
     );
-    await this.messageLabelsService.run(dto.messageId, null, false, [SystemLabel.Inquiry]);
-    dto.types?.length && (await this.syncTypeLabels(dto.messageId, dto.types, []));
+    const typeLabels = (dto.types ?? []) as unknown as LabelKey[];
+    await this.messageLabelsService.run(dto.messageId, null, false, typeLabels as unknown as EmailLabel[]);
+    dto.types?.length && (await this.syncTypeLabels(dto.messageId, typeLabels, []));
     return await super.create(dto);
   }
 
@@ -71,7 +70,6 @@ export class InquiriesService extends ResourceService<Inquiry> {
         'COUNT(*) AS total',
         `SUM(CASE WHEN '${InquiryType.Graduation}' = ANY("${alias}"."types"::text[]) THEN 1 ELSE 0 END) AS graduation`,
         `SUM(CASE WHEN '${InquiryType.Training}' = ANY("${alias}"."types"::text[]) THEN 1 ELSE 0 END) AS training`,
-        `SUM(CASE WHEN '${InquiryType.Procedure}' = ANY("${alias}"."types"::text[]) THEN 1 ELSE 0 END) AS procedure`,
       ])
       .where(`${this.p('createdAt')} BETWEEN :startDate AND :endDate`, { startDate, endDate })
       .groupBy('date')
@@ -84,7 +82,6 @@ export class InquiriesService extends ResourceService<Inquiry> {
         types: {
           [InquiryType.Graduation]: +row.graduation,
           [InquiryType.Training]: +row.training,
-          [InquiryType.Procedure]: +row.procedure,
         },
       };
       return acc;
@@ -96,7 +93,7 @@ export class InquiriesService extends ResourceService<Inquiry> {
     return { content: new InquiryTemplate(this.configService, inquiry).generate() };
   }
 
-  async sendReply(id: number, content?: string, isClose = false) {
+  async sendReply(id: number, content?: string) {
     const inquiry = await this.findOne(id);
     const message = inquiry.message;
     throwUnless(message, new ConflictException('Inquiry has no message'));
@@ -107,7 +104,7 @@ export class InquiriesService extends ResourceService<Inquiry> {
     const sentMessageId = await this.emailReplyService.reply(message, content);
     await this.update(id, {
       answer: content,
-      messageStatus: isClose ? MessageStatus.Closed : MessageStatus.Replied,
+      messageStatus: MessageStatus.Replied,
     });
 
     return sentMessageId;

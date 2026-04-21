@@ -29,9 +29,6 @@ export class ClassRegistrationItem extends BaseEntity {
   @Column({ nullable: true })
   subjectCode?: string;
 
-  @Column({ nullable: true })
-  slotInfo?: string;
-
   @Index()
   @Column({ type: 'boolean', nullable: true })
   isInCurriculum: boolean;

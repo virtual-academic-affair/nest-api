@@ -44,8 +44,13 @@ export abstract class ResourceService<T extends ObjectLiteral> {
     if (keyword && this.searchableColumns.length > 0) {
       qb.andWhere(
         new Brackets((sub) => {
-          const sql = this.searchableColumns.map((col) => `${this.p(col)} ILike :k`).join(' OR ');
-          sub.where(sql, { k: `%${keyword}%` });
+          const vector = this.searchableColumns
+            .map((col) => `COALESCE(${this.p(col)}::text, '')`)
+            .join(` || ' ' || `);
+          sub.where(
+            `to_tsvector('simple', ${vector}) @@ websearch_to_tsquery('simple', :keyword)`,
+            { keyword: keyword.trim() },
+          );
         }),
       );
     }

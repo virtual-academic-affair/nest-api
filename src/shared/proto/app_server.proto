@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+import "common.proto";
+import "auth.proto";
+import "message.proto";
+import "inquiry.proto";
+import "class-registration.proto";
+syntax = "proto3";
+
+import "common.proto";
+import "auth.proto";
+import "message.proto";
+import "inquiry.proto";
+import "class-registration.proto";

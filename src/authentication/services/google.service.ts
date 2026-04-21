@@ -1,59 +1,46 @@
-import { Inject, Injectable, OnModuleInit, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { OAuth2Client } from 'google-auth-library';
 import { Repository } from 'typeorm';
-import { CodeDto } from '@authentication/dtos/google/code.dto';
+import { EmailDomainsByRole } from '@authentication/types/email-domains-by-role.type';
 import { User } from '@authentication/entities/user.entity';
-import { resolveEmail } from '@authentication/utils/resolve-email.util';
+import { normalizeEmailDomainsByRole, resolveEmail } from '@authentication/utils/resolve-email.util';
 import googleConfig from '@shared/config/google.config';
+import { SettingKey } from '@shared/setting/enums/setting-key.enum';
+import { SettingService } from '@shared/setting/services/setting.service';
+import { GoogleProfile } from '@authentication/strategies/google.strategy';
 import { AuthService } from './auth.service';
 
 @Injectable()
-export class GoogleService implements OnModuleInit {
-  private oAuthClient: OAuth2Client;
-
+export class GoogleService {
   constructor(
-    @Inject(googleConfig.KEY)
-    private readonly googleConfiguration: ConfigType<typeof googleConfig>,
+    @Inject(googleConfig.KEY) private readonly googleConfiguration: ConfigType<typeof googleConfig>,
     private readonly authService: AuthService,
+    private readonly settingService: SettingService,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
 
-  onModuleInit() {
-    this.oAuthClient = new OAuth2Client(this.googleConfiguration);
+  getRedirectUrl() {
+    return this.googleConfiguration.redirectUri;
   }
 
-  generateAuthUrl(redirectUrl?: string) {
-    return this.oAuthClient.generateAuthUrl({
-      access_type: 'offline',
-      scope: ['openid', 'email', 'profile'],
-      prompt: 'consent',
-      ...(redirectUrl ? { redirect_uri: redirectUrl } : {}),
-    });
-  }
-
-  async authenticate(dto: CodeDto) {
-    const { tokens } = await this.oAuthClient.getToken({ code: dto.code, redirect_uri: dto.redirectUrl });
-    throwUnless(tokens?.id_token, new UnauthorizedException('Google token is missing'));
-
-    const loginTicket = await this.oAuthClient.verifyIdToken({ idToken: tokens.id_token });
-    const payload = loginTicket.getPayload();
-    throwUnless(payload?.email, new UnauthorizedException('Google email is missing'));
-
-    const email = payload.email;
+  async login(profile: GoogleProfile) {
+    const email = profile.email.toLowerCase();
     let user: Partial<User> = await this.userRepository.findOneBy({ email });
 
     if (!user) {
-      user = resolveEmail(email);
+      const emailDomainsByRole = normalizeEmailDomainsByRole(
+        await this.settingService.get<EmailDomainsByRole>(SettingKey.AuthEmailDomains),
+      );
+      user = resolveEmail(email, emailDomainsByRole);
     }
 
     user = await this.userRepository.save({
       ...user,
       email,
-      googleId: payload.sub,
-      name: payload.name,
-      picture: payload.picture,
+      googleId: profile.googleId,
+      name: profile.name,
+      picture: profile.picture,
     });
 
     return this.authService.generateTokens(user as User);

@@ -1,7 +1,6 @@
 export enum SettingKey {
+  AuthEmailDomains = 'auth.emailDomains',
   EmailLabels = 'email.labels',
   EmailSuperEmail = 'email.superEmail',
-  EmailLastPullAt = 'email.lastPullAt',
-  EmailAllowedDomains = 'email.allowedDomains',
-  EmailCanSaveContent = 'email.canSaveContent',
+  EmailGmailHistoryId = 'email.gmailHistoryId',
 }

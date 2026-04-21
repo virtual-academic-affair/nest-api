@@ -57,7 +57,7 @@
                 {
                   "key": "messageStatuses[]",
                   "value": "",
-                  "description": "opened | replied | closed | resolved",
+                  "description": "opened | replied",
                   "disabled": true
                 },
                 {
@@ -188,11 +188,11 @@
               "query": [
                 {
                   "key": "from",
-                  "value": "2025-01-01"
+                  "value": "2024-01-01"
                 },
                 {
                   "key": "to",
-                  "value": "2025-01-31"
+                  "value": "2026-12-31"
                 }
               ]
             }
@@ -202,15 +202,6 @@
           "name": "reply",
           "request": {
             "method": "POST",
-            "body": {
-              "mode": "raw",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              },
-              "raw": "{\n    \"content\": \"Cam on em da dat cau hoi. Phong dao tao se phan hoi chi tiet vao tuan nay.\",\n    \"isClose\": false\n}"
-            },
             "url": {
               "host": [
                 "{{baseUrl}}"

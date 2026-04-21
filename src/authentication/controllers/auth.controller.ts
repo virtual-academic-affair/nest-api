@@ -5,7 +5,7 @@ import { GrpcMethod } from '@nestjs/microservices';
 import { Request, Response } from 'express';
 import { ActiveUser } from '@authentication/decorators/active-user.decorator';
 import { Auth } from '@authentication/decorators/auth.decorator';
-import { QueryDto } from '@authentication/dtos/users/query.dto';
+import { QueryDto } from '@authentication/dtos/users/resource.dto';
 import { UpdateProfileDto } from '@authentication/dtos/users/update-profile.dto';
 import { AuthType } from '@authentication/enums/auth-type.enum';
 import { Role } from '@authentication/enums/role.enum';

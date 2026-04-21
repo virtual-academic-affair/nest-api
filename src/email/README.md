@@ -1,108 +1,33 @@
 # Email Module
 
-## Introduction
+## Muc tieu
 
-Module **Email** xử lý đồng bộ email từ Gmail, phân loại tự động bằng NLP và quản lý labels. Module này giúp tự động hóa
-việc xử lý và phân loại email học vụ.
+Module `email` quan ly grant Gmail, dong bo labels, ingest email tu webhook, va phat su kien cho NLP.
 
-## Flow
+## Luong nghiep vu
 
-```
-┌─────────────┐
-│  Gmail API  │
-└──────┬──────┘
-       │
-       ↓
-┌──────────────────┐
-│ EmailSyncService │ Lọc theo policy (domain)
-└──────┬───────────┘
-       │ Lưu DB + Publish message
-       ↓
-┌──────────────────┐
-│ RabbitMQ         │ Routing key: ingested
-│ (Ingested)       │
-└──────┬───────────┘
-       │
-       ↓
-┌──────────────────┐
-│  NLP Service     │ (External - Python service)
-│  Phân loại email │
-└──────┬───────────┘
-       │ gRPC: LabelService.UpdateLabel
-       ↓
-┌──────────────────────┐
-│ MessageLabelsService │ Cập nhật SystemLabels
-└──────┬───────────────┘
-       │ Modify labels
-       ↓
-┌──────────────────────┐
-│ Gmail API            │ Gắn label vào email
-│ (Modify Labels)      │
-└──────────────────────┘
-```
+1. Admin grant Gmail qua `/email/grants`.
+2. He thong luu `email.superEmail` + `email.gmailHistoryId`.
+3. Gmail push webhook vao `POST /email/gmail/webhook`.
+4. `GmailWebhookService` setup/renew Gmail watch va chi resolve history delta (nhan thay doi tu webhook).
+5. `GmailChangeSyncService` xu ly thay doi he thong (ingest email moi + dong bo labels vao DB).
+6. `GmailRabbitPublisherService` phat su kien `ingested` len RabbitMQ.
+7. NLP/worker cap nhat labels qua gRPC `MessageService.UpdateLabels` va dong bo nguoc len Gmail.
 
-## Features
+## Doi tuong chinh
 
-### 1. Đồng Bộ Email (Email Sync)
+- `GmailApiService`: OAuth client + Gmail client.
+- `GmailWebhookService`: chi nhan webhook va dieu phoi luong thay doi.
+- `GmailChangeSyncService`: xu ly thay doi tren he thong.
+- `GmailRabbitPublisherService`: publish event len RabbitMQ.
+- `LabelsService` + `MessageLabelsService`: dong bo label DB/Gmail.
+- `MessagesService`: query/remove message resource.
 
-- **Scheduler**: Tự động chạy mỗi 10 giây (`EmailSyncScheduler`)
-- **Sync thủ công**: Có thể trigger qua API endpoint `/email/messages/sync`
-- **Policy**: Chỉ sync email từ:
-    - Các domain được phép trong setting `email/allowedDomains`
+## Labels he thong
 
-### 2. OAuth & Permissions
+Chi giu 4 labels:
 
-- Cần grant quyền Gmail API qua OAuth 2.0
-- Admin tạo auth URL và xác thực để lấy refresh token
-- Refresh token được lưu trong setting `email/superEmail` và dùng để truy cập Gmail API
-
-### 3. Quản Lý Labels
-
-- **Gmail Labels**: Labels có sẵn hoặc tự tạo trên Gmail
-- **System Labels**: Labels hệ thống cho phân loại (enum `SystemLabel`)
-- **Mapping**: Liên kết giữa System Labels và Gmail Label IDs
-- **Auto Create**: Tự động tạo labels trên Gmail nếu chưa có
-
-### 4. Phân Loại Tự Động (NLP)
-
-- Email sau khi sync được gửi qua RabbitMQ cho NLP service
-- NLP service phân tích nội dung và gọi gRPC `LabelService.UpdateLabel` để cập nhật `SystemLabel`
-- Hệ thống tự động gắn Gmail labels tương ứng
-
-## Services
-
-| Service                  | Chức năng                                         |
-|--------------------------|---------------------------------------------------|
-| **GoogleapisService**    | Kết nối Gmail API, tạo OAuth client               |
-| **EmailSyncService**     | Đồng bộ email mới từ Gmail về database            |
-| **GrantsService**        | Xác thực OAuth cho Gmail API                      |
-| **LabelsService**        | Quản lý Gmail labels và mapping với system labels |
-| **MessagesService**      | CRUD các email đã đồng bộ                         |
-| **MessageLabelsService** | Thêm/xóa labels cho email, đồng bộ Gmail + DB     |
-
-## API Endpoints
-
-### Grants (OAuth)
-
-| Endpoint        | Method | Role  | Chức năng                                |
-|-----------------|--------|-------|------------------------------------------|
-| `/email/grants` | GET    | Admin | Lấy Google OAuth URL để grant quyền      |
-| `/email/grants` | POST   | Admin | Xác thực OAuth code và lưu refresh token |
-
-### Labels
-
-| Endpoint                    | Method | Role  | Chức năng                                           |
-|-----------------------------|--------|-------|-----------------------------------------------------|
-| `/email/labels`             | GET    | Admin | Lấy danh sách system labels và mapping              |
-| `/email/labels/gmailLabels` | GET    | Admin | Lấy tất cả Gmail labels từ tài khoản                |
-| `/email/labels`             | PUT    | Admin | Cập nhật mapping giữa SystemLabel và Gmail label ID |
-| `/email/labels/autoCreate`  | POST   | Admin | Tự động tạo labels trên Gmail theo SystemLabel      |
-
-### Messages (Emails)
-
-| Endpoint               | Method | Role  | Chức năng                                    |
-|------------------------|--------|-------|----------------------------------------------|
-| `/email/messages`      | GET    | Admin | Lấy danh sách emails (có pagination, filter) |
-| `/email/messages/:id`  | GET    | Admin | Lấy chi tiết một email                       |
-| `/email/messages/sync` | POST   | Admin | Trigger đồng bộ email thủ công               |
-| `/email/messageLabels` | PUT    | Admin | Thêm/xóa label vào email                     |
+- `classRegistration`
+- `training`
+- `graduation`
+- `pending`

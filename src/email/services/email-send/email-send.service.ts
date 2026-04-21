@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SendEmailDto } from '@email/dtos/messages/send-email.dto';
 import { SuperEmailSetting } from '@email/interfaces/super-email-setting.type';
-import { GoogleapisService } from '@email/services/googleapis.service';
+import { GmailApiService } from '@email/services/gmail/gmail-api.service';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
 import { SettingService } from '@shared/setting/services/setting.service';
 
@@ -11,13 +11,13 @@ export class EmailSendService {
   private readonly logger = new Logger(EmailSendService.name);
 
   constructor(
-    private readonly googleapisService: GoogleapisService,
+    private readonly gmailApiService: GmailApiService,
     private readonly configService: ConfigService,
     private readonly settingService: SettingService,
   ) {}
 
   async send({ to, subject, content, senderName, threadId, messageId }: SendEmailDto): Promise<string> {
-    const gmail = await this.googleapisService.getGmailClient();
+    const gmail = await this.gmailApiService.getGmailClient();
 
     senderName ??= this.configService.get<string>('app.name');
     const account = await this.settingService.get<SuperEmailSetting>(SettingKey.EmailSuperEmail);

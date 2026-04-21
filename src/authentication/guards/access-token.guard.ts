@@ -1,43 +1,5 @@
-import { CanActivate, ExecutionContext, ForbiddenException, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
-import { ConfigType } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Request } from 'express';
-import { Repository } from 'typeorm';
-import { User } from '@authentication/entities/user.entity';
-import { REQUEST_USER_KEY } from '@authentication/guards/authentication.guard';
-import jwtConfig from '@shared/config/jwt.config';
+import { Injectable } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 
 @Injectable()
-export class AccessTokenGuard implements CanActivate {
-  constructor(
-    private readonly jwtService: JwtService,
-    @Inject(jwtConfig.KEY) private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
-    @InjectRepository(User) private readonly usersRepository: Repository<User>,
-  ) {}
-
-  async canActivate(context: ExecutionContext): Promise<boolean> {
-    if (context.getType() !== 'http') {
-      return true;
-    }
-
-    const request = context.switchToHttp().getRequest();
-    const token = this.extractTokenFromHeader(request);
-    throwUnless(token, new UnauthorizedException('Access token is missing'));
-
-    const payload = await this.jwtService.verifyAsync(token, this.jwtConfiguration);
-    throwUnless(payload, new UnauthorizedException('Access token is invalid'));
-
-    const user = await this.usersRepository.findOneBy({ id: payload.sub });
-    throwUnless(user, new UnauthorizedException('User not found or inactive'));
-    throwUnless(user.isActive, new ForbiddenException('User is banned'));
-
-    request[REQUEST_USER_KEY] = payload;
-    return true;
-  }
-
-  private extractTokenFromHeader(request: Request): string | undefined {
-    const [, token] = request.headers.authorization?.split(' ') ?? [];
-    return token;
-  }
-}
+export class AccessTokenGuard extends AuthGuard('jwt') {}

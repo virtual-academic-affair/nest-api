@@ -4,17 +4,6 @@ import { ClassRegistrationItem } from './class-registration-item.entity';
 
 @Entity()
 export class ClassRegistration extends BelongsToMessage {
-  @Index()
-  @Column()
-  studentCode: string;
-
-  @Index()
-  @Column({ type: 'smallint', nullable: true })
-  academicYear?: number;
-
-  @Column({ nullable: true })
-  studentName?: string;
-
   @Column({ type: 'text', nullable: true })
   note?: string;
 

@@ -1,9 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as parseMessage from 'gmail-api-parse-message';
 import { Message } from '@email/entities/message.entity';
+import { compile } from '@email/templates/email-template.service';
 import { EmailSendService } from '@email/services/email-send/email-send.service';
-import { compile } from '@email/services/email-send/email-template.service';
-import { GoogleapisService } from '@email/services/googleapis.service';
+import { GmailApiService } from '@email/services/gmail/gmail-api.service';
 
 @Injectable()
 export class EmailReplyService {
@@ -11,7 +11,7 @@ export class EmailReplyService {
   static instance: EmailReplyService;
 
   constructor(
-    private readonly googleapisService: GoogleapisService,
+    private readonly gmailApiService: GmailApiService,
     private readonly emailSendService: EmailSendService,
   ) {
     EmailReplyService.instance = this;
@@ -22,7 +22,7 @@ export class EmailReplyService {
 
     try {
       // Force fetch: Always sync with Gmail API to ensure it has the most up-to-date content
-      const gmail = await this.googleapisService.getGmailClient();
+      const gmail = await this.gmailApiService.getGmailClient();
       const { data } = await gmail.users.messages.get({ userId: 'me', id: message.gmailMessageId, format: 'full' });
       const parsedMessage = parseMessage(data);
       originalContent = parsedMessage.textHtml ?? parsedMessage.textPlain ?? '';

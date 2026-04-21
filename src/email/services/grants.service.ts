@@ -5,17 +5,17 @@ import { Repository } from 'typeorm';
 import { User } from '@authentication/entities/user.entity';
 import { Role } from '@authentication/enums/role.enum';
 import { CodeDto } from '@email/dtos/grants/code.dto';
-import { EmailSyncService } from '@email/services/email-send/email-sync.service';
-import { GoogleapisService } from '@email/services/googleapis.service';
+import { GmailApiService } from '@email/services/gmail/gmail-api.service';
+import { GmailWebhookService } from '@email/services/gmail/gmail-webhook.service';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
 import { SettingService } from '@shared/setting/services/setting.service';
 
 @Injectable()
 export class GrantsService {
   constructor(
-    private readonly googleapisService: GoogleapisService,
+    private readonly gmailApiService: GmailApiService,
+    private readonly gmailWebhookService: GmailWebhookService,
     private readonly settingService: SettingService,
-    private readonly emailSyncService: EmailSyncService,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
 
@@ -27,19 +27,19 @@ export class GrantsService {
       prompt: 'consent',
       ...(redirectUrl ? { redirect_uri: redirectUrl } : {}),
     };
-    return this.googleapisService.oAuthClient.generateAuthUrl(options);
+    return this.gmailApiService.oAuthClient.generateAuthUrl(options);
   }
 
   async grant(dto: CodeDto) {
-    const { tokens } = await this.googleapisService.oAuthClient.getToken({
+    const { tokens } = await this.gmailApiService.oAuthClient.getToken({
       code: dto.code,
       redirect_uri: dto.redirectUrl,
     });
     throwUnless(tokens?.refresh_token, new BadRequestException('Missing refresh token'));
 
-    this.googleapisService.oAuthClient.setCredentials(tokens);
+    this.gmailApiService.oAuthClient.setCredentials(tokens);
 
-    const oauth2 = google.oauth2({ version: 'v2', auth: this.googleapisService.oAuthClient });
+    const oauth2 = google.oauth2({ version: 'v2', auth: this.gmailApiService.oAuthClient });
     const { data: profile } = await oauth2.userinfo.get();
     throwUnless(profile?.email, new BadRequestException('Missing email address'));
 
@@ -61,6 +61,9 @@ export class GrantsService {
       ['email'],
     );
 
-    this.emailSyncService.run().then(() => 1);
+    const gmail = await this.gmailApiService.getGmailClient();
+    const { data: gmailProfile } = await gmail.users.getProfile({ userId: 'me' });
+    await this.settingService.set(SettingKey.EmailGmailHistoryId, gmailProfile.historyId);
+    await this.gmailWebhookService.setupAndWatch();
   }
 }

@@ -3,30 +3,26 @@ import {
   Controller,
   Param,
   ParseIntPipe,
-  Post,
   Put,
   Delete,
-  Query,
-  DefaultValuePipe,
-  ParseBoolPipe,
 } from '@nestjs/common';
+import { RedisService } from '@shared/redis/redis.service';
 import { Get } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
+import type { Redis } from 'ioredis';
 import { Auth } from '@authentication/decorators/auth.decorator';
 import { Roles } from '@authentication/decorators/roles.decorator';
 import { AuthType } from '@authentication/enums/auth-type.enum';
 import { Role } from '@authentication/enums/role.enum';
-import { QueryDto } from '@email/dtos/messages/query.dto';
+import { ResourceDto } from '@email/dtos/messages/resource.dto';
 import { UpdateLabelsDto } from '@email/dtos/messages/update-labels.dto';
 import { Message } from '@email/entities/message.entity';
-import { EmailSyncService } from '@email/services/email-send/email-sync.service';
 import { MessageLabelsService } from '@email/services/message-labels.service';
 import { MessagesService } from '@email/services/messages.service';
 import { ResourceController } from '@shared/resource/controllers/resource.controller';
 import { RestrictMethods } from '@shared/resource/decorators/restrict-methods.decorator';
 import { ResourceAction } from '@shared/resource/enums/resource-action.enum';
-import { RedisService } from '@shared/services/redis.service';
-import { SocketGateway } from 'src/socket/socket.gateway';
+import { SocketGateway } from 'src/app/socket/socket.gateway';
 
 @Auth(AuthType.Bearer)
 @Roles(Role.Admin)
@@ -37,21 +33,23 @@ import { SocketGateway } from 'src/socket/socket.gateway';
 export class MessagesController extends ResourceController<Message> {
   constructor(
     protected readonly service: MessagesService,
-    private readonly emailSyncService: EmailSyncService,
     private readonly messageLabelsService: MessageLabelsService,
     private readonly socketGateway: SocketGateway,
-    private readonly redisService: RedisService,
+    redisService: RedisService,
   ) {
     super(service);
+    this.redis = redisService.getOrThrow();
   }
 
+  private readonly redis: Redis;
+
   protected getDtoClasses() {
-    return { query: QueryDto };
+    return ResourceDto;
   }
 
   @Get('processing-ids')
   async getProcessingIds() {
-    const keys = await this.redisService.keys('message:processing:*');
+    const keys = await this.redis.keys('message:processing:*');
     const ids = keys
       .map((k) => {
         const parts = k.split(':');
@@ -61,14 +59,9 @@ export class MessagesController extends ResourceController<Message> {
     return { data: ids };
   }
 
-  @Post('sync')
-  protected async sync() {
-    return await this.emailSyncService.run();
-  }
-
   @Put(':id/labels')
   async updateLabels(@Body() data: UpdateLabelsDto, @Param('id', ParseIntPipe) messageId: number) {
-    return await this.messageLabelsService.run(messageId, data.systemLabels, data.deleteTasks);
+    return await this.messageLabelsService.run(messageId, data.systemLabels);
   }
 
   @GrpcMethod('MessageService', 'UpdateLabels')
@@ -78,10 +71,7 @@ export class MessagesController extends ResourceController<Message> {
   }
 
   @Delete(':id')
-  async remove(
-    @Param('id') id: string,
-    @Query('deleteTasks', new DefaultValuePipe(false), ParseBoolPipe) deleteTasks?: boolean,
-  ) {
-    return await this.service.removeMessage(+id, deleteTasks);
+  async remove(@Param('id') id: string) {
+    return await this.service.removeMessage(+id);
   }
 }

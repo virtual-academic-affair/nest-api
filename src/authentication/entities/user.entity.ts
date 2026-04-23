@@ -29,7 +29,5 @@ export class User extends BaseEntity {
 
 export type Profile = {
   enrollmentYear?: number;
-  classNo?: string;
   major?: string;
-  classAdvisor?: string;
 };

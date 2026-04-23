@@ -2,21 +2,18 @@ import { AuthenticationModule } from '@authentication/authentication.module';
 import { ClassRegistrationModule } from '@class-registration/class-registration.module';
 import { EmailModule } from '@email/email.module';
 import { InquiryModule } from '@inquiry/inquiry.module';
-import { Module, OnModuleInit, ValidationPipe } from '@nestjs/common';
+import { Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { appConfig } from '@shared/config/app.config';
 import { SharedModule } from '@shared/shared.module';
-import { ClsGuard, ClsModule, ClsService } from 'nestjs-cls';
-import { ClsServiceManager } from './cls-manager';
 import { UnifiedExceptionFilter } from './filters/unified-exception.filter';
 import { GrpcResponseInterceptor } from './interceptors/grpc-response.interceptor';
 import { HttpResponseInterceptor } from './interceptors/http-response.interceptor';
 
 @Module({
   providers: [
-    { provide: APP_GUARD, useClass: ClsGuard },
     { provide: APP_INTERCEPTOR, useClass: HttpResponseInterceptor },
     { provide: APP_INTERCEPTOR, useClass: GrpcResponseInterceptor },
     { provide: APP_FILTER, useClass: UnifiedExceptionFilter },
@@ -47,13 +44,6 @@ import { HttpResponseInterceptor } from './interceptors/http-response.intercepto
     AuthenticationModule,
     ClassRegistrationModule,
     InquiryModule,
-    ClsModule.forRoot({ global: true, middleware: { mount: true }, interceptor: { mount: false } }),
   ],
 })
-export class AppModule implements OnModuleInit {
-  constructor(private readonly cls: ClsService) {}
-
-  onModuleInit() {
-    ClsServiceManager.setService(this.cls);
-  }
-}
+export class AppModule {}

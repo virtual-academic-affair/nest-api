@@ -1,5 +1,4 @@
 import { randomUUID } from 'crypto';
-import { RedisService } from '@shared/redis/redis.service';
 import { ForbiddenException, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -8,11 +7,8 @@ import type { Redis } from 'ioredis';
 import { Repository } from 'typeorm';
 import { RefreshTokenDto } from '@authentication/dtos/auth/refresh-token.dto';
 import { User } from '@authentication/entities/user.entity';
-import { ActiveUserData } from '@authentication/interfaces/active-user-data.interface';
-import { SuperEmailSetting } from '@email/interfaces/super-email-setting.type';
 import jwtConfig from '@shared/config/jwt.config';
-import { SettingKey } from '@shared/setting/enums/setting-key.enum';
-import { SettingService } from '@shared/setting/services/setting.service';
+import { RedisService } from '@shared/redis/redis.service';
 
 @Injectable()
 export class AuthService {
@@ -21,7 +17,6 @@ export class AuthService {
     redisService: RedisService,
     @Inject(jwtConfig.KEY) private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
-    private readonly settingService: SettingService,
   ) {
     this.redis = redisService.getOrThrow();
   }
@@ -35,7 +30,7 @@ export class AuthService {
   async generateTokens(user: User) {
     throwUnless(user?.isActive, new ForbiddenException('User is banned'));
 
-    const accessToken = await this.signToken<Partial<ActiveUserData>>(user.id, this.jwtConfiguration.accessTokenTtl, {
+    const accessToken = await this.signToken(user.id, this.jwtConfiguration.accessTokenTtl, {
       email: user.email,
       role: user.role,
     });
@@ -43,7 +38,12 @@ export class AuthService {
     const refreshTokenId = randomUUID();
     const refreshToken = await this.signToken(user.id, this.jwtConfiguration.refreshTokenTtl, { refreshTokenId });
 
-    await this.redis.set(this.getRFTRedisKey(refreshTokenId), user.id.toString(), 'EX', this.jwtConfiguration.refreshTokenTtl);
+    await this.redis.set(
+      this.getRFTRedisKey(refreshTokenId),
+      user.id.toString(),
+      'EX',
+      this.jwtConfiguration.refreshTokenTtl,
+    );
     return { accessToken, refreshToken };
   }
 
@@ -73,13 +73,5 @@ export class AuthService {
         expiresIn,
       },
     );
-  }
-
-  async generateSuperToken(email: string) {
-    const superEmail = (await this.settingService.get<SuperEmailSetting>(SettingKey.EmailSuperEmail))['email'];
-    throwUnless(email === superEmail, new UnauthorizedException('Unauthorized email address'));
-
-    const user = await this.userRepository.findOneBy({ email });
-    return await this.generateTokens(user);
   }
 }

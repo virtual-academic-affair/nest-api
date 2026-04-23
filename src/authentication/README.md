@@ -10,7 +10,7 @@ Module `authentication` xu ly dang nhap Google OAuth theo Passport, phat hanh JW
 2. Google callback vao `GET /authentication/google/redirect`.
 3. `GoogleStrategy` tra profile, `GoogleService` upsert user theo email/domain mapping (`setting key: auth.emailDomains`).
 4. `AuthService` phat hanh access/refresh token, refresh token duoc luu cookie.
-5. Cac API private dung `AuthenticationGuard` + `AccessTokenGuard` (Passport JWT), khong verify JWT thu cong.
+5. Cac API private dung `JwtGuard` (Passport JWT), khong verify JWT thu cong.
 
 ## Role theo email domain
 
@@ -22,6 +22,6 @@ Module `authentication` xu ly dang nhap Google OAuth theo Passport, phat hanh JW
 
 - `AccessTokenStrategy`: validate JWT va user active.
 - `GoogleStrategy`: OAuth profile provider.
-- `GoogleOAuthGuard`: guard cho flow login Google.
+- Flow login Google dung `@UseGuards(AuthGuard('google'))`.
 - `GoogleService`: business login/upsert/token.
-- `AuthService`: token lifecycle (issue/refresh/super-token).
+- `AuthService`: token lifecycle (issue/refresh).

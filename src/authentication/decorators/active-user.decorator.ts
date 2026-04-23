@@ -1,28 +1,24 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import { User } from '@authentication/entities/user.entity';
 import { Role } from '@authentication/enums/role.enum';
-import { REQUEST_USER_KEY } from '@authentication/guards/authentication.guard';
-import { ActiveUserData } from '@authentication/interfaces/active-user-data.interface';
 
-export const ActiveUser = createParamDecorator((field: keyof ActiveUserData | undefined, ctx: ExecutionContext) =>
+export const ActiveUser = createParamDecorator((field: keyof User | undefined, ctx: ExecutionContext) =>
   getActiveUser(field, ctx),
 );
 
-export function getActiveUser(
-  field: keyof ActiveUserData | undefined,
-  ctx: ExecutionContext,
-): number | string | ActiveUserData {
-  let user: ActiveUserData | undefined;
+export function getActiveUser(field: keyof User | undefined, ctx: ExecutionContext): unknown {
+  let user: Partial<User> | undefined;
 
   if (ctx.getType() === 'rpc') {
     const metadata = ctx.switchToRpc().getContext();
     user = {
-      sub: +metadata?.get?.('x-user-id')?.[0] || 0,
+      id: +metadata?.get?.('x-user-id')?.[0] || 0,
       email: metadata?.get?.('x-user-email')?.[0] ?? 'system@gmail.com',
       role: metadata?.get?.('x-user-role')?.[0] ?? Role.Admin,
-    } as ActiveUserData;
+    };
   } else {
     const request = ctx.switchToHttp().getRequest();
-    user = request[REQUEST_USER_KEY];
+    user = request.user;
   }
 
   return field ? user?.[field] : user;

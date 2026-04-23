@@ -3,13 +3,9 @@ import { ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { GrpcMethod } from '@nestjs/microservices';
 import { Request, Response } from 'express';
+import { Auth, AuthType } from '@authentication/decorators/auth.decorator';
 import { ActiveUser } from '@authentication/decorators/active-user.decorator';
-import { Auth } from '@authentication/decorators/auth.decorator';
-import { QueryDto } from '@authentication/dtos/users/resource.dto';
 import { UpdateProfileDto } from '@authentication/dtos/users/update-profile.dto';
-import { AuthType } from '@authentication/enums/auth-type.enum';
-import { Role } from '@authentication/enums/role.enum';
-import { ActiveUserData } from '@authentication/interfaces/active-user-data.interface';
 import { AuthService } from '@authentication/services/auth.service';
 import { UsersService } from '@authentication/services/users.service';
 import { REFRESH_COOKIE, getClearCookieOptions, getRefreshCookieOptions } from '@authentication/utils/cookie.util';
@@ -40,38 +36,20 @@ export class AuthenticationController {
   }
 
   @Get('me')
-  @Auth(AuthType.Bearer)
-  async findOne(@ActiveUser('sub') sub: ActiveUserData['sub']) {
-    return this.userService.findOne(sub);
+  @Auth(AuthType.Jwt)
+  async findOne(@ActiveUser('id') userId: number) {
+    return this.userService.findOne(userId);
   }
 
   @Put('me')
-  @Auth(AuthType.Bearer)
-  async updateMe(@ActiveUser('sub') sub: ActiveUserData['sub'], @Body() dto: UpdateProfileDto) {
-    return this.userService.update(sub, dto);
-  }
-
-  @GrpcMethod('AuthService', 'FindOneByKeyword')
-  async findOneByKeyword(@Body() { keyword }: { keyword?: string }) {
-    const { items } = await this.userService.findAll({
-      keyword,
-      limit: 1,
-      roles: [Role.Admin],
-      isActive: true,
-    } as QueryDto);
-    return items[0] || {};
+  @Auth(AuthType.Jwt)
+  async updateMe(@ActiveUser('id') userId: number, @Body() dto: UpdateProfileDto) {
+    return this.userService.update(userId, dto);
   }
 
   @GrpcMethod('AuthService', 'VerifyToken')
   async verifyToken(@Body() { token }: { token: string }) {
     const data = await this.jwtService.verifyAsync(token, this.jwtConfiguration);
-    return {
-      payload: Object.fromEntries(Object.entries(data).map(([k, v]) => [k, String(v)])),
-    };
-  }
-
-  @Post('super-token')
-  async generateSuperToken(@Body() { email }: { email: string }) {
-    return this.authService.generateSuperToken(email);
+    return { payload: Object.fromEntries(Object.entries(data).map(([k, v]) => [k, String(v)])) };
   }
 }

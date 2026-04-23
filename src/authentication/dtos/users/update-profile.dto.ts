@@ -11,15 +11,7 @@ export class ProfilePatchDto {
 
   @IsOptional()
   @IsString()
-  classNo?: string;
-
-  @IsOptional()
-  @IsString()
   major?: string;
-
-  @IsOptional()
-  @IsString()
-  classAdvisor?: string;
 }
 
 export class UpdateProfileDto {

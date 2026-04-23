@@ -21,7 +21,7 @@ export class RolesGuard implements CanActivate {
     const currentRole = getActiveUser('role', context) as string;
 
     const hasRole = contextRoles.some((role) => currentRole === role);
-    throwUnless(hasRole, new ForbiddenException('Forbidden resource'));
+    throwUnless(hasRole, new ForbiddenException());
 
     return true;
   }

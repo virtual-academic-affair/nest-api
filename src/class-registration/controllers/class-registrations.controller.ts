@@ -1,8 +1,7 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Post, Query } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
-import { Auth } from '@authentication/decorators/auth.decorator';
+import { Auth, AuthType } from '@authentication/decorators/auth.decorator';
 import { Roles } from '@authentication/decorators/roles.decorator';
-import { AuthType } from '@authentication/enums/auth-type.enum';
 import { Role } from '@authentication/enums/role.enum';
 import { ResourceDto } from '@class-registration/dtos/class-registrations/resource.dto';
 import { StatsDto } from '@class-registration/dtos/class-registrations/stats.dto';
@@ -10,7 +9,7 @@ import { ClassRegistration } from '@class-registration/entities/class-registrati
 import { ClassRegistrationsService } from '@class-registration/services/class-registrations.service';
 import { ResourceController } from '@shared/resource/controllers/resource.controller';
 
-@Auth(AuthType.Bearer)
+@Auth(AuthType.Jwt)
 @Roles(Role.Admin)
 @Controller('classRegistration/classRegistrations')
 export class ClassRegistrationsController extends ResourceController<ClassRegistration> {

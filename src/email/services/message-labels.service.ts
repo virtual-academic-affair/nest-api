@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, EntityManager } from 'typeorm';
 import { ClassRegistration } from '@class-registration/entities/class-registration.entity';
-import { EmailLabel, LabelKey } from '@email/enums/email-label.enum';
 import { Message } from '@email/entities/message.entity';
+import { EmailLabel, LabelKey } from '@email/enums/email-label.enum';
 import { Inquiry } from '@inquiry/entities/inquiry.entity';
 import { Setting } from '@shared/setting/entities/setting.entity';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
-import { GmailApiService } from './gmail/gmail-api.service';
+import { GmailApiService } from './gmail-api.service';
 
 @Injectable()
 export class MessageLabelsService {

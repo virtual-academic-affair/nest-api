@@ -1,8 +1,7 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Post, Query } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
-import { Auth } from '@authentication/decorators/auth.decorator';
+import { Auth, AuthType } from '@authentication/decorators/auth.decorator';
 import { Roles } from '@authentication/decorators/roles.decorator';
-import { AuthType } from '@authentication/enums/auth-type.enum';
 import { Role } from '@authentication/enums/role.enum';
 import { ResourceDto } from '@inquiry/dtos/inquiries/resource.dto';
 import { StatsDto } from '@inquiry/dtos/inquiries/stats.dto';
@@ -10,7 +9,7 @@ import { Inquiry } from '@inquiry/entities/inquiry.entity';
 import { InquiriesService } from '@inquiry/services/inquiries.service';
 import { ResourceController } from '@shared/resource/controllers/resource.controller';
 
-@Auth(AuthType.Bearer)
+@Auth(AuthType.Jwt)
 @Roles(Role.Admin)
 @Controller('inquiry/inquiries')
 export class InquiriesController extends ResourceController<Inquiry> {

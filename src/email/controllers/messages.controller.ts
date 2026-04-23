@@ -1,23 +1,22 @@
-import { Auth } from '@authentication/decorators/auth.decorator';
+import { Body, Controller, Delete, Param, ParseIntPipe, Put } from '@nestjs/common';
+import { GrpcMethod } from '@nestjs/microservices';
+import { Auth, AuthType } from '@authentication/decorators/auth.decorator';
 import { Roles } from '@authentication/decorators/roles.decorator';
-import { AuthType } from '@authentication/enums/auth-type.enum';
 import { Role } from '@authentication/enums/role.enum';
 import { ResourceDto } from '@email/dtos/messages/resource.dto';
 import { UpdateLabelsDto } from '@email/dtos/messages/update-labels.dto';
 import { Message } from '@email/entities/message.entity';
 import { MessageLabelsService } from '@email/services/message-labels.service';
 import { MessagesService } from '@email/services/messages.service';
-import { Body, Controller, Delete, Param, ParseIntPipe, Put } from '@nestjs/common';
-import { GrpcMethod } from '@nestjs/microservices';
 import { ResourceController } from '@shared/resource/controllers/resource.controller';
 import { RestrictMethods } from '@shared/resource/decorators/restrict-methods.decorator';
 import { ResourceAction } from '@shared/resource/enums/resource-action.enum';
 
-@Auth(AuthType.Bearer)
+@Auth(AuthType.Jwt)
 @Roles(Role.Admin)
 @Controller('email/messages')
 @RestrictMethods({
-  only: [ResourceAction.FindAll, ResourceAction.FindOne, ResourceAction.Delete],
+  only: [ResourceAction.FindOne, ResourceAction.Delete],
 })
 export class MessagesController extends ResourceController<Message> {
   constructor(

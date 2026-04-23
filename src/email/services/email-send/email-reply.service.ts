@@ -1,9 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as parseMessage from 'gmail-api-parse-message';
 import { Message } from '@email/entities/message.entity';
-import { compile } from '@email/templates/email-template.service';
 import { EmailSendService } from '@email/services/email-send/email-send.service';
-import { GmailApiService } from '@email/services/gmail/gmail-api.service';
+import { GmailApiService } from '@email/services/gmail-api.service';
+import { compile } from '@email/templates/email-template.service';
 
 @Injectable()
 export class EmailReplyService {

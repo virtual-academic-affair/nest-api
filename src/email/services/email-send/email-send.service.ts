@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SendEmailDto } from '@email/dtos/messages/send-email.dto';
 import { SuperEmailSetting } from '@email/interfaces/super-email-setting.type';
-import { GmailApiService } from '@email/services/gmail/gmail-api.service';
+import { GmailApiService } from '@email/services/gmail-api.service';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
 import { SettingService } from '@shared/setting/services/setting.service';
 

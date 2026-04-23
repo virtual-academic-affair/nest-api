@@ -1,9 +1,9 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { UpdateDto } from '@email/dtos/labels/update.dto';
 import { getLangLabel, LabelKey, LabelLang } from '@email/enums/email-label.enum';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
+import { EmailLabelsSettingDto } from '@shared/setting/dtos/email-labels-setting.dto';
 import { SettingService } from '@shared/setting/services/setting.service';
-import { GmailApiService } from './gmail/gmail-api.service';
+import { GmailApiService } from './gmail-api.service';
 
 @Injectable()
 export class LabelsService {
@@ -45,11 +45,11 @@ export class LabelsService {
     }
   }
 
-  async findAll(): Promise<UpdateDto> {
-    return await this.settingService.get<UpdateDto>(SettingKey.EmailLabels);
+  async findAll(): Promise<EmailLabelsSettingDto> {
+    return await this.settingService.get<EmailLabelsSettingDto>(SettingKey.EmailLabels);
   }
 
-  async update(dto: UpdateDto) {
+  async update(dto: EmailLabelsSettingDto) {
     await this.settingService.set(SettingKey.EmailLabels, dto);
   }
 

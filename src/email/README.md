@@ -6,7 +6,7 @@ Module `email` quan ly grant Gmail, dong bo labels, ingest email tu webhook, va 
 
 ## Luong nghiep vu
 
-1. Admin grant Gmail qua `/email/grants`.
+1. Admin grant Gmail qua `/authentication/google/grant-gmail`.
 2. He thong luu `email.superEmail` + `email.gmailHistoryId`.
 3. Gmail push webhook vao `POST /email/gmail/webhook`.
 4. `GmailWebhookService` setup/renew Gmail watch va chi resolve history delta (nhan thay doi tu webhook).
@@ -31,3 +31,8 @@ Chi giu 4 labels:
 - `training`
 - `graduation`
 - `pending`
+
+## Settings
+
+- Update `auth.emailDomains`: `PUT /shared/settings/auth.emailDomains`
+- Update `email.labels`: `PUT /shared/settings/email.labels`

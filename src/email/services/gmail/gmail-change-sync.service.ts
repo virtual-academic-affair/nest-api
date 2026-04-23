@@ -5,9 +5,9 @@ import { gmail_v1 } from 'googleapis';
 import { htmlToText } from 'html-to-text';
 import { In, Repository } from 'typeorm';
 import { Role } from '@authentication/enums/role.enum';
-import { EmailDomainsByRole } from '@authentication/types/email-domains-by-role.type';
-import { normalizeEmailDomainsByRole } from '@authentication/utils/resolve-email.util';
+import { RoleDomains } from '@authentication/utils/resolve-email.util';
 import { EmailLabel } from '@email/enums/email-label.enum';
+import { MessageStatus } from '@email/enums/message-status.enum';
 import { Message } from '@email/entities/message.entity';
 import { SuperEmailSetting } from '@email/interfaces/super-email-setting.type';
 import { MessageLabelsService } from '@email/services/message-labels.service';
@@ -31,6 +31,20 @@ export class GmailChangeSyncService {
     @InjectRepository(Message) private readonly messageRepository: Repository<Message>,
   ) {}
 
+  async markIgnoredByGmailMessageIds(gmailMessageIds: string[]): Promise<number> {
+    const uniqueIds = [...new Set(gmailMessageIds.filter(Boolean))];
+    if (uniqueIds.length === 0) {
+      return 0;
+    }
+
+    // Only downgrade "opened" -> "ignored" (keep replied as-is)
+    const result = await this.messageRepository.update(
+      { gmailMessageId: In(uniqueIds), status: MessageStatus.Opened },
+      { status: MessageStatus.Ignored },
+    );
+    return result.affected ?? 0;
+  }
+
   async applyHistoryChanges(
     gmail: gmail_v1.Gmail,
     messageIds: string[],
@@ -39,6 +53,13 @@ export class GmailChangeSyncService {
     const { ingestedIds, ingestedEvents } = await this.ingestMessageIds(gmail, messageIds);
     await this.syncSystemLabelChanges(labelChanges);
     return { ingestedIds, ingestedEvents };
+  }
+
+  async ingestNewMessages(
+    gmail: gmail_v1.Gmail,
+    messageIds: string[],
+  ): Promise<{ ingestedIds: number[]; ingestedEvents: IngestedMessageEvent[] }> {
+    return await this.ingestMessageIds(gmail, messageIds);
   }
 
   private async ingestMessageIds(
@@ -194,9 +215,8 @@ export class GmailChangeSyncService {
       return false;
     }
 
-    const emailDomainsByRole = normalizeEmailDomainsByRole(
-      await this.settingService.get<EmailDomainsByRole>(SettingKey.AuthEmailDomains),
-    );
+    const emailDomainsByRole =
+      (await this.settingService.get<RoleDomains>(SettingKey.AuthEmailDomains)) ?? ({} as RoleDomains);
     const allowedStudentDomains = emailDomainsByRole[Role.Student] ?? [];
     return allowedStudentDomains.includes(domain);
   }

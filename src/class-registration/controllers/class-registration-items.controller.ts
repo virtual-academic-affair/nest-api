@@ -1,7 +1,6 @@
 import { Controller } from '@nestjs/common';
-import { Auth } from '@authentication/decorators/auth.decorator';
+import { Auth, AuthType } from '@authentication/decorators/auth.decorator';
 import { Roles } from '@authentication/decorators/roles.decorator';
-import { AuthType } from '@authentication/enums/auth-type.enum';
 import { Role } from '@authentication/enums/role.enum';
 import { ResourceDto } from '@class-registration/dtos/class-registration-items/resource.dto';
 import { ClassRegistrationItem } from '@class-registration/entities/class-registration-item.entity';
@@ -10,7 +9,7 @@ import { ResourceController } from '@shared/resource/controllers/resource.contro
 import { RestrictMethods } from '@shared/resource/decorators/restrict-methods.decorator';
 import { ResourceAction } from '@shared/resource/enums/resource-action.enum';
 
-@Auth(AuthType.Bearer)
+@Auth(AuthType.Jwt)
 @Roles(Role.Admin)
 @RestrictMethods({ except: [ResourceAction.FindAll, ResourceAction.FindOne] })
 @Controller('classRegistration/classRegistrations/:parentId/items')

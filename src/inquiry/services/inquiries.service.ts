@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ArrayOverlap, DataSource, Repository, SelectQueryBuilder } from 'typeorm';
 import { Message } from '@email/entities/message.entity';
 import { MessageStatus } from '@email/enums/message-status.enum';
-import { EmailLabel, LabelKey } from '@email/enums/email-label.enum';
+import { EmailLabel } from '@email/enums/email-label.enum';
 import { EmailReplyService } from '@email/services/email-send/email-reply.service';
 import { MessageLabelsService } from '@email/services/message-labels.service';
 import { CreateDto, QueryDto, UpdateDto } from '@inquiry/dtos/inquiries/resource.dto';
@@ -16,6 +16,11 @@ import { ResourceService } from '@shared/resource/services/resource.service';
 
 @Injectable()
 export class InquiriesService extends ResourceService<Inquiry> {
+  private readonly inquiryTypeToEmailLabel: Record<InquiryType, EmailLabel> = {
+    [InquiryType.Training]: EmailLabel.Training,
+    [InquiryType.Graduation]: EmailLabel.Graduation,
+  };
+
   constructor(
     @InjectRepository(Inquiry) repository: Repository<Inquiry>,
     private readonly emailReplyService: EmailReplyService,
@@ -43,8 +48,8 @@ export class InquiriesService extends ResourceService<Inquiry> {
       await this.repository.findOneBy({ messageId: dto.messageId }),
       new ConflictException('Inquiry already exists'),
     );
-    const typeLabels = (dto.types ?? []) as unknown as LabelKey[];
-    await this.messageLabelsService.run(dto.messageId, null, false, typeLabels as unknown as EmailLabel[]);
+    const typeLabels = this.toEmailLabels(dto.types ?? []);
+    await this.messageLabelsService.run(dto.messageId, null, false, typeLabels);
     dto.types?.length && (await this.syncTypeLabels(dto.messageId, typeLabels, []));
     return await super.create(dto);
   }
@@ -53,10 +58,12 @@ export class InquiriesService extends ResourceService<Inquiry> {
     const { messageId, types: prevTypes = [] } = await this.findOne(id);
     if (updateDto.types !== undefined) {
       const nextTypes = updateDto.types ?? [];
+      const prevLabels = this.toEmailLabels(prevTypes);
+      const nextLabels = this.toEmailLabels(nextTypes);
       await this.syncTypeLabels(
         messageId,
-        nextTypes.filter((t) => !prevTypes.includes(t)) as LabelKey[],
-        prevTypes.filter((t) => !nextTypes.includes(t)) as LabelKey[],
+        nextLabels.filter((l) => !prevLabels.includes(l)),
+        prevLabels.filter((l) => !nextLabels.includes(l)),
       );
     }
     return await super.update(id, updateDto);
@@ -110,7 +117,7 @@ export class InquiriesService extends ResourceService<Inquiry> {
     return sentMessageId;
   }
 
-  private async syncTypeLabels(messageId: number, toAdd: LabelKey[], toRemove: LabelKey[]): Promise<void> {
+  private async syncTypeLabels(messageId: number, toAdd: EmailLabel[], toRemove: EmailLabel[]): Promise<void> {
     if (toAdd.length === 0 && toRemove.length === 0) {
       return;
     }
@@ -122,5 +129,9 @@ export class InquiriesService extends ResourceService<Inquiry> {
       });
       await this.messageLabelsService.syncGmailLabels(message.gmailMessageId, toAdd, toRemove, manager);
     });
+  }
+
+  private toEmailLabels(types: InquiryType[]): EmailLabel[] {
+    return types.map((t) => this.inquiryTypeToEmailLabel[t]).filter(Boolean);
   }
 }

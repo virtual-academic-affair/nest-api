@@ -1,19 +1,20 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthenticationModule } from '@authentication/authentication.module';
 import { User } from '@authentication/entities/user.entity';
-import { GrantsController } from '@email/controllers/grants.controller';
 import { GmailWebhookController } from '@email/controllers/gmail-webhook.controller';
 import { LabelsController } from '@email/controllers/labels.controller';
 import { MessagesController } from '@email/controllers/messages.controller';
 import { Message } from '@email/entities/message.entity';
 import { EmailReplyService } from '@email/services/email-send/email-reply.service';
 import { EmailSendService } from '@email/services/email-send/email-send.service';
-import { GmailApiService } from '@email/services/gmail/gmail-api.service';
 import { GmailChangeSyncService } from '@email/services/gmail/gmail-change-sync.service';
 import { GmailRabbitPublisherService } from '@email/services/gmail/gmail-rabbit-publisher.service';
 import { GmailWebhookService } from '@email/services/gmail/gmail-webhook.service';
+import { GmailApiService } from '@email/services/gmail-api.service';
 import { GrantsService } from '@email/services/grants.service';
+import { GmailLabelIdsService } from '@email/services/gmail-label-ids.service';
 import { LabelsService } from '@email/services/labels.service';
 import { MessageLabelsService } from '@email/services/message-labels.service';
 import { MessagesService } from '@email/services/messages.service';
@@ -23,12 +24,14 @@ import googleConfig from '@shared/config/google.config';
   imports: [
     TypeOrmModule.forFeature([Message, User]),
     ConfigModule.forFeature(googleConfig),
+    forwardRef(() => AuthenticationModule),
   ],
-  controllers: [GrantsController, LabelsController, MessagesController, GmailWebhookController],
+  controllers: [LabelsController, MessagesController, GmailWebhookController],
   providers: [
     GmailApiService,
     GmailChangeSyncService,
     GmailRabbitPublisherService,
+    GmailLabelIdsService,
     GmailWebhookService,
     LabelsService,
     GrantsService,
@@ -37,6 +40,14 @@ import googleConfig from '@shared/config/google.config';
     MessagesService,
     MessageLabelsService,
   ],
-  exports: [MessagesService, GmailApiService, GmailWebhookService, EmailSendService, EmailReplyService, MessageLabelsService],
+  exports: [
+    MessagesService,
+    GmailApiService,
+    GmailWebhookService,
+    EmailSendService,
+    EmailReplyService,
+    MessageLabelsService,
+    GrantsService,
+  ],
 })
 export class EmailModule {}

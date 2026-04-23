@@ -6,6 +6,6 @@ export class StatsQueryDto {
   from: string;
 
   @IsDateString()
-  @CompareField<StatsQueryDto>('from', '>=')
+  @CompareField<StatsQueryDto>('>=', 'from')
   to: string;
 }

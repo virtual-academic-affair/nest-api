@@ -17,11 +17,11 @@ export function CompareField<T>(operator: ComparisonOperator, property: keyof T,
       name: 'compareField',
       target: object.constructor,
       propertyName: propertyName,
-      constraints: [operator, property, options],
+      constraints: [property, operator, options],
       options: options,
       validator: {
         validate(value: any, args: ValidationArguments) {
-          const [relatedPropertyName, op, opts] = args.constraints;
+          const [relatedPropertyName, op, opts] = args.constraints as [keyof any, ComparisonOperator, CompareOptions?];
           const relatedValue = (args.object as any)[relatedPropertyName];
 
           if (value === undefined || value === null || relatedValue === undefined || relatedValue === null) {
@@ -50,7 +50,7 @@ export function CompareField<T>(operator: ComparisonOperator, property: keyof T,
         },
 
         defaultMessage(args: ValidationArguments) {
-          const [relatedPropertyName, op] = args.constraints;
+          const [relatedPropertyName, op] = args.constraints as [keyof any, ComparisonOperator];
           const operatorLabels: Record<ComparisonOperator, string> = {
             '>=': 'greater than or equal to',
             '>': 'greater than',

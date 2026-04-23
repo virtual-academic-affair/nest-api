@@ -16,6 +16,7 @@ import { HashingService } from '@shared/hashing/hashing.service';
 import { RedisService } from '@shared/redis/redis.service';
 import { RestrictMethodsGuard } from '@shared/resource/guards/restrict-methods.guard';
 import { DynamicDataController } from '@shared/setting/controllers/dynamic-data.controller';
+import { SettingsController } from '@shared/setting/controllers/settings.controller';
 import { Setting } from '@shared/setting/entities/setting.entity';
 import { DynamicDataService } from '@shared/setting/services/dynamic-data.service';
 import { SettingService } from '@shared/setting/services/setting.service';
@@ -40,11 +41,11 @@ import { SettingService } from '@shared/setting/services/setting.service';
         imports: [ConfigModule],
         name: GRPC_SERVICE,
         inject: [ConfigService],
-        useFactory: (config: ConfigService) => config.get('grpc'),
+        useFactory: (config: ConfigService) => config.getOrThrow('grpc'),
       },
     ]),
   ],
-  controllers: [DynamicDataController],
+  controllers: [DynamicDataController, SettingsController],
   providers: [
     { provide: HashingService, useClass: BcryptService },
     { provide: EncryptionService, useClass: AesEncryptionService },

@@ -15,8 +15,11 @@ export interface PaginatedResult<T> {
 @Injectable()
 export abstract class ResourceService<T extends ObjectLiteral> {
   protected readonly searchableColumns: string[] = [];
+
   protected readonly orderableColumns: string[] = [];
+
   protected readonly autoOrderableColumns: string[] = ['id', 'createdAt', 'updatedAt'];
+
   protected readonly alias: string;
 
   protected constructor(protected readonly repository: Repository<T>) {
@@ -24,7 +27,7 @@ export abstract class ResourceService<T extends ObjectLiteral> {
   }
 
   protected p(column: keyof T | string): string {
-    return `${this.alias}.${String(column)}`; // path
+    return `"${this.alias}"."${String(column)}"`; //path
   }
 
   protected get queryBuilder(): SelectQueryBuilder<T> {
@@ -44,13 +47,10 @@ export abstract class ResourceService<T extends ObjectLiteral> {
     if (keyword && this.searchableColumns.length > 0) {
       qb.andWhere(
         new Brackets((sub) => {
-          const vector = this.searchableColumns
+          const rawConcat = this.searchableColumns
             .map((col) => `COALESCE(${this.p(col)}::text, '')`)
             .join(` || ' ' || `);
-          sub.where(
-            `to_tsvector('simple', ${vector}) @@ websearch_to_tsquery('simple', :keyword)`,
-            { keyword: keyword.trim() },
-          );
+          sub.where(`unaccent(${rawConcat}) ILIKE unaccent(:keyword)`, { keyword: `%${keyword.trim()}%` });
         }),
       );
     }

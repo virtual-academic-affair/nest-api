@@ -1,16 +1,19 @@
+import { Controller, Get, Inject, Logger, Req, Res, UseGuards } from '@nestjs/common';
+import { ConfigType } from '@nestjs/config';
+import { AuthGuard } from '@nestjs/passport';
+import { Request, Response } from 'express';
+import { GoogleGmailGuard } from '@authentication/guards/google-gmail.guard';
 import { GoogleService } from '@authentication/services/google.service';
 import { GoogleGmailProfile } from '@authentication/strategies/google-gmail.strategy';
 import { GoogleProfile } from '@authentication/strategies/google.strategy';
 import { REFRESH_COOKIE, getRefreshCookieOptions } from '@authentication/utils/cookie.util';
 import { GrantsService } from '@email/services/grants.service';
-import { Controller, Get, Inject, Req, Res, UseGuards } from '@nestjs/common';
-import { ConfigType } from '@nestjs/config';
-import { AuthGuard } from '@nestjs/passport';
 import jwtConfig from '@shared/config/jwt.config';
-import { Request, Response } from 'express';
 
 @Controller('authentication/google')
 export class GoogleController {
+  private readonly logger = new Logger(GoogleController.name);
+
   constructor(
     private readonly googleService: GoogleService,
     private readonly grantsService: GrantsService,
@@ -27,8 +30,17 @@ export class GoogleController {
   }
 
   @Get('grant-gmail')
-  @UseGuards(AuthGuard('google-gmail'))
-  grantGmail(@Req() req: Request) {
-    return this.grantsService.grant(req.user as GoogleGmailProfile);
+  @UseGuards(GoogleGmailGuard)
+  async grantGmail(@Req() req: Request, @Res() res: Response) {
+    let isSuccess = false;
+
+    try {
+      await this.grantsService.grant(req.user as GoogleGmailProfile);
+      isSuccess = true;
+    } catch (error) {
+      this.logger.error(`Grant Gmail failed: ${error.message}`, error.stack);
+    }
+
+    return res.redirect(`${process.env.APP_URL}?grant=${isSuccess}`);
   }
 }

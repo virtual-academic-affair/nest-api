@@ -11,6 +11,7 @@ import { UsersController } from '@authentication/controllers/users.controller';
 import { Student } from '@authentication/entities/student.entity';
 import { User } from '@authentication/entities/user.entity';
 import { AuthsGuard } from '@authentication/guards/auths.guard';
+import { GoogleGmailGuard } from '@authentication/guards/google-gmail.guard';
 import { GrpcGuard } from '@authentication/guards/grpc.guard';
 import { JwtGuard } from '@authentication/guards/jwt.guard';
 import { RolesGuard } from '@authentication/guards/roles.guard';
@@ -41,6 +42,7 @@ import jwtConfig from '@shared/config/jwt.config';
     { provide: APP_GUARD, useClass: RolesGuard },
     GrpcGuard,
     JwtGuard,
+    GoogleGmailGuard,
     AccessTokenStrategy,
     GoogleStrategy,
     GoogleGmailStrategy,

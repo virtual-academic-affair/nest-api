@@ -7,7 +7,7 @@ import googleConfig from '@shared/config/google.config';
 export type GoogleGmailProfile = {
   email: string;
   googleId: string;
-  refreshToken: string;
+  refreshToken?: string;
   name?: string;
   picture?: string;
 };
@@ -20,8 +20,6 @@ export class GoogleGmailStrategy extends PassportStrategy(Strategy, 'google-gmai
       clientSecret: googleConfiguration.clientSecret,
       callbackURL: googleConfiguration.gmailRedirectUri,
       scope: ['openid', 'email', 'profile', 'https://www.googleapis.com/auth/gmail.modify'],
-      // passport-google-oauth20 supports these Google params at runtime;
-      // typings don't always include them across versions.
       accessType: 'offline',
       prompt: 'consent',
     } as any);
@@ -30,7 +28,6 @@ export class GoogleGmailStrategy extends PassportStrategy(Strategy, 'google-gmai
   validate(_accessToken: string, refreshToken: string, profile: Profile): GoogleGmailProfile {
     const email = profile.emails?.[0]?.value;
     throwUnless(email, new Error('Google email is missing'));
-    throwUnless(refreshToken, new Error('Google refresh token is missing'));
 
     return {
       email,

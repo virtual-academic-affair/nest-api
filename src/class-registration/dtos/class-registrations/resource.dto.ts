@@ -1,24 +1,11 @@
+import { OmitType, PartialType } from '@nestjs/mapped-types';
+import { Type } from 'class-transformer';
+import { IsArray, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { CreateDto as CreateItemDto } from '@class-registration/dtos/class-registration-items/resource.dto';
 import { HasMessageIdDto } from '@email/dtos/messages/has-message-id.dto';
-import { OmitType, PartialType } from '@nestjs/mapped-types';
 import { MessageResourceQueryDto } from '@email/dtos/messages/message-resource-query.dto';
-import { Type } from 'class-transformer';
-import { IsArray, IsBoolean, IsInt, IsOptional, IsString, ValidateNested } from 'class-validator';
 
-export class QueryDto extends MessageResourceQueryDto {
-  @IsOptional()
-  @IsString()
-  studentCode?: string;
-
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  cohort?: number;
-
-  @IsOptional()
-  @IsBoolean()
-  smartOrder?: boolean;
-}
+export class QueryDto extends MessageResourceQueryDto {}
 
 export class CreateDto extends HasMessageIdDto {
   @IsOptional()

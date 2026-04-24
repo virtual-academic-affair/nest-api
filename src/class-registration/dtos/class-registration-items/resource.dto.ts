@@ -1,7 +1,8 @@
-import { RegistrationAction } from '@class-registration/enums/registration-action.enum';
-import { RegistrationStatus } from '@class-registration/enums/registration-status.enum';
 import { PartialType } from '@nestjs/mapped-types';
 import { IsBoolean, IsDefined, IsEnum, IsOptional, IsString } from 'class-validator';
+import { RegistrationAction } from '@class-registration/enums/registration-action.enum';
+import { RegistrationStatus } from '@class-registration/enums/registration-status.enum';
+import { Upper } from '@shared/decorators/upper.decorator';
 
 export class CreateDto {
   @IsDefined()
@@ -10,14 +11,17 @@ export class CreateDto {
 
   @IsDefined()
   @IsString()
+  @Upper()
   subjectName: string;
 
   @IsOptional()
   @IsString()
+  @Upper()
   className?: string;
 
   @IsOptional()
   @IsString()
+  @Upper()
   subjectCode?: string;
 
   @IsOptional()

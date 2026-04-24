@@ -13,8 +13,6 @@ message CreateRegistrationItemRequest {
 
 message CreateRegistrationRequest {
   int32 messageId = 1;
-  string status = 2;
-  string note = 3;
   repeated CreateRegistrationItemRequest items = 4;
 }
 

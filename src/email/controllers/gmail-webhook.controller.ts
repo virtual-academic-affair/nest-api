@@ -1,9 +1,9 @@
 import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
 import { GmailWebhookGuard } from '@email/guards/gmail-webhook.guard';
-import { GmailWebhookHandlerService } from '@email/services/gmail-webhook-handler.service';
 import { PubSubPushPayload } from '@email/services/gmail/gmail-webhook.service';
+import { GmailWebhookHandlerService } from '@email/services/gmail-webhook-handler.service';
 
-@Controller('email/gmail')
+@Controller('email/webhook')
 export class GmailWebhookController {
   constructor(private readonly gmailWebhookHandlerService: GmailWebhookHandlerService) {}
 

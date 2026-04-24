@@ -1,11 +1,11 @@
-import { ClassRegistrationItem } from '@class-registration/entities/class-registration-item.entity';
-import { RegistrationStatus } from '@class-registration/enums/registration-status.enum';
 import { Inject, Injectable, Scope } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ResourceItemService } from '@shared/resource/services/resource-item.service';
 import { Request as TRequest } from 'express';
 import { Repository } from 'typeorm';
+import { ClassRegistrationItem } from '@class-registration/entities/class-registration-item.entity';
+import { RegistrationStatus } from '@class-registration/enums/registration-status.enum';
+import { ResourceItemService } from '@shared/resource/services/resource-item.service';
 
 @Injectable({ scope: Scope.REQUEST })
 export class ClassRegistrationItemsService extends ResourceItemService<ClassRegistrationItem> {

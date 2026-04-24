@@ -19,7 +19,6 @@ import { GmailWebhookService } from '@email/services/gmail/gmail-webhook.service
 import { GmailApiService } from '@email/services/gmail-api.service';
 import { GmailLabelIdsService } from '@email/services/gmail-label-ids.service';
 import { GmailWebhookHandlerService } from '@email/services/gmail-webhook-handler.service';
-import { GrantsService } from '@email/services/grants.service';
 import { LabelsService } from '@email/services/labels.service';
 import { MessageLabelsService } from '@email/services/message-labels.service';
 import { MessagesService } from '@email/services/messages.service';
@@ -46,7 +45,6 @@ import googleConfig from '@shared/config/google.config';
     GmailWebhookGuard,
     GmailWatchService,
     LabelsService,
-    GrantsService,
     EmailSendService,
     EmailReplyService,
     MessagesService,
@@ -55,11 +53,11 @@ import googleConfig from '@shared/config/google.config';
   exports: [
     MessagesService,
     GmailApiService,
+    GmailWatchService,
     GmailWebhookHandlerService,
     EmailSendService,
     EmailReplyService,
     MessageLabelsService,
-    GrantsService,
   ],
 })
 export class EmailModule {}

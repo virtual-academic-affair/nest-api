@@ -18,6 +18,7 @@ import { RolesGuard } from '@authentication/guards/roles.guard';
 import { AuthService } from '@authentication/services/auth.service';
 import { DomainsService } from '@authentication/services/domains.service';
 import { GoogleService } from '@authentication/services/google.service';
+import { GrantsService } from '@authentication/services/grants.service';
 import { StudentsService } from '@authentication/services/students.service';
 import { UsersService } from '@authentication/services/users.service';
 import { AccessTokenStrategy } from '@authentication/strategies/access-token.strategy';
@@ -48,6 +49,7 @@ import jwtConfig from '@shared/config/jwt.config';
     GoogleGmailStrategy,
     UsersService,
     GoogleService,
+    GrantsService,
     AuthService,
     DomainsService,
     StudentsService,

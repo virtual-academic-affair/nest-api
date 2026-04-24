@@ -1,6 +1,6 @@
-import { Column, Entity, Index, OneToMany, Unique } from 'typeorm';
+import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, Unique } from 'typeorm';
+import { Student } from '@authentication/entities/student.entity';
 import { ClassRegistration } from '@class-registration/entities/class-registration.entity';
-import { EmailLabel } from '@email/enums/email-label.enum';
 import { MessageStatus } from '@email/enums/message-status.enum';
 import { Inquiry } from '@inquiry/entities/inquiry.entity';
 import { EncryptedColumn } from '@shared/decorators/encrypted-column.decorator';
@@ -32,9 +32,6 @@ export class Message extends BaseEntity {
   @Column()
   superEmail?: string;
 
-  @Column({ type: 'jsonb', nullable: true })
-  studentInfo?: StudentInfo;
-
   @Index()
   @Column({ type: 'timestamp', nullable: true })
   sentAt?: Date;
@@ -42,9 +39,12 @@ export class Message extends BaseEntity {
   @Column('text', { array: true, default: '{}' })
   labelIds: string[];
 
-  @Index()
-  @Column('text', { array: true, nullable: true })
-  systemLabels: EmailLabel[];
+  @Column({ nullable: true })
+  studentCode?: string;
+
+  @ManyToOne(() => Student, { nullable: true, eager: false })
+  @JoinColumn({ name: 'studentCode', referencedColumnName: 'studentCode' })
+  student?: Student;
 
   @EncryptedColumn({ type: 'text', nullable: true, select: false })
   content?: string;
@@ -59,8 +59,3 @@ export class Message extends BaseEntity {
   @OneToMany(() => ClassRegistration, (classRegistration) => classRegistration.message)
   classRegistration: ClassRegistration[];
 }
-
-export type StudentInfo = {
-  studentCode?: string;
-  cohort?: number;
-};

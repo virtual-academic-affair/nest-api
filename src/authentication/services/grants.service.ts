@@ -1,9 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from '@authentication/entities/user.entity';
 import { Role } from '@authentication/decorators/roles.decorator';
-import { GoogleGmailProfile } from '@authentication/strategies/google-gmail.strategy';
+import { User } from '@authentication/entities/user.entity';
+import { SuperEmail } from '@authentication/strategies/google-gmail.strategy';
 import { GmailWatchService } from '@email/services/gmail/gmail-watch.service';
 import { GmailApiService } from '@email/services/gmail-api.service';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
@@ -18,7 +18,7 @@ export class GrantsService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
 
-  async grant(profile: GoogleGmailProfile) {
+  async grant(profile: SuperEmail) {
     throwUnless(profile?.email, new BadRequestException('Missing email address'));
     throwUnless(profile?.refreshToken, new BadRequestException('Missing refresh token'));
 

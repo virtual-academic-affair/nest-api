@@ -4,7 +4,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy } from 'passport-google-oauth20';
 import googleConfig from '@shared/config/google.config';
 
-export type GoogleGmailProfile = {
+export type SuperEmail = {
   email: string;
   googleId: string;
   refreshToken?: string;
@@ -25,7 +25,7 @@ export class GoogleGmailStrategy extends PassportStrategy(Strategy, 'google-gmai
     } as any);
   }
 
-  validate(_accessToken: string, refreshToken: string, profile: Profile): GoogleGmailProfile {
+  validate(_accessToken: string, refreshToken: string, profile: Profile): SuperEmail {
     const email = profile.emails?.[0]?.value;
     throwUnless(email, new Error('Google email is missing'));
 

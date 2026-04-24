@@ -4,10 +4,10 @@ import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
 import { GoogleGmailGuard } from '@authentication/guards/google-gmail.guard';
 import { GoogleService } from '@authentication/services/google.service';
-import { GoogleGmailProfile } from '@authentication/strategies/google-gmail.strategy';
+import { GrantsService } from '@authentication/services/grants.service';
+import { SuperEmail } from '@authentication/strategies/google-gmail.strategy';
 import { GoogleProfile } from '@authentication/strategies/google.strategy';
 import { REFRESH_COOKIE, getRefreshCookieOptions } from '@authentication/utils/cookie.util';
-import { GrantsService } from '@email/services/grants.service';
 import jwtConfig from '@shared/config/jwt.config';
 
 @Controller('authentication/google')
@@ -35,7 +35,7 @@ export class GoogleController {
     let isSuccess = false;
 
     try {
-      await this.grantsService.grant(req.user as GoogleGmailProfile);
+      await this.grantsService.grant(req.user as SuperEmail);
       isSuccess = true;
     } catch (error) {
       this.logger.error(`Grant Gmail failed: ${error.message}`, error.stack);

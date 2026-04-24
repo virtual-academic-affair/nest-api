@@ -1,6 +1,7 @@
 import { Controller, Get, Post } from '@nestjs/common';
 import { Auth, AuthType } from '@authentication/decorators/auth.decorator';
 import { Role, Roles } from '@authentication/decorators/roles.decorator';
+import { LabelKey, LabelLang } from '@email/enums/email-label.enum';
 import { LabelsService } from '@email/services/labels.service';
 
 @Auth(AuthType.Jwt)
@@ -16,6 +17,6 @@ export class LabelsController {
 
   @Post('autoCreate')
   autoCreateLabels() {
-    return this.labelsService.autoCreateLabels();
+    return Promise.all(Object.keys(LabelLang).map((key: LabelKey) => this.labelsService.create(key)));
   }
 }

@@ -16,7 +16,7 @@ import { GrpcGuard } from '@authentication/guards/grpc.guard';
 import { JwtGuard } from '@authentication/guards/jwt.guard';
 import { RolesGuard } from '@authentication/guards/roles.guard';
 import { AuthService } from '@authentication/services/auth.service';
-import { EmailDomainsService } from '@authentication/services/email-domains.service';
+import { DomainsService } from '@authentication/services/domains.service';
 import { GoogleService } from '@authentication/services/google.service';
 import { StudentsService } from '@authentication/services/students.service';
 import { UsersService } from '@authentication/services/users.service';
@@ -49,9 +49,9 @@ import jwtConfig from '@shared/config/jwt.config';
     UsersService,
     GoogleService,
     AuthService,
-    EmailDomainsService,
+    DomainsService,
     StudentsService,
   ],
-  exports: [TypeOrmModule, EmailDomainsService],
+  exports: [TypeOrmModule, DomainsService],
 })
 export class AuthenticationModule {}

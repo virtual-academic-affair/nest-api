@@ -10,7 +10,10 @@ import { MessagesController } from '@email/controllers/messages.controller';
 import { Message } from '@email/entities/message.entity';
 import { EmailReplyService } from '@email/services/email-send/email-reply.service';
 import { EmailSendService } from '@email/services/email-send/email-send.service';
+import { GmailWebhookHandlerService } from '@email/services/gmail-webhook-handler.service';
 import { GmailChangeSyncService } from '@email/services/gmail/gmail-change-sync.service';
+import { GmailHistoryClientService } from '@email/services/gmail/gmail-history-client.service';
+import { GmailMessageClientService } from '@email/services/gmail/gmail-message-client.service';
 import { GmailRabbitPublisherService } from '@email/services/gmail/gmail-rabbit-publisher.service';
 import { GmailWatchService } from '@email/services/gmail/gmail-watch.service';
 import { GmailWebhookService } from '@email/services/gmail/gmail-webhook.service';
@@ -33,10 +36,13 @@ import googleConfig from '@shared/config/google.config';
   controllers: [LabelsController, MessagesController, GmailWebhookController],
   providers: [
     GmailApiService,
+    GmailHistoryClientService,
+    GmailMessageClientService,
     GmailChangeSyncService,
     GmailRabbitPublisherService,
     GmailLabelIdsService,
     GmailWebhookService,
+    GmailWebhookHandlerService,
     GmailWebhookGuard,
     GmailWatchService,
     LabelsService,
@@ -49,7 +55,7 @@ import googleConfig from '@shared/config/google.config';
   exports: [
     MessagesService,
     GmailApiService,
-    GmailWebhookService,
+    GmailWebhookHandlerService,
     EmailSendService,
     EmailReplyService,
     MessageLabelsService,

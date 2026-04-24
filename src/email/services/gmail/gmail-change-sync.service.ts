@@ -4,11 +4,11 @@ import * as parseMessage from 'gmail-api-parse-message';
 import { gmail_v1 } from 'googleapis';
 import { htmlToText } from 'html-to-text';
 import { In, Repository } from 'typeorm';
-import { Role } from '@authentication/enums/role.enum';
+import { Role } from '@authentication/decorators/roles.decorator';
 import { RoleDomains } from '@authentication/utils/resolve-email.util';
+import { Message } from '@email/entities/message.entity';
 import { EmailLabel } from '@email/enums/email-label.enum';
 import { MessageStatus } from '@email/enums/message-status.enum';
-import { Message } from '@email/entities/message.entity';
 import { SuperEmailSetting } from '@email/interfaces/super-email-setting.type';
 import { MessageLabelsService } from '@email/services/message-labels.service';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
@@ -215,9 +215,9 @@ export class GmailChangeSyncService {
       return false;
     }
 
-    const emailDomainsByRole =
+    const domainsByRole =
       (await this.settingService.get<RoleDomains>(SettingKey.AuthEmailDomains)) ?? ({} as RoleDomains);
-    const allowedStudentDomains = emailDomainsByRole[Role.Student] ?? [];
+    const allowedStudentDomains = domainsByRole[Role.Student] ?? [];
     return allowedStudentDomains.includes(domain);
   }
 
@@ -227,7 +227,6 @@ export class GmailChangeSyncService {
       EmailLabel.ClassRegistration,
       EmailLabel.Training,
       EmailLabel.Graduation,
-      EmailLabel.Pending,
     ];
 
     return new Map(

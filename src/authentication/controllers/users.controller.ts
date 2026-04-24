@@ -1,10 +1,9 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { Auth, AuthType } from '@authentication/decorators/auth.decorator';
-import { Roles } from '@authentication/decorators/roles.decorator';
+import { Role, Roles } from '@authentication/decorators/roles.decorator';
 import { AssignRoleDto } from '@authentication/dtos/auth/assign-role.dto';
 import { ResourceDto } from '@authentication/dtos/users/resource.dto';
 import { User } from '@authentication/entities/user.entity';
-import { Role } from '@authentication/enums/role.enum';
 import { UsersService } from '@authentication/services/users.service';
 import { ResourceController } from '@shared/resource/controllers/resource.controller';
 import { RestrictMethods } from '@shared/resource/decorators/restrict-methods.decorator';

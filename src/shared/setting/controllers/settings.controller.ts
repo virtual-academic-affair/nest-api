@@ -1,7 +1,6 @@
 import { BadRequestException, Body, Controller, Get, Param, Put, Query } from '@nestjs/common';
 import { Auth, AuthType } from '@authentication/decorators/auth.decorator';
-import { Roles } from '@authentication/decorators/roles.decorator';
-import { Role } from '@authentication/enums/role.enum';
+import { Role, Roles } from '@authentication/decorators/roles.decorator';
 import { validateDto } from '@shared/resource/utils/validate-dto.util';
 import { AuthEmailDomainsDto } from '@shared/setting/dtos/auth-email-domains.dto';
 import { EmailLabelsDto } from '@shared/setting/dtos/email-labels.dto';

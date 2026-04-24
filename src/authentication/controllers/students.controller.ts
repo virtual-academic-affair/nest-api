@@ -1,10 +1,9 @@
 import { BadRequestException, Body, Controller, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Auth, AuthType } from '@authentication/decorators/auth.decorator';
-import { Roles } from '@authentication/decorators/roles.decorator';
+import { Role, Roles } from '@authentication/decorators/roles.decorator';
 import { ImportStudentsDto } from '@authentication/dtos/students/import-students.dto';
 import { ResourceDto } from '@authentication/dtos/students/resource.dto';
-import { Role } from '@authentication/enums/role.enum';
 import { Student } from '@authentication/entities/student.entity';
 import { StudentsService } from '@authentication/services/students.service';
 import { ResourceController } from '@shared/resource/controllers/resource.controller';

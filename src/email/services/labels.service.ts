@@ -1,7 +1,7 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { getLangLabel, LabelKey, LabelLang } from '@email/enums/email-label.enum';
+import { EmailLabelsDto } from '@shared/setting/dtos/email-labels.dto';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
-import { EmailLabelsSettingDto } from '@shared/setting/dtos/email-labels-setting.dto';
 import { SettingService } from '@shared/setting/services/setting.service';
 import { GmailApiService } from './gmail-api.service';
 
@@ -45,18 +45,19 @@ export class LabelsService {
     }
   }
 
-  async findAll(): Promise<EmailLabelsSettingDto> {
-    return await this.settingService.get<EmailLabelsSettingDto>(SettingKey.EmailLabels);
+  async findAll(): Promise<EmailLabelsDto> {
+    return await this.settingService.get<EmailLabelsDto>(SettingKey.EmailLabels);
   }
 
-  async update(dto: EmailLabelsSettingDto) {
+  async update(dto: EmailLabelsDto) {
     await this.settingService.set(SettingKey.EmailLabels, dto);
   }
 
   async autoCreateLabels(): Promise<void> {
-    await this.createGmailLabel(getLangLabel('parent'), getLangLabel('parent', 'color'));
+    const parentId = await this.createGmailLabel(getLangLabel('parent'), getLangLabel('parent', 'color'));
 
     const labels = (await this.findAll()) || ({} as Record<LabelKey, string>);
+    (labels as Record<string, string>)['parent'] = parentId;
     const missingKeys = (Object.keys(LabelLang) as LabelKey[]).filter((key) => !labels[key] && key !== 'parent');
 
     const parent = getLangLabel('parent');

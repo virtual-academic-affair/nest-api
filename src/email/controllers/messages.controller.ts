@@ -1,8 +1,7 @@
 import { Body, Controller, Delete, Param, ParseIntPipe, Put } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 import { Auth, AuthType } from '@authentication/decorators/auth.decorator';
-import { Roles } from '@authentication/decorators/roles.decorator';
-import { Role } from '@authentication/enums/role.enum';
+import { Role, Roles } from '@authentication/decorators/roles.decorator';
 import { ResourceDto } from '@email/dtos/messages/resource.dto';
 import { UpdateLabelsDto } from '@email/dtos/messages/update-labels.dto';
 import { Message } from '@email/entities/message.entity';

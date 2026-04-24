@@ -1,17 +1,17 @@
 import { UnauthorizedException } from '@nestjs/common';
 import { User } from '@authentication/entities/user.entity';
-import { Role } from '@authentication/enums/role.enum';
+import { Role } from '@authentication/decorators/roles.decorator';
 
 export const COHORT_BASE_YEAR = 2000;
 
-export type EmailDomainsByRole = Partial<Record<Role, string[]>>;
-export type RoleDomains = EmailDomainsByRole;
+export type domainsByRole = Partial<Record<Role, string[]>>;
+export type RoleDomains = domainsByRole;
 
-export const resolveEmail = (email: string, emailDomainsByRole: EmailDomainsByRole): Pick<User, 'role' | 'profile'> => {
+export const resolveEmail = (email: string, domainsByRole: domainsByRole): Pick<User, 'role' | 'profile'> => {
   const [localPart, domain] = email.split('@');
   throwUnless(localPart && domain, new UnauthorizedException('Invalid email format'));
 
-  const role = Object.entries(emailDomainsByRole).find(([, domains]) => domains?.includes(domain))?.[0] as Role;
+  const role = Object.entries(domainsByRole).find(([, domains]) => domains?.includes(domain))?.[0] as Role;
   throwUnless(role, new UnauthorizedException('Email domain is not allowed'));
 
   if (role === Role.Student) {

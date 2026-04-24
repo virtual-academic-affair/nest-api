@@ -1,5 +1,5 @@
 import { Column, Entity, Index } from 'typeorm';
-import { Role } from '@authentication/enums/role.enum';
+import { Role } from '@authentication/decorators/roles.decorator';
 import { BaseEntity } from '@shared/resource/entities/base.entity';
 
 @Entity()

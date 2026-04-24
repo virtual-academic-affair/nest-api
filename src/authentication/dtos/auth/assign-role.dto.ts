@@ -1,5 +1,5 @@
 import { IsEmail, IsEnum } from 'class-validator';
-import { Role } from '@authentication/enums/role.enum';
+import { Role } from '@authentication/decorators/roles.decorator';
 
 export class AssignRoleDto {
   @IsEmail()

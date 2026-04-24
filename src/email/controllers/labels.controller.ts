@@ -1,7 +1,6 @@
 import { Controller, Get, Post } from '@nestjs/common';
 import { Auth, AuthType } from '@authentication/decorators/auth.decorator';
-import { Roles } from '@authentication/decorators/roles.decorator';
-import { Role } from '@authentication/enums/role.enum';
+import { Role, Roles } from '@authentication/decorators/roles.decorator';
 import { LabelsService } from '@email/services/labels.service';
 
 @Auth(AuthType.Jwt)

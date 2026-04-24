@@ -1,7 +1,6 @@
-import { Type } from 'class-transformer';
-import { IsBoolean, IsEnum, IsOptional, ValidateNested } from 'class-validator';
-import { ProfilePatchDto, UpdateProfileDto } from '@authentication/dtos/users/update-profile.dto';
-import { Role } from '@authentication/enums/role.enum';
+import { IsBoolean, IsEnum, IsOptional } from 'class-validator';
+import { Role } from '@authentication/decorators/roles.decorator';
+import { UpdateProfileDto } from '@authentication/dtos/users/update-profile.dto';
 import { IsBooleanQuery } from '@shared/decorators/is-boolean-query.decorator';
 import { ResourceQueryDto } from '@shared/resource/dtos/resource-query.dto';
 

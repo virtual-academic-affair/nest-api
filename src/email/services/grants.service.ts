@@ -2,10 +2,10 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '@authentication/entities/user.entity';
-import { Role } from '@authentication/enums/role.enum';
+import { Role } from '@authentication/decorators/roles.decorator';
 import { GoogleGmailProfile } from '@authentication/strategies/google-gmail.strategy';
-import { GmailApiService } from '@email/services/gmail-api.service';
 import { GmailWatchService } from '@email/services/gmail/gmail-watch.service';
+import { GmailApiService } from '@email/services/gmail-api.service';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
 import { SettingService } from '@shared/setting/services/setting.service';
 

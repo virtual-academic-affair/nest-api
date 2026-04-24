@@ -1,8 +1,7 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Post, Query } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 import { Auth, AuthType } from '@authentication/decorators/auth.decorator';
-import { Roles } from '@authentication/decorators/roles.decorator';
-import { Role } from '@authentication/enums/role.enum';
+import { Role, Roles } from '@authentication/decorators/roles.decorator';
 import { ResourceDto } from '@class-registration/dtos/class-registrations/resource.dto';
 import { StatsDto } from '@class-registration/dtos/class-registrations/stats.dto';
 import { ClassRegistration } from '@class-registration/entities/class-registration.entity';

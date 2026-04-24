@@ -1,6 +1,6 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { User } from '@authentication/entities/user.entity';
-import { Role } from '@authentication/enums/role.enum';
+import { Role } from '@authentication/decorators/roles.decorator';
 
 export const ActiveUser = createParamDecorator((field: keyof User | undefined, ctx: ExecutionContext) =>
   getActiveUser(field, ctx),

@@ -1,44 +1,41 @@
-import { BadRequestException, Body, Controller, Param, Put } from '@nestjs/common';
-import { plainToInstance } from 'class-transformer';
-import { validateOrReject } from 'class-validator';
+import { BadRequestException, Body, Controller, Get, Param, Put, Query } from '@nestjs/common';
 import { Auth, AuthType } from '@authentication/decorators/auth.decorator';
 import { Roles } from '@authentication/decorators/roles.decorator';
 import { Role } from '@authentication/enums/role.enum';
-import { AuthEmailDomainsSettingDto } from '@shared/setting/dtos/auth-email-domains-setting.dto';
-import { EmailLabelsSettingDto } from '@shared/setting/dtos/email-labels-setting.dto';
+import { validateDto } from '@shared/resource/utils/validate-dto.util';
+import { AuthEmailDomainsDto } from '@shared/setting/dtos/auth-email-domains.dto';
+import { EmailLabelsDto } from '@shared/setting/dtos/email-labels.dto';
+import { SettingsQueryDto } from '@shared/setting/dtos/settings-query.dto';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
 import { SettingService } from '@shared/setting/services/setting.service';
-
-type SettingConfig = {
-  dto: new () => any;
-};
 
 @Controller('shared/settings')
 @Auth(AuthType.Jwt)
 @Roles(Role.Admin)
 export class SettingsController {
-  private readonly configByKey: Partial<Record<SettingKey, SettingConfig>>;
+  private readonly configByKey: Partial<Record<SettingKey, { dto: new () => any }>>;
 
   constructor(private readonly settingService: SettingService) {
     this.configByKey = {
-      [SettingKey.AuthEmailDomains]: {
-        dto: AuthEmailDomainsSettingDto,
-      },
-      [SettingKey.EmailLabels]: {
-        dto: EmailLabelsSettingDto,
-      },
+      [SettingKey.AuthEmailDomains]: { dto: AuthEmailDomainsDto },
+      [SettingKey.EmailLabels]: { dto: EmailLabelsDto },
     };
+  }
+
+  @Get()
+  async get(@Query() query: SettingsQueryDto) {
+    const entries = await Promise.all(
+      query.keys.map(async (key) => [key, await this.settingService.get(key)] as const),
+    );
+
+    return Object.fromEntries(entries);
   }
 
   @Put(':key')
   async update(@Param('key') key: SettingKey, @Body() body: unknown) {
     const config = this.configByKey[key];
     throwUnless(config, new BadRequestException(`Unsupported setting key: ${key}`));
-
-    const dto = plainToInstance(config.dto, body);
-    await validateOrReject(dto as object, { whitelist: true, forbidNonWhitelisted: true });
-
-    const saved = await this.settingService.set(key, dto, true);
-    return { key: saved.key, value: saved.value };
+    await validateDto(config.dto, body, true);
+    await this.settingService.set(key, body, true);
   }
 }

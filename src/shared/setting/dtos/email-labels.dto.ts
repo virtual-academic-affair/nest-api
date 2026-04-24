@@ -1,7 +1,7 @@
 import { IsOptional, IsString } from 'class-validator';
 import { EmailLabel } from '@email/enums/email-label.enum';
 
-export class EmailLabelsSettingDto {
+export class EmailLabelsDto {
   @IsOptional()
   @IsString()
   [EmailLabel.ClassRegistration]?: string | null;

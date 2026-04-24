@@ -15,10 +15,8 @@ import { BcryptService } from '@shared/hashing/bcrypt.service';
 import { HashingService } from '@shared/hashing/hashing.service';
 import { RedisService } from '@shared/redis/redis.service';
 import { RestrictMethodsGuard } from '@shared/resource/guards/restrict-methods.guard';
-import { DynamicDataController } from '@shared/setting/controllers/dynamic-data.controller';
 import { SettingsController } from '@shared/setting/controllers/settings.controller';
 import { Setting } from '@shared/setting/entities/setting.entity';
-import { DynamicDataService } from '@shared/setting/services/dynamic-data.service';
 import { SettingService } from '@shared/setting/services/setting.service';
 
 @Global()
@@ -45,13 +43,12 @@ import { SettingService } from '@shared/setting/services/setting.service';
       },
     ]),
   ],
-  controllers: [DynamicDataController, SettingsController],
+  controllers: [SettingsController],
   providers: [
     { provide: HashingService, useClass: BcryptService },
     { provide: EncryptionService, useClass: AesEncryptionService },
     { provide: APP_GUARD, useClass: RestrictMethodsGuard },
     SettingService,
-    DynamicDataService,
     RedisService,
   ],
   exports: [TypeOrmModule, HashingService, EncryptionService, SettingService, ClientsModule, RedisService],

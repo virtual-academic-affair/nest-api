@@ -5,7 +5,7 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import { CreateDto, QueryDto } from '@class-registration/dtos/class-registrations/resource.dto';
 import { ClassRegistration } from '@class-registration/entities/class-registration.entity';
 import { ClassRegistrationItemsService } from '@class-registration/services/class-registration-items.service';
-import { applyMessageFilters } from '@email/dtos/messages/message-resource-query.dto';
+import { applyMessageFilters } from '@email/dtos/messages/related-message.dto';
 import { GmailReplyService } from '@email/services/gmail/sending/reply.service';
 import { ClassRegistrationTemplate } from '@email/templates/class-registration.template';
 import { ResourceService } from '@shared/resource/services/resource.service';

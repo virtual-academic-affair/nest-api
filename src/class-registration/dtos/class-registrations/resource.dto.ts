@@ -2,12 +2,11 @@ import { OmitType, PartialType } from '@nestjs/mapped-types';
 import { Type } from 'class-transformer';
 import { IsArray, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { CreateDto as CreateItemDto } from '@class-registration/dtos/class-registration-items/resource.dto';
-import { HasMessageIdDto } from '@email/dtos/messages/has-message-id.dto';
-import { MessageResourceQueryDto } from '@email/dtos/messages/message-resource-query.dto';
+import { BelongsToMessageCreateDto, BelongsToMessageQueryDto } from '@email/dtos/messages/related-message.dto';
 
-export class QueryDto extends MessageResourceQueryDto {}
+export class QueryDto extends BelongsToMessageQueryDto {}
 
-export class CreateDto extends HasMessageIdDto {
+export class CreateDto extends BelongsToMessageCreateDto {
   @IsOptional()
   @IsString()
   note?: string;

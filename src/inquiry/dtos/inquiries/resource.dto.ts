@@ -1,16 +1,15 @@
 import { OmitType, PartialType } from '@nestjs/mapped-types';
 import { IsArray, IsEnum, IsOptional, IsString, MaxLength } from 'class-validator';
-import { HasMessageIdDto } from '@email/dtos/messages/has-message-id.dto';
-import { MessageResourceQueryDto } from '@email/dtos/messages/message-resource-query.dto';
+import { BelongsToMessageCreateDto, BelongsToMessageQueryDto } from '@email/dtos/messages/related-message.dto';
 import { InquiryType } from '@inquiry/enums/inquiry-type.enum';
 
-export class QueryDto extends MessageResourceQueryDto {
+export class QueryDto extends BelongsToMessageQueryDto {
   @IsEnum(InquiryType, { each: true })
   @IsOptional()
   types?: InquiryType[];
 }
 
-export class CreateDto extends HasMessageIdDto {
+export class CreateDto extends BelongsToMessageCreateDto {
   @IsArray()
   @IsOptional()
   @IsEnum(InquiryType, { each: true })

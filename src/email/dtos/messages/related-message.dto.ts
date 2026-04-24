@@ -1,10 +1,18 @@
 import { Type } from 'class-transformer';
-import { IsEnum, IsInt, IsOptional } from 'class-validator';
+import { IsDefined, IsEnum, IsInt, IsOptional, Min } from 'class-validator';
 import { In, ObjectLiteral, SelectQueryBuilder } from 'typeorm';
 import { MessageStatus } from '@email/enums/message-status.enum';
 import { ResourceQueryDto } from '@shared/resource/dtos/resource-query.dto';
 
-export class MessageResourceQueryDto extends ResourceQueryDto {
+export class BelongsToMessageCreateDto {
+  @IsDefined()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  messageId!: number;
+}
+
+export class BelongsToMessageQueryDto extends ResourceQueryDto {
   @Type(() => Number)
   @IsInt()
   @IsOptional()
@@ -17,7 +25,7 @@ export class MessageResourceQueryDto extends ResourceQueryDto {
 
 export function applyMessageFilters<T extends ObjectLiteral>(
   queryBuilder: SelectQueryBuilder<T>,
-  { messageId, messageStatuses }: MessageResourceQueryDto,
+  { messageId, messageStatuses }: BelongsToMessageQueryDto,
 ): void {
   messageId && queryBuilder.andWhere({ messageId } as ObjectLiteral);
   messageStatuses?.length && queryBuilder.andWhere({ messageStatus: In(messageStatuses) } as ObjectLiteral);

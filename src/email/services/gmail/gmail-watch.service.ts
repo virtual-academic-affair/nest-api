@@ -32,7 +32,7 @@ export class GmailWatchService {
 
   async refreshWatch(reason: 'grant' | 'schedule' | 'manual' = 'manual'): Promise<void> {
     const topicName = this.gmailWatchConfiguration.topicName;
-    throwUnless(topicName, new Error('GMAIL_WATCH_TOPIC_NAME is required'));
+    throwUnless(topicName, new Error('GOOGLE_WATCH_TOPIC_NAME is required'));
 
     const gmail = await this.gmailApiService.getGmailClient();
     const vaaLabelId = await this.gmailLabelIdsService.ensureParentId();

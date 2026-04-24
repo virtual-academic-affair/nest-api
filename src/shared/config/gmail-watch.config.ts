@@ -7,7 +7,7 @@ export interface GmailWatchConfiguration {
 }
 
 export default registerAs<GmailWatchConfiguration>('gmailWatch', () => ({
-  topicName: process.env.GMAIL_WATCH_TOPIC_NAME?.trim() ?? '',
+  topicName: process.env.GOOGLE_WATCH_TOPIC_NAME?.trim() ?? '',
   pubsubAudience: process.env.GOOGLE_PUBSUB_AUDIENCE?.trim() || '',
   pushServiceAccountEmail: process.env.GOOGLE_PUBSUB_PUSH_SERVICE_ACCOUNT_EMAIL?.trim() || '',
 }));

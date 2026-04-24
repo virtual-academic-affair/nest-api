@@ -9,8 +9,6 @@ import { StudentsService } from '@authentication/services/students.service';
 import { ResourceController } from '@shared/resource/controllers/resource.controller';
 import { readTabularFileRows } from '@shared/utils/tabular-file.util';
 
-type StudentRow = { studentCode: string; studentName: string };
-
 @Controller('authentication/students')
 @Auth(AuthType.Jwt)
 @Roles(Role.Admin)
@@ -31,20 +29,23 @@ export class StudentsController extends ResourceController<Student> {
     }
     throwUnless(dto.studentCodeCol && dto.studentNameCol, new BadRequestException('Missing column config'));
 
-    const it = readTabularFileRows<StudentRow>(file, {
+    const it = readTabularFileRows<Partial<Student>>(file, {
       startRow: dto.startRow,
       columns: {
         studentCode: dto.studentCodeCol,
         studentName: dto.studentNameCol,
+        ...(dto.majorCol ? { major: dto.majorCol } : {}),
       },
     });
 
     const batchSize = 500;
-    let batch: StudentRow[] = [];
+    let batch: Partial<Student>[] = [];
     let total = 0;
 
     for await (const row of it) {
-      if (!row.studentCode || !row.studentName) continue;
+      if (!row.studentCode || !row.studentName) {
+        continue;
+      }
       batch.push(row);
       if (batch.length >= batchSize) {
         const { insertedOrUpdated } = await this.service.upsertMany(batch);

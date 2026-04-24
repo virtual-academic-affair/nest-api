@@ -1,5 +1,5 @@
 export enum SettingKey {
-  AuthEmailDomains = 'auth.emailDomains',
+  AuthRoleDomains = 'auth.roleDomains',
   EmailLabels = 'email.labels',
   EmailSuperEmail = 'email.superEmail',
   EmailGmailHistoryId = 'email.gmailHistoryId',

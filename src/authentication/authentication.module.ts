@@ -52,6 +52,6 @@ import jwtConfig from '@shared/config/jwt.config';
     DomainsService,
     StudentsService,
   ],
-  exports: [TypeOrmModule, DomainsService],
+  exports: [TypeOrmModule, DomainsService, StudentsService],
 })
 export class AuthenticationModule {}

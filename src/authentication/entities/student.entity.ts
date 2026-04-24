@@ -5,8 +5,14 @@ import { BaseEntity } from '@shared/resource/entities/base.entity';
 export class Student extends BaseEntity {
   @Index({ unique: true })
   @Column({ unique: true, nullable: false })
-  studentCode: string;
+  studentCode?: string;
 
   @Column({ nullable: false })
-  studentName: string;
+  studentName?: string;
+
+  @Column({ nullable: true })
+  enrollmentYear?: number;
+
+  @Column({ nullable: true })
+  major?: string;
 }

@@ -1,5 +1,6 @@
-import { Column, Entity, Index } from 'typeorm';
+import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
 import { Role } from '@authentication/decorators/roles.decorator';
+import { Student } from '@authentication/entities/student.entity';
 import { BaseEntity } from '@shared/resource/entities/base.entity';
 
 @Entity()
@@ -17,17 +18,16 @@ export class User extends BaseEntity {
   @Column({ type: 'enum', enum: Role, default: Role.Student })
   role: Role;
 
-  @Column({ type: 'jsonb', nullable: true })
-  profile?: Profile;
-
   @Column({ nullable: true })
   picture?: string;
 
   @Column({ type: 'boolean', default: true })
   isActive: boolean;
-}
 
-export type Profile = {
-  enrollmentYear?: number;
-  major?: string;
-};
+  @Column({ nullable: true })
+  studentCode?: string;
+
+  @ManyToOne(() => Student, { nullable: true, eager: false })
+  @JoinColumn({ name: 'studentCode', referencedColumnName: 'studentCode' })
+  student?: Student;
+}

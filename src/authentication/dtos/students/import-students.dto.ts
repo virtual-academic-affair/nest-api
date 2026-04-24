@@ -7,6 +7,10 @@ export class StudentRowDto {
 
   @IsString()
   studentName: string;
+
+  @IsOptional()
+  @IsString()
+  major?: string;
 }
 
 export class ImportStudentsDto {
@@ -21,6 +25,12 @@ export class ImportStudentsDto {
   @IsInt()
   @Min(1)
   studentNameCol?: number;
+
+  @Type(() => Number)
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  majorCol?: number;
 
   @Type(() => Number)
   @IsOptional()

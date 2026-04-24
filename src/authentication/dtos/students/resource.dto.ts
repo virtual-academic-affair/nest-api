@@ -1,5 +1,5 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 import { ResourceQueryDto } from '@shared/resource/dtos/resource-query.dto';
 
 export class QueryDto extends ResourceQueryDto {}
@@ -10,6 +10,10 @@ export class CreateDto {
 
   @IsString()
   studentName: string;
+
+  @IsOptional()
+  @IsString()
+  major?: string;
 }
 
 export class UpdateDto extends PartialType(CreateDto) {}

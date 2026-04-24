@@ -1,6 +1,5 @@
 import { IsBoolean, IsEnum, IsOptional } from 'class-validator';
 import { Role } from '@authentication/decorators/roles.decorator';
-import { UpdateProfileDto } from '@authentication/dtos/users/update-profile.dto';
 import { IsBooleanQuery } from '@shared/decorators/is-boolean-query.decorator';
 import { ResourceQueryDto } from '@shared/resource/dtos/resource-query.dto';
 
@@ -14,7 +13,7 @@ export class QueryDto extends ResourceQueryDto {
   isActive?: boolean;
 }
 
-export class UpdateDto extends UpdateProfileDto {
+export class UpdateDto {
   @IsOptional()
   @IsEnum(Role)
   role?: Role;

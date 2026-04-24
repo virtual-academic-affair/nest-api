@@ -1,7 +1,7 @@
 import { IsArray, IsOptional, IsString } from 'class-validator';
 import { Role } from '@authentication/decorators/roles.decorator';
 
-export class AuthEmailDomainsDto {
+export class AuthRoleDomainsDto {
   @IsOptional()
   @IsArray()
   @IsString({ each: true })

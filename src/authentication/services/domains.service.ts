@@ -1,20 +1,31 @@
 import { Injectable } from '@nestjs/common';
 import { Role } from '@authentication/decorators/roles.decorator';
-import { RoleDomains, resolveEmail } from '@authentication/utils/resolve-email.util';
+import { User } from '@authentication/entities/user.entity';
+import { StudentsService } from '@authentication/services/students.service';
+import { RoleDomains, email2Role } from '@authentication/utils/student.util';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
 import { SettingService } from '@shared/setting/services/setting.service';
 
 @Injectable()
 export class DomainsService {
-  constructor(private readonly settingService: SettingService) {}
+  constructor(
+    private readonly settingService: SettingService,
+    private readonly studentsService: StudentsService,
+  ) {}
 
   async getDomains(role: Role): Promise<string[]> {
-    const domainsByRole = await this.settingService.get<RoleDomains>(SettingKey.AuthEmailDomains);
-    return domainsByRole[role] ?? [];
+    const roleDomains = await this.settingService.get<RoleDomains>(SettingKey.AuthRoleDomains);
+    return roleDomains?.[role] ?? [];
   }
 
-  async resolveIdentity(email: string): Promise<{ role: Role; profile?: unknown } | null> {
-    const domainsByRole = await this.settingService.get<RoleDomains>(SettingKey.AuthEmailDomains);
-    return resolveEmail(email, domainsByRole);
+  async email2Identify(email: string): Promise<Partial<User>> {
+    const domainsByRole = await this.settingService.get<RoleDomains>(SettingKey.AuthRoleDomains);
+    const identity: Partial<User> = { role: email2Role(email, domainsByRole) };
+
+    if (identity.role === Role.Student) {
+      identity.studentCode = await this.studentsService.findByEmail(email).then((s) => s?.studentCode);
+    }
+
+    return identity;
   }
 }

@@ -1,3 +1,4 @@
+import { LabelingService } from '@email/services/gmail/labeling/gmail-labeling.service';
 import { Module, forwardRef } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -8,14 +9,14 @@ import { LabelsController } from '@email/controllers/labels.controller';
 import { MessagesController } from '@email/controllers/messages.controller';
 import { Message } from '@email/entities/message.entity';
 import { GmailWebhookGuard } from '@email/guards/gmail-webhook.guard';
-import { EmailReplyService } from '@email/services/email-send/email-reply.service';
-import { EmailSendService } from '@email/services/email-send/email-send.service';
 import { GmailChangeSyncService } from '@email/services/gmail/gmail-change-sync.service';
 import { GmailHistoryClientService } from '@email/services/gmail/gmail-history-client.service';
 import { GmailMessageClientService } from '@email/services/gmail/gmail-message-client.service';
 import { GmailRabbitPublisherService } from '@email/services/gmail/gmail-rabbit-publisher.service';
 import { GmailWatchService } from '@email/services/gmail/gmail-watch.service';
 import { GmailWebhookService } from '@email/services/gmail/gmail-webhook.service';
+import { GmailReplyService } from '@email/services/gmail/sending/reply.service';
+import { GmailSendService } from '@email/services/gmail/sending/send.service';
 import { GmailApiService } from '@email/services/gmail-api.service';
 import { GmailLabelIdsService } from '@email/services/gmail-label-ids.service';
 import { GmailWebhookHandlerService } from '@email/services/gmail-webhook-handler.service';
@@ -44,9 +45,10 @@ import googleConfig from '@shared/config/google.config';
     GmailWebhookHandlerService,
     GmailWebhookGuard,
     GmailWatchService,
+    LabelingService,
     LabelsService,
-    EmailSendService,
-    EmailReplyService,
+    GmailSendService,
+    GmailReplyService,
     MessagesService,
     MessageLabelsService,
   ],
@@ -55,8 +57,8 @@ import googleConfig from '@shared/config/google.config';
     GmailApiService,
     GmailWatchService,
     GmailWebhookHandlerService,
-    EmailSendService,
-    EmailReplyService,
+    GmailSendService,
+    GmailReplyService,
     MessageLabelsService,
   ],
 })

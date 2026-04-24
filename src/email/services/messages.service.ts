@@ -8,6 +8,7 @@ import { ResourceService } from '@shared/resource/services/resource.service';
 @Injectable()
 export class MessagesService extends ResourceService<Message> {
   protected searchableColumns = ['subject', 'senderEmail', 'senderName'];
+
   protected orderableColumns = ['sentAt'];
 
   constructor(@InjectRepository(Message) repository: Repository<Message>) {
@@ -19,12 +20,6 @@ export class MessagesService extends ResourceService<Message> {
     queryBuilder.addSelect(this.p('content'));
   }
 
-  protected withAll(queryBuilder: SelectQueryBuilder<Message>) {
-    queryBuilder
-      .loadRelationIdAndMap(this.p('inquiryIds'), this.p('inquiry'))
-      .loadRelationIdAndMap(this.p('classRegistrationIds'), this.p('classRegistration'));
-  }
-
   protected applyCustomFilters(
     queryBuilder: SelectQueryBuilder<Message>,
     { systemLabels, gmailMessageId, threadId }: QueryDto,
@@ -32,9 +27,5 @@ export class MessagesService extends ResourceService<Message> {
     systemLabels?.length && queryBuilder.andWhere({ systemLabels: ArrayOverlap(systemLabels) });
     gmailMessageId && queryBuilder.andWhere({ gmailMessageId });
     threadId && queryBuilder.andWhere({ threadId });
-  }
-
-  async removeMessage(id: number) {
-    return await this.remove(id);
   }
 }

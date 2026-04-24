@@ -6,13 +6,9 @@ export enum EmailLabel {
 
 export type LabelKey = EmailLabel | 'parent';
 
-export const LabelLang: Record<LabelKey, { vi: string; en: string; color: string }> = {
-  [EmailLabel.ClassRegistration]: { vi: 'Đăng ký lớp', en: 'Class Registration', color: 'purple' },
-  [EmailLabel.Training]: { vi: 'Đào tạo', en: 'Training', color: 'blue' },
-  [EmailLabel.Graduation]: { vi: 'Tốt nghiệp', en: 'Graduation', color: 'green' },
-  parent: { vi: 'VAA', en: 'VAA', color: 'grey' },
+export const LabelLang: Record<LabelKey, { name: string; color: string }> = {
+  [EmailLabel.ClassRegistration]: { name: 'VAA/Đăng ký lớp', color: '#8E44AD' },
+  [EmailLabel.Training]: { name: 'VAA/Đào tạo', color: '#27AE60' },
+  [EmailLabel.Graduation]: { name: 'VAA/Tốt nghiệp', color: '#2980B9' },
+  parent: { name: 'VAA', color: '#7F8C8D' },
 };
-
-export function getLangLabel(label: LabelKey, field: 'vi' | 'en' | 'color' = 'vi'): string {
-  return LabelLang[label]?.[field] ?? label;
-}

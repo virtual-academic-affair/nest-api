@@ -3,8 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ArrayOverlap, Repository, SelectQueryBuilder } from 'typeorm';
 import { applyMessageFilters } from '@email/dtos/messages/message-resource-query.dto';
-import { MessageStatus } from '@email/enums/message-status.enum';
-import { EmailReplyService } from '@email/services/email-send/email-reply.service';
+import { GmailReplyService } from '@email/services/gmail/sending/reply.service';
 import { InquiryTemplate } from '@email/templates/inquiry.template';
 import { CreateDto, QueryDto } from '@inquiry/dtos/inquiries/resource.dto';
 import { Inquiry } from '@inquiry/entities/inquiry.entity';
@@ -15,7 +14,7 @@ import { ResourceService } from '@shared/resource/services/resource.service';
 export class InquiriesService extends ResourceService<Inquiry> {
   constructor(
     @InjectRepository(Inquiry) repository: Repository<Inquiry>,
-    private readonly emailReplyService: EmailReplyService,
+    private readonly gmailReplyService: GmailReplyService,
     private readonly configService: ConfigService,
   ) {
     super(repository);
@@ -78,6 +77,6 @@ export class InquiriesService extends ResourceService<Inquiry> {
     const message = inquiry.message;
     throwUnless(message, new ConflictException('Inquiry has no message'));
 
-    await this.emailReplyService.reply(message, await this.previewReply(id).then((res) => res.content));
+    await this.gmailReplyService.reply(message, await this.previewReply(id).then((res) => res.content));
   }
 }

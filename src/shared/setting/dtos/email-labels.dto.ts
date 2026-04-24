@@ -13,4 +13,8 @@ export class EmailLabelsDto {
   @IsOptional()
   @IsString()
   [EmailLabel.Graduation]?: string | null;
+
+  @IsOptional()
+  @IsString()
+  'parent'?: string | null;
 }

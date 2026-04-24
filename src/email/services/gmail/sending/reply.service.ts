@@ -1,27 +1,27 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as parseMessage from 'gmail-api-parse-message';
 import { Message } from '@email/entities/message.entity';
-import { EmailSendService } from '@email/services/email-send/email-send.service';
 import { GmailApiService } from '@email/services/gmail-api.service';
 import { compile } from '@email/templates/email-template.service';
+import { GmailSendService } from './send.service';
 
 @Injectable()
-export class EmailReplyService {
-  private readonly logger = new Logger(EmailReplyService.name);
-  static instance: EmailReplyService;
+export class GmailReplyService {
+  private readonly logger = new Logger(GmailReplyService.name);
+
+  static instance: GmailReplyService;
 
   constructor(
     private readonly gmailApiService: GmailApiService,
-    private readonly emailSendService: EmailSendService,
+    private readonly gmailSendService: GmailSendService,
   ) {
-    EmailReplyService.instance = this;
+    GmailReplyService.instance = this;
   }
 
   async getContent(message: Message, newContent: string): Promise<string> {
     let originalContent = '';
 
     try {
-      // Force fetch: Always sync with Gmail API to ensure it has the most up-to-date content
       const gmail = await this.gmailApiService.getGmailClient();
       const { data } = await gmail.users.messages.get({ userId: 'me', id: message.gmailMessageId, format: 'full' });
       const parsedMessage = parseMessage(data);
@@ -36,11 +36,7 @@ export class EmailReplyService {
       .toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
       .replace(' ', ' ')} ${message.senderName.replace(/"/g, '')} <${message.senderEmail}> wrote:`;
 
-    return compile('reply.hbs', {
-      newContent,
-      originalContent,
-      quotedInfo,
-    });
+    return compile('reply.hbs', { newContent, originalContent, quotedInfo });
   }
 
   getSubject(message: Message): string {
@@ -52,7 +48,7 @@ export class EmailReplyService {
     throwUnless(message.senderEmail, new Error('Cannot reply: message does not have sender email'));
     throwUnless(message.threadId, new Error('Cannot reply: message does not have thread ID'));
 
-    return this.emailSendService.send({
+    return this.gmailSendService.send({
       to: message.senderEmail,
       subject: this.getSubject(message),
       content: await this.getContent(message, content),

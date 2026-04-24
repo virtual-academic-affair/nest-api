@@ -6,7 +6,7 @@ import { CreateDto, QueryDto } from '@class-registration/dtos/class-registration
 import { ClassRegistration } from '@class-registration/entities/class-registration.entity';
 import { ClassRegistrationItemsService } from '@class-registration/services/class-registration-items.service';
 import { applyMessageFilters } from '@email/dtos/messages/message-resource-query.dto';
-import { EmailReplyService } from '@email/services/email-send/email-reply.service';
+import { GmailReplyService } from '@email/services/gmail/sending/reply.service';
 import { ClassRegistrationTemplate } from '@email/templates/class-registration.template';
 import { ResourceService } from '@shared/resource/services/resource.service';
 
@@ -20,7 +20,7 @@ export class ClassRegistrationsService extends ResourceService<ClassRegistration
     @InjectRepository(ClassRegistration) repository: Repository<ClassRegistration>,
     private readonly classRegistrationItemsService: ClassRegistrationItemsService,
     private readonly configService: ConfigService,
-    private readonly emailReplyService: EmailReplyService,
+    private readonly gmailReplyService: GmailReplyService,
   ) {
     super(repository);
   }
@@ -62,6 +62,6 @@ export class ClassRegistrationsService extends ResourceService<ClassRegistration
     const message = registration.message;
     throwUnless(message, new ConflictException('Registration has no message'));
 
-    await this.emailReplyService.reply(message, await this.previewReply(id).then((res) => res.content));
+    await this.gmailReplyService.reply(message, await this.previewReply(id).then((res) => res.content));
   }
 }

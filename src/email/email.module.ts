@@ -11,6 +11,7 @@ import { GmailWebhookGuard } from '@email/guards/gmail-webhook.guard';
 import { GmailLabelingService } from '@email/services/gmail/labeling/labeling.service';
 import { GmailReplyService } from '@email/services/gmail/sending/reply.service';
 import { GmailSendService } from '@email/services/gmail/sending/send.service';
+import { HistoryService } from '@email/services/gmail/webhook/history.service';
 import { IngestService } from '@email/services/gmail/webhook/ingest.service';
 import { WatchService } from '@email/services/gmail/webhook/watch.service';
 import { WebhookService } from '@email/services/gmail/webhook/webhook.service';
@@ -31,6 +32,7 @@ import { SettingService } from '@shared/setting/services/setting.service';
   controllers: [LabelsController, MessagesController, WebhookController],
   providers: [
     GmailApiService,
+    HistoryService,
     WebhookService,
     GmailWebhookGuard,
     WatchService,
@@ -41,7 +43,6 @@ import { SettingService } from '@shared/setting/services/setting.service';
     MessagesService,
     IngestService,
     SettingService,
-    LabelsService,
   ],
   exports: [
     MessagesService,

@@ -32,19 +32,18 @@ export class ClassRegistrationTemplate extends EmailTemplateService {
 
   protected getTemplateData(): Record<string, unknown> {
     const hasItems = this.classRegistration.items && this.classRegistration.items.length > 0;
-    const studentInfo = this.classRegistration.message?.studentInfo;
+    const studentCode = this.classRegistration.message?.studentCode;
+    const studentName = this.classRegistration.message?.senderName;
     const items = hasItems
       ? this.classRegistration.items.map((item) => {
           const action = this.actionConfig[item.action];
           const status = this.statusConfig[item.status];
-          const details: string[] = [`Nguyện vọng: ${action.label}`];
 
           return {
             subjectCode: item.subjectCode,
             subjectName: item.subjectName,
             className: item.className || '-',
-            details,
-            isOutOfCurriculum: item.isInCurriculum === false,
+            actionLabel: action.label,
             statusLabel: status.label,
             statusColor: status.color,
             statusBg: status.color + '1A',
@@ -54,8 +53,8 @@ export class ClassRegistrationTemplate extends EmailTemplateService {
       : [];
 
     return {
-      studentCode: studentInfo?.studentCode ?? '—',
-      cohort: studentInfo?.cohort ?? '—',
+      studentName: studentName ?? '—',
+      studentCode: studentCode ?? '—',
       note: this.classRegistration.note,
       hasItems,
       items: items.map((item, index) => ({ ...item, displayIndex: index + 1 })),

@@ -1,5 +1,6 @@
 export enum MessageStatus {
-  Waiting = 'waiting',
+  Old = 'old',
+  New = 'new',
   Staged = 'staged',
   Replied = 'replied',
 }

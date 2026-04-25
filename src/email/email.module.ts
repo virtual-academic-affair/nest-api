@@ -14,7 +14,6 @@ import { GmailMessageClientService } from '@email/services/gmail/gmail-message-c
 import { GmailMessageReaderService } from '@email/services/gmail/gmail-message-reader.service';
 import { GmailRabbitPublisherService } from '@email/services/gmail/gmail-rabbit-publisher.service';
 import { GmailWatchService } from '@email/services/gmail/gmail-watch.service';
-import { GmailWebhookService } from '@email/services/gmail/gmail-webhook.service';
 import { GmailLabelingService } from '@email/services/gmail/labeling/labeling.service';
 import { GmailReplyService } from '@email/services/gmail/sending/reply.service';
 import { GmailSendService } from '@email/services/gmail/sending/send.service';
@@ -40,7 +39,6 @@ import googleConfig from '@shared/config/google.config';
     GmailMessageReaderService,
     GmailChangeSyncService,
     GmailRabbitPublisherService,
-    GmailWebhookService,
     WebhookService,
     GmailWebhookGuard,
     GmailWatchService,

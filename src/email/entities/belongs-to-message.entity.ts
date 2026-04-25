@@ -5,7 +5,7 @@ import { BaseEntity } from '@shared/resource/entities/base.entity';
 
 export abstract class BelongsToMessage extends BaseEntity {
   @Index()
-  @Column({ type: 'enum', enum: MessageStatus, default: MessageStatus.Waiting })
+  @Column({ type: 'enum', enum: MessageStatus, default: MessageStatus.Old })
   messageStatus: MessageStatus;
 
   @Index()

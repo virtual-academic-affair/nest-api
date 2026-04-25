@@ -34,7 +34,7 @@ import { HttpResponseInterceptor } from './interceptors/http-response.intercepto
       url: process.env.DB_URL,
       type: process.env.DB_TYPE,
       autoLoadEntities: true,
-      synchronize: false,
+      synchronize: true,
       ssl: {
         rejectUnauthorized: false,
       },

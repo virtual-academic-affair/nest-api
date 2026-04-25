@@ -34,7 +34,7 @@ export class InquiriesService extends ResourceService<Inquiry> {
 
   async create(dto: CreateDto) {
     throwIf(
-      await this.repository.findOneBy({ messageId: dto.messageId }),
+      await this.repository.exists({ where: { messageId: dto.messageId } }),
       new ConflictException('Inquiry already exists'),
     );
     return await super.create(dto);

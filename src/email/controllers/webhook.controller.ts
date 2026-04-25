@@ -1,7 +1,7 @@
 import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
 import { PayloadDto } from '@email/dtos/webhook/payload.dto';
 import { GmailWebhookGuard } from '@email/guards/gmail-webhook.guard';
-import { WebhookService } from '@email/services/webhook.service';
+import { WebhookService } from '@email/services/gmail/webhook/webhook.service';
 
 @Controller(['email/webhook'])
 export class WebhookController {

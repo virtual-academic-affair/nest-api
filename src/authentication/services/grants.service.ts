@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { Role } from '@authentication/decorators/roles.decorator';
 import { User } from '@authentication/entities/user.entity';
 import { SuperEmail } from '@authentication/strategies/google-gmail.strategy';
-import { GmailWatchService } from '@email/services/gmail/gmail-watch.service';
+import { WatchService } from '@email/services/gmail/webhook/watch.service';
 import { GmailApiService } from '@email/services/gmail-api.service';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
 import { SettingService } from '@shared/setting/services/setting.service';
@@ -13,7 +13,7 @@ import { SettingService } from '@shared/setting/services/setting.service';
 export class GrantsService {
   constructor(
     private readonly gmailApiService: GmailApiService,
-    private readonly gmailWatchService: GmailWatchService,
+    private readonly watchService: WatchService,
     private readonly settingService: SettingService,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
@@ -26,10 +26,6 @@ export class GrantsService {
 
     await this.userRepository.upsert({ ...profile, role: Role.Admin }, ['email']);
     this.gmailApiService.oAuthClient.setCredentials({ refresh_token: profile.refreshToken });
-
-    const gmail = await this.gmailApiService.getGmailClient();
-    const { data: gmailProfile } = await gmail.users.getProfile({ userId: 'me' });
-    await this.settingService.set(SettingKey.EmailGmailHistoryId, gmailProfile.historyId);
-    await this.gmailWatchService.refreshWatch('grant');
+    await this.watchService.sync('grant');
   }
 }

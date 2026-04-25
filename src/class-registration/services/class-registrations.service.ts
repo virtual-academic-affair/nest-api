@@ -39,7 +39,7 @@ export class ClassRegistrationsService extends ResourceService<ClassRegistration
 
   async create(@Body() dto: CreateDto) {
     throwIf(
-      await this.repository.findOneBy({ messageId: dto.messageId }),
+      await this.repository.exists({ where: { messageId: dto.messageId } }),
       new ConflictException('Class registration already exists'),
     );
     return await super.create(dto);

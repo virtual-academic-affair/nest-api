@@ -2,7 +2,7 @@ import { ConflictException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ArrayOverlap, Repository, SelectQueryBuilder } from 'typeorm';
-import { applyMessageFilters } from '@email/dtos/messages/related-message.dto';
+import { applyMessageFilters } from '@email/dtos/messages/belongs-to-message.dto';
 import { GmailReplyService } from '@email/services/gmail/sending/reply.service';
 import { InquiryTemplate } from '@email/templates/inquiry.template';
 import { CreateDto, QueryDto } from '@inquiry/dtos/inquiries/resource.dto';

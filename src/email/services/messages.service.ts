@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ArrayOverlap, Repository, SelectQueryBuilder } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { QueryDto } from '@email/dtos/messages/resource.dto';
 import { Message } from '@email/entities/message.entity';
 import { ResourceService } from '@shared/resource/services/resource.service';
@@ -22,9 +22,8 @@ export class MessagesService extends ResourceService<Message> {
 
   protected applyCustomFilters(
     queryBuilder: SelectQueryBuilder<Message>,
-    { systemLabels, gmailMessageId, threadId }: QueryDto,
+    { gmailMessageId, threadId }: QueryDto,
   ): void {
-    systemLabels?.length && queryBuilder.andWhere({ systemLabels: ArrayOverlap(systemLabels) });
     gmailMessageId && queryBuilder.andWhere({ gmailMessageId });
     threadId && queryBuilder.andWhere({ threadId });
   }

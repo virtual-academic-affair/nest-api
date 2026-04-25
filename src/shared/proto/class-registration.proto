@@ -8,7 +8,6 @@ message CreateRegistrationItemRequest {
   string subjectName = 2;
   string className = 3;
   string subjectCode = 4;
-  bool isInCurriculum = 6;
 }
 
 message CreateRegistrationRequest {

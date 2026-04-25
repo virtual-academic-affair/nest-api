@@ -1,7 +1,6 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, Unique } from 'typeorm';
 import { Student } from '@authentication/entities/student.entity';
 import { ClassRegistration } from '@class-registration/entities/class-registration.entity';
-import { MessageStatus } from '@email/enums/message-status.enum';
 import { Inquiry } from '@inquiry/entities/inquiry.entity';
 import { EncryptedColumn } from '@shared/decorators/encrypted-column.decorator';
 import { BaseEntity } from '@shared/resource/entities/base.entity';
@@ -48,10 +47,6 @@ export class Message extends BaseEntity {
 
   @EncryptedColumn({ type: 'text', nullable: true, select: false })
   content?: string;
-
-  @Index()
-  @Column({ type: 'enum', enum: MessageStatus, default: MessageStatus.Opened })
-  status: MessageStatus;
 
   @OneToMany(() => Inquiry, (inquiry) => inquiry.message)
   inquiry: Inquiry[];

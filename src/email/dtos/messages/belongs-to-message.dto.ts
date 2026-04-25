@@ -1,10 +1,14 @@
 import { Type } from 'class-transformer';
 import { IsDefined, IsEnum, IsInt, IsOptional, Min } from 'class-validator';
 import { In, ObjectLiteral, SelectQueryBuilder } from 'typeorm';
-import { MessageStatus } from '@email/enums/message-status.enum';
+import { MessageStatus } from '@email/enums/belongs-to-message-status.enum';
 import { ResourceQueryDto } from '@shared/resource/dtos/resource-query.dto';
 
 export class BelongsToMessageCreateDto {
+  @IsOptional()
+  @IsEnum(MessageStatus)
+  messageStatus?: MessageStatus;
+
   @IsDefined()
   @Type(() => Number)
   @IsInt()

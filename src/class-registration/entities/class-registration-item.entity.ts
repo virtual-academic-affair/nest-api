@@ -30,10 +30,6 @@ export class ClassRegistrationItem extends BaseEntity {
   subjectCode?: string;
 
   @Index()
-  @Column({ type: 'boolean', nullable: true })
-  isInCurriculum: boolean;
-
-  @Index()
   @Column({ type: 'enum', enum: RegistrationStatus, default: RegistrationStatus.Pending })
   status: RegistrationStatus;
 

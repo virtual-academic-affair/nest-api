@@ -1,5 +1,5 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { IsBoolean, IsDefined, IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsDefined, IsEnum, IsOptional, IsString } from 'class-validator';
 import { RegistrationAction } from '@class-registration/enums/registration-action.enum';
 import { RegistrationStatus } from '@class-registration/enums/registration-status.enum';
 import { Upper } from '@shared/decorators/upper.decorator';
@@ -23,10 +23,6 @@ export class CreateDto {
   @IsString()
   @Upper()
   subjectCode?: string;
-
-  @IsOptional()
-  @IsBoolean()
-  isInCurriculum?: boolean;
 }
 
 export class UpdateDto extends PartialType(CreateDto) {

@@ -5,7 +5,7 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import { CreateDto, QueryDto } from '@class-registration/dtos/class-registrations/resource.dto';
 import { ClassRegistration } from '@class-registration/entities/class-registration.entity';
 import { ClassRegistrationItemsService } from '@class-registration/services/class-registration-items.service';
-import { applyMessageFilters } from '@email/dtos/messages/related-message.dto';
+import { applyMessageFilters } from '@email/dtos/messages/belongs-to-message.dto';
 import { GmailReplyService } from '@email/services/gmail/sending/reply.service';
 import { ClassRegistrationTemplate } from '@email/templates/class-registration.template';
 import { ResourceService } from '@shared/resource/services/resource.service';
@@ -33,11 +33,8 @@ export class ClassRegistrationsService extends ResourceService<ClassRegistration
     queryBuilder.leftJoinAndSelect(this.p('items'), 'items').leftJoinAndSelect(this.p('message'), 'message');
   }
 
-  protected applyCustomFilters(
-    queryBuilder: SelectQueryBuilder<ClassRegistration>,
-    { messageId, messageStatuses }: QueryDto,
-  ): void {
-    applyMessageFilters(queryBuilder, { messageId, messageStatuses });
+  protected applyCustomFilters(queryBuilder: SelectQueryBuilder<ClassRegistration>, dto: QueryDto): void {
+    applyMessageFilters(queryBuilder, dto);
   }
 
   async create(@Body() dto: CreateDto) {

@@ -1,11 +1,10 @@
-import { Body, Controller, Get, Inject, Post, Put, Req, Res, UnauthorizedException } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Post, Req, Res, UnauthorizedException } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { GrpcMethod } from '@nestjs/microservices';
 import { Request, Response } from 'express';
 import { ActiveUser } from '@authentication/decorators/active-user.decorator';
 import { Auth, AuthType } from '@authentication/decorators/auth.decorator';
-import { UpdateProfileDto } from '@authentication/dtos/users/update-profile.dto';
 import { AuthService } from '@authentication/services/auth.service';
 import { UsersService } from '@authentication/services/users.service';
 import { REFRESH_COOKIE, getClearCookieOptions, getRefreshCookieOptions } from '@authentication/utils/cookie.util';
@@ -39,12 +38,6 @@ export class AuthenticationController {
   @Auth(AuthType.Jwt)
   async findOne(@ActiveUser('id') userId: number) {
     return this.userService.findOne(userId);
-  }
-
-  @Put('me')
-  @Auth(AuthType.Jwt)
-  async updateMe(@ActiveUser('id') userId: number, @Body() dto: UpdateProfileDto) {
-    return this.userService.update(userId, dto);
   }
 
   @GrpcMethod('AuthService', 'VerifyToken')

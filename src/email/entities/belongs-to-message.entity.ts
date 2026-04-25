@@ -1,8 +1,13 @@
 import { Column, Index, JoinColumn, ManyToOne } from 'typeorm';
 import { Message } from '@email/entities/message.entity';
+import { MessageStatus } from '@email/enums/belongs-to-message-status.enum';
 import { BaseEntity } from '@shared/resource/entities/base.entity';
 
 export abstract class BelongsToMessage extends BaseEntity {
+  @Index()
+  @Column({ type: 'enum', enum: MessageStatus, default: MessageStatus.Waiting })
+  messageStatus: MessageStatus;
+
   @Index()
   @Column()
   messageId!: number;

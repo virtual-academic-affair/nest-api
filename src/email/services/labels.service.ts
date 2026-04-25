@@ -17,9 +17,16 @@ export class LabelsService {
     return await this.gmailLabelingService.list();
   }
 
-  async create(key: LabelKey): Promise<void> {
+  async create(key: LabelKey): Promise<string> {
     const newLabelId = await this.gmailLabelingService.create(LabelLang[key]);
     await this.settingService.set(SettingKey.EmailLabels, { [key]: newLabelId }, true);
+
+    return newLabelId;
+  }
+
+  async getId(key: LabelKey, force: boolean = false): Promise<string | null> {
+    const labels = await this.settingService.get<EmailLabelsDto>(SettingKey.EmailLabels);
+    return labels?.[key] ?? (force ? await this.create(key) : null);
   }
 
   async label(message: Message, toAdds: LabelKey[], toRemoves: LabelKey[], force: false): Promise<void> {

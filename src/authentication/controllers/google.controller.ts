@@ -1,8 +1,8 @@
-import { Controller, Get, Inject, Logger, Req, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, Inject, Logger, Query, Req, Res, UseGuards } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
-import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
 import { GoogleGmailGuard } from '@authentication/guards/google-gmail.guard';
+import { GoogleGuard } from '@authentication/guards/google.guard';
 import { GoogleService } from '@authentication/services/google.service';
 import { GrantsService } from '@authentication/services/grants.service';
 import { SuperEmail } from '@authentication/strategies/google-gmail.strategy';
@@ -21,17 +21,17 @@ export class GoogleController {
   ) {}
 
   @Get()
-  @UseGuards(AuthGuard('google'))
-  async googleRedirect(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+  @UseGuards(GoogleGuard)
+  async googleRedirect(@Req() req: Request, @Query('state') state: string, @Res({ passthrough: true }) res: Response) {
     const profile = req.user as GoogleProfile;
     const tokens = await this.googleService.login(profile);
     res.cookie(REFRESH_COOKIE, tokens.refreshToken, getRefreshCookieOptions(this.jwtConfiguration.refreshTokenTtl));
-    return res.redirect(`${process.env.APP_URL}?token="${tokens.accessToken}"`);
+    return res.redirect(`${state}?token="${tokens.accessToken}"`);
   }
 
   @Get('grant-gmail')
   @UseGuards(GoogleGmailGuard)
-  async grantGmail(@Req() req: Request, @Res() res: Response) {
+  async grantGmail(@Req() req: Request, @Query('state') state: string, @Res({ passthrough: true }) res: Response) {
     let isSuccess = false;
 
     try {
@@ -41,6 +41,6 @@ export class GoogleController {
       this.logger.error(`Grant Gmail failed: ${error.message}`, error.stack);
     }
 
-    return res.redirect(`${process.env.APP_URL}?grant=${isSuccess}`);
+    return res.redirect(`${state}?grant=${isSuccess}`);
   }
 }

@@ -1,8 +1,9 @@
-import { Global, Module } from '@nestjs/common';
+import { Global, Module, forwardRef } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { ClientsModule } from '@nestjs/microservices';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { EmailModule } from '@email/email.module';
 import { GRPC_SERVICE, RABBIT_SERVICE } from '@shared/config/constants';
 import googleConfig from '@shared/config/google.config';
 import grpcConfig from '@shared/config/grpc.config';
@@ -22,6 +23,7 @@ import { SettingService } from '@shared/setting/services/setting.service';
 @Global()
 @Module({
   imports: [
+    forwardRef(() => EmailModule),
     TypeOrmModule.forFeature([Setting]),
     ConfigModule.forFeature(jwtConfig),
     ConfigModule.forFeature(redisConfig),

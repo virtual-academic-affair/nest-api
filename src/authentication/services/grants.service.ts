@@ -23,10 +23,12 @@ export class GrantsService {
     throwUnless(profile?.refreshToken, new BadRequestException('Missing refresh token'));
 
     await Promise.all([
-      this.settingService.set(SettingKey.EmailLabels, []),
       this.settingService.set(SettingKey.EmailSuperEmail, profile),
       this.userRepository.upsert({ ...profile, role: Role.Admin }, ['email']),
+      this.settingService.remove(SettingKey.EmailLabels),
+      this.settingService.remove(SettingKey.EmailGmailHistoryId),
     ]);
+
     this.gmailApiService.oAuthClient.setCredentials({ refresh_token: profile.refreshToken });
     await this.watchService.sync('grant');
   }

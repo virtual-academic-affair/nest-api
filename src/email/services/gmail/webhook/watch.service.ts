@@ -60,20 +60,31 @@ export class WatchService {
   }
 
   private async syncDomainFilters(gmail: gmail_v1.Gmail, domains: string[], labelId: string): Promise<void> {
-    await Promise.all(
-      domains.map(async (domain) => {
-        try {
-          await gmail.users.settings.filters.create({
-            userId: 'me',
-            requestBody: { criteria: { from: `@${domain}` }, action: { addLabelIds: [labelId] } },
-          });
-        } catch (error: any) {
-          // 409 Conflict: Filter already exists
-          if (error?.code !== 409) {
-            this.logger.warn(`Failed to create filter for domain ${domain}: ${error.message}`);
-          }
-        }
-      }),
-    );
+    const normalizedDomains = [
+      ...new Set(domains.map((value) => value.trim().replace(/^@+/, '').toLowerCase())),
+    ].filter(Boolean);
+
+    await this.clearDomainFilters(gmail, labelId);
+    for (const domain of normalizedDomains) {
+      await gmail.users.settings.filters.create({
+        userId: 'me',
+        requestBody: { criteria: { from: `@${domain}` }, action: { addLabelIds: [labelId] } },
+      });
+    }
+  }
+
+  private async clearDomainFilters(gmail: gmail_v1.Gmail, labelId: string): Promise<void> {
+    const { data } = await gmail.users.settings.filters.list({ userId: 'me' });
+    const managedFilters =
+      data.filter?.filter(
+        (item) =>
+          !!item.id &&
+          item.criteria?.from?.trim().startsWith('@') &&
+          (item.action?.addLabelIds ?? []).includes(labelId),
+      ) ?? [];
+
+    for (const filter of managedFilters) {
+      await gmail.users.settings.filters.delete({ userId: 'me', id: filter.id! });
+    }
   }
 }

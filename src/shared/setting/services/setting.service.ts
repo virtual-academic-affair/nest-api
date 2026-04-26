@@ -52,4 +52,9 @@ export class SettingService {
     await this.redis.set(this.cacheKey(key), JSON.stringify(saved.value), 'EX', SettingService.CACHE_TTL_SECONDS);
     return saved;
   }
+
+  async remove(key: string): Promise<void> {
+    await this.settingRepository.delete({ key });
+    await this.redis.del(this.cacheKey(key));
+  }
 }

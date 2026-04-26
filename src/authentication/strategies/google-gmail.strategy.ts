@@ -19,7 +19,13 @@ export class GoogleGmailStrategy extends PassportStrategy(Strategy, 'google-gmai
       clientID: googleConfiguration.clientId,
       clientSecret: googleConfiguration.clientSecret,
       callbackURL: googleConfiguration.gmailRedirectUri,
-      scope: ['openid', 'email', 'profile', 'https://www.googleapis.com/auth/gmail.modify'],
+      scope: [
+        'openid',
+        'email',
+        'profile',
+        'https://www.googleapis.com/auth/gmail.modify',
+        'https://www.googleapis.com/auth/gmail.settings.basic',
+      ],
       accessType: 'offline',
       prompt: 'consent',
     } as any);

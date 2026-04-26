@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Message } from '@email/entities/message.entity';
-import { LabelKey, LabelLang } from '@email/enums/email-label.enum';
+import { LabelKey, LabelLang } from '@email/enums/label.enum';
 import { GmailLabelingService } from '@email/services/gmail/labeling/labeling.service';
-import { EmailLabelsDto } from '@shared/setting/dtos/email-labels.dto';
+import { LabelsDto } from '@shared/setting/dtos/email-labels.dto';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
 import { SettingService } from '@shared/setting/services/setting.service';
 
@@ -25,7 +25,7 @@ export class LabelsService {
   }
 
   async getId(key: LabelKey, force: boolean = false): Promise<string | null> {
-    const labels = await this.settingService.get<EmailLabelsDto>(SettingKey.EmailLabels);
+    const labels = await this.settingService.get<LabelsDto>(SettingKey.EmailLabels);
     return labels?.[key] ?? (force ? await this.create(key) : null);
   }
 
@@ -34,7 +34,7 @@ export class LabelsService {
       return;
     }
 
-    const labels = await this.settingService.get<EmailLabelsDto>(SettingKey.EmailLabels);
+    const labels = await this.settingService.get<LabelsDto>(SettingKey.EmailLabels);
 
     return this.gmailLabelingService.label(
       message.gmailMessageId,

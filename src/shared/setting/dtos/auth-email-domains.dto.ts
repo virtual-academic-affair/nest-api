@@ -10,5 +10,10 @@ export class AuthRoleDomainsDto {
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
+  [Role.Admin]?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
   [Role.Lecture]?: string[];
 }

@@ -3,7 +3,7 @@ import { Auth, AuthType } from '@authentication/decorators/auth.decorator';
 import { Role, Roles } from '@authentication/decorators/roles.decorator';
 import { validateDto } from '@shared/resource/utils/validate-dto.util';
 import { AuthRoleDomainsDto } from '@shared/setting/dtos/auth-email-domains.dto';
-import { EmailLabelsDto } from '@shared/setting/dtos/email-labels.dto';
+import { LabelsDto } from '@shared/setting/dtos/email-labels.dto';
 import { SettingsQueryDto } from '@shared/setting/dtos/settings-query.dto';
 import { SettingKey } from '@shared/setting/enums/setting-key.enum';
 import { SettingService } from '@shared/setting/services/setting.service';
@@ -17,7 +17,7 @@ export class SettingsController {
   constructor(private readonly settingService: SettingService) {
     this.configByKey = {
       [SettingKey.AuthRoleDomains]: { dto: AuthRoleDomainsDto },
-      [SettingKey.EmailLabels]: { dto: EmailLabelsDto },
+      [SettingKey.EmailLabels]: { dto: LabelsDto },
     };
   }
 

@@ -6,6 +6,7 @@ import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { AuthenticationModule } from '@authentication/authentication.module';
 import { ClassRegistrationModule } from '@class-registration/class-registration.module';
 import { EmailModule } from '@email/email.module';
+import { FormModule } from '../form/form.module';
 import { InquiryModule } from '@inquiry/inquiry.module';
 import { appConfig } from '@shared/config/app.config';
 import { SharedModule } from '@shared/shared.module';
@@ -44,6 +45,7 @@ import { HttpResponseInterceptor } from './interceptors/http-response.intercepto
     AuthenticationModule,
     ClassRegistrationModule,
     InquiryModule,
+    FormModule,
   ],
 })
 export class AppModule {}

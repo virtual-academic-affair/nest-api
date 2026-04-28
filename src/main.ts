@@ -2,17 +2,20 @@ import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions } from '@nestjs/microservices';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import * as cookieParser from 'cookie-parser';
+import { webhookAdaptMiddleware } from '@email/middlewares/webhook-adapt.middleware';
 import '@shared/utils/throw.util';
-import { AppModule } from './app/app.module';
+import { AppModule } from '@app/app.module';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
 
   try {
-    const app = await NestFactory.create(AppModule);
+    const app = await NestFactory.create<NestExpressApplication>(AppModule, { rawBody: true });
     app.enableCors({ origin: true, credentials: true });
     app.getHttpAdapter().getInstance().set('query parser', 'extended');
+    app.use(webhookAdaptMiddleware);
     app.use(cookieParser());
 
     if (process.env.START_GRPC === 'true') {

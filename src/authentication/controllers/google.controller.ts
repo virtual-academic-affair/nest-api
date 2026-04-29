@@ -22,7 +22,7 @@ export class GoogleController {
 
   @Get()
   @UseGuards(GoogleGuard)
-  async googleRedirect(@Req() req: Request, @Query('state') state: string, @Res({ passthrough: true }) res: Response) {
+  async googleRedirect(@Req() req: Request, @Query('state') state: string, @Res() res: Response) {
     const profile = req.user as GoogleProfile;
     const tokens = await this.googleService.login(profile);
     res.cookie(REFRESH_COOKIE, tokens.refreshToken, getRefreshCookieOptions(this.jwtConfiguration.refreshTokenTtl));
@@ -31,7 +31,7 @@ export class GoogleController {
 
   @Get('grant-gmail')
   @UseGuards(GoogleGmailGuard)
-  async grantGmail(@Req() req: Request, @Query('state') state: string, @Res({ passthrough: true }) res: Response) {
+  async grantGmail(@Req() req: Request, @Query('state') state: string, @Res() res: Response) {
     let isSuccess = false;
 
     try {

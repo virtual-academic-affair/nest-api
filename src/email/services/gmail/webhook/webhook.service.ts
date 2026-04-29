@@ -36,8 +36,8 @@ export class WebhookService {
       parentLabelId,
     );
 
-    await Promise.all([this.handleAdded(addedMessageIds), this.handleRemoved(removedMessageIds)]);
     await this.settingService.set(SettingKey.EmailGmailHistoryId, latestHistoryId ?? historyId);
+    await Promise.all([this.handleAdded(addedMessageIds), this.handleRemoved(removedMessageIds)]);
   }
 
   private async handleAdded(gmailMessageIds: string[]): Promise<void> {

@@ -6,7 +6,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import * as cookieParser from 'cookie-parser';
 import { webhookAdaptMiddleware } from '@email/middlewares/webhook-adapt.middleware';
 import '@shared/utils/throw.util';
-import { AppModule } from '@app/app.module';
+import { AppModule } from './app/app.module';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');

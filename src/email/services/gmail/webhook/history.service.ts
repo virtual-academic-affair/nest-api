@@ -25,18 +25,26 @@ export class HistoryService {
         const { data } = await gmail.users.history.list({
           userId: 'me',
           startHistoryId,
-          historyTypes: ['labelAdded', 'labelRemoved'],
+          historyTypes: ['labelAdded', 'labelRemoved', 'messageAdded', 'messageDeleted'],
           pageToken,
           maxResults: 500,
         });
 
+        this.logger.log(`Fetched history page. HistoryId: ${data.historyId}, Records: ${JSON.stringify(data)}`);
+
+        latestHistoryId = data.historyId;
         if (!data.history) {
           break;
         }
 
-        latestHistoryId = data.historyId;
-
         for (const history of data.history) {
+          history.messagesAdded?.forEach((item) => {
+            if (item.message?.id && item.message?.labelIds?.includes(parentLabelId)) {
+              added.add(item.message.id);
+              removed.delete(item.message.id);
+            }
+          });
+
           history.labelsAdded?.forEach((item) => {
             if (item.message?.id && item.labelIds?.includes(parentLabelId)) {
               added.add(item.message.id);
@@ -50,7 +58,18 @@ export class HistoryService {
               added.delete(item.message.id);
             }
           });
+
+          history.messagesDeleted?.forEach((item) => {
+            if (item.message?.id && item.message?.labelIds.includes(parentLabelId)) {
+              removed.add(item.message.id);
+              added.delete(item.message.id);
+            }
+          });
         }
+
+        this.logger.log(
+          `Page processed. Added: ${added.size}, Removed: ${removed.size}, LatestHistoryId: ${latestHistoryId}`,
+        );
 
         pageToken = data.nextPageToken ?? undefined;
       } while (pageToken);

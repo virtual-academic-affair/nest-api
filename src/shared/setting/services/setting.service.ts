@@ -45,10 +45,17 @@ export class SettingService {
   }
 
   async set<T>(key: string, value: T, isPartial = false): Promise<Setting> {
-    const existing = await this.settingRepository.findOneBy({ key });
-    value = isPartial && typeof existing?.value === 'object' ? ({ ...existing.value, ...value } as T) : value;
+    const saved = await this.settingRepository.manager.transaction(async (trans) => {
+      const existing = await trans.findOne(Setting, { where: { key: key }, lock: { mode: 'pessimistic_write' } });
 
-    const saved = await this.settingRepository.save({ ...existing, key, value } as Setting);
+      const finalValue =
+        isPartial && existing?.value && typeof existing.value === 'object'
+          ? ({ ...existing.value, ...value } as T)
+          : value;
+
+      return await trans.save(Setting, { ...existing, key, value: finalValue } as Setting);
+    });
+
     await this.redis.set(this.cacheKey(key), JSON.stringify(saved.value), 'EX', SettingService.CACHE_TTL_SECONDS);
     return saved;
   }

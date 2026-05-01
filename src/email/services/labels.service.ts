@@ -29,7 +29,7 @@ export class LabelsService {
     return labels?.[key] ?? (force ? await this.create(key) : null);
   }
 
-  async label(message: Message, toAdds: LabelKey[], toRemoves: LabelKey[], force: false): Promise<void> {
+  async label(message: Message, toAdds: LabelKey[], toRemoves: LabelKey[], force: boolean = false): Promise<void> {
     if (toAdds.length === 0 && toRemoves.length === 0) {
       return;
     }

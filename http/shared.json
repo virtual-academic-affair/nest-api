@@ -1,0 +1,81 @@
+{
+  "info": {
+    "name": "Shared",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Settings",
+      "item": [
+        {
+          "name": "get settings",
+          "request": {
+            "method": "GET",
+            "url": {
+              "host": ["{{baseUrl}}"],
+              "path": ["shared", "settings"],
+              "query": [
+                {
+                  "key": "keys[]",
+                  "value": "auth.roleDomains"
+                },
+                {
+                  "key": "keys[]",
+                  "value": "email.labels"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "update auth role domains",
+          "request": {
+            "method": "PUT",
+            "body": {
+              "mode": "raw",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "raw": "{\n  \"student\": [\"student.hcmus.edu.vn\"],\n  \"lecture\": [\"hcmus.edu.vn\"],\n  \"admin\": [\"hcmus.edu.vn\"]\n}"
+            },
+            "url": {
+              "host": ["{{baseUrl}}"],
+              "path": ["shared", "settings", "auth.roleDomains"]
+            }
+          }
+        },
+        {
+          "name": "update email labels",
+          "request": {
+            "method": "PUT",
+            "body": {
+              "mode": "raw",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "raw": "{\n  \"classRegistration\": \"Label_123\",\n  \"training\": \"Label_456\",\n  \"graduation\": \"Label_789\",\n  \"parent\": \"Label_000\"\n}"
+            },
+            "url": {
+              "host": ["{{baseUrl}}"],
+              "path": ["shared", "settings", "email.labels"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

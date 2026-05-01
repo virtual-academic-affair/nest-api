@@ -22,13 +22,8 @@
           "request": {
             "method": "GET",
             "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "classRegistration",
-                "classRegistrations"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["classRegistration", "classRegistrations"],
               "query": [
                 {
                   "key": "page",
@@ -41,22 +36,6 @@
                 {
                   "key": "keyword",
                   "value": "",
-                  "description": "studentCode",
-                  "disabled": true
-                },
-                {
-                  "key": "studentCode",
-                  "value": "",
-                  "disabled": true
-                },
-                {
-                  "key": "cohort",
-                  "value": "",
-                  "disabled": true
-                },
-                {
-                  "key": "smartOrder",
-                  "value": "",
                   "disabled": true
                 },
                 {
@@ -67,7 +46,7 @@
                 {
                   "key": "messageStatuses[]",
                   "value": "",
-                  "description": "opened | replied",
+                  "description": "new | staged | replied",
                   "disabled": true
                 },
                 {
@@ -89,14 +68,8 @@
           "request": {
             "method": "GET",
             "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "classRegistration",
-                "classRegistrations",
-                ":id"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["classRegistration", "classRegistrations", ":id"],
               "variable": [
                 {
                   "key": "id",
@@ -117,16 +90,11 @@
                   "language": "json"
                 }
               },
-              "raw": "{\n    \"note\": \"Ghi chu thanh toan\",\n    \"messageId\": 1,\n    \"items\": [\n        {\n            \"action\": \"register\",\n            \"subjectName\": \"Toan cao cap\",\n            \"subjectCode\": \"MATH101\",\n            \"className\": \"TH1\",\n            \"isInCurriculum\": true\n        }\n    ]\n}"
+              "raw": "{\n  \"messageId\": 1,\n  \"messageStatus\": \"new\",\n  \"note\": \"Needs review by academic office\",\n  \"items\": [\n    {\n      \"action\": \"register\",\n      \"subjectName\": \"Advanced Mathematics\",\n      \"subjectCode\": \"MATH101\",\n      \"className\": \"TH1\"\n    }\n  ]\n}"
             },
             "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "classRegistration",
-                "classRegistrations"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["classRegistration", "classRegistrations"]
             }
           }
         },
@@ -144,14 +112,8 @@
               "raw": "{\n    \"note\": \"Ghi chu cap nhat\"\n}"
             },
             "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "classRegistration",
-                "classRegistrations",
-                ":id"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["classRegistration", "classRegistrations", ":id"],
               "variable": [
                 {
                   "key": "id",
@@ -166,14 +128,8 @@
           "request": {
             "method": "DELETE",
             "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "classRegistration",
-                "classRegistrations",
-                ":id"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["classRegistration", "classRegistrations", ":id"],
               "variable": [
                 {
                   "key": "id",
@@ -188,14 +144,8 @@
           "request": {
             "method": "GET",
             "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "classRegistration",
-                "classRegistrations",
-                "stats"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["classRegistration", "classRegistrations", "stats"],
               "query": [
                 {
                   "key": "from",
@@ -214,15 +164,8 @@
           "request": {
             "method": "GET",
             "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "classRegistration",
-                "classRegistrations",
-                ":id",
-                "reply"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["classRegistration", "classRegistrations", ":id", "reply"],
               "variable": [
                 {
                   "key": "id",
@@ -237,15 +180,8 @@
           "request": {
             "method": "POST",
             "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "classRegistration",
-                "classRegistrations",
-                ":id",
-                "reply"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["classRegistration", "classRegistrations", ":id", "reply"],
               "variable": [
                 {
                   "key": "id",
@@ -271,18 +207,11 @@
                   "language": "json"
                 }
               },
-              "raw": "{\n    \"action\": \"register\",\n    \"subjectName\": \"Toan cao cap\",\n    \"subjectCode\": \"MATH101\",\n    \"className\": \"TH1\",\n    \"isInCurriculum\": true\n}"
+              "raw": "{\n  \"action\": \"register\",\n  \"subjectName\": \"Advanced Mathematics\",\n  \"subjectCode\": \"MATH101\",\n  \"className\": \"TH1\"\n}"
             },
             "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "classRegistration",
-                "classRegistrations",
-                ":parentId",
-                "items"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["classRegistration", "classRegistrations", ":parentId", "items"],
               "variable": [
                 {
                   "key": "parentId",
@@ -303,19 +232,11 @@
                   "language": "json"
                 }
               },
-              "raw": "{\n    \"status\": \"rejected\",\n    \"rejectReasons\": [\n        \"Lop da day\"\n    ]\n}"
+              "raw": "{\n  \"status\": \"rejected\",\n  \"note\": \"Class is full for this semester.\"\n}"
             },
             "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "classRegistration",
-                "classRegistrations",
-                ":parentId",
-                "items",
-                ":id"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["classRegistration", "classRegistrations", ":parentId", "items", ":id"],
               "variable": [
                 {
                   "key": "parentId",
@@ -334,16 +255,8 @@
           "request": {
             "method": "DELETE",
             "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "classRegistration",
-                "classRegistrations",
-                ":parentId",
-                "items",
-                ":id"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["classRegistration", "classRegistrations", ":parentId", "items", ":id"],
               "variable": [
                 {
                   "key": "parentId",

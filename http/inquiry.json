@@ -22,13 +22,8 @@
           "request": {
             "method": "GET",
             "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "inquiry",
-                "inquiries"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["inquiry", "inquiries"],
               "query": [
                 {
                   "key": "page",
@@ -46,7 +41,7 @@
                 {
                   "key": "types[]",
                   "value": "",
-                  "description": "graduation | training | procedure",
+                  "description": "graduation | training",
                   "disabled": true
                 },
                 {
@@ -57,7 +52,7 @@
                 {
                   "key": "messageStatuses[]",
                   "value": "",
-                  "description": "opened | replied",
+                  "description": "new | staged | replied",
                   "disabled": true
                 },
                 {
@@ -78,14 +73,8 @@
           "request": {
             "method": "GET",
             "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "inquiry",
-                "inquiries",
-                ":id"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["inquiry", "inquiries", ":id"],
               "variable": [
                 {
                   "key": "id",
@@ -106,16 +95,11 @@
                   "language": "json"
                 }
               },
-              "raw": "{\n    \"messageId\": 1,\n    \"types\": [\"graduation\", \"training\"],\n    \"question\": \"Bao gio co lich bao ve?\",\n    \"answer\": \"Du kien cuoi thang 6\"\n}"
+              "raw": "{\n  \"messageId\": 1,\n  \"messageStatus\": \"new\",\n  \"types\": [\"graduation\"],\n  \"question\": \"When is the graduation defense schedule?\",\n  \"answer\": \"The expected period is late June.\"\n}"
             },
             "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "inquiry",
-                "inquiries"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["inquiry", "inquiries"]
             }
           }
         },
@@ -130,17 +114,11 @@
                   "language": "json"
                 }
               },
-              "raw": "{\n    \"types\": [\"training\"],\n    \"question\": \"Cho em hoi thu tuc nop ho so dao tao?\",\n    \"answer\": \"Em nop tai phong giao vu\"\n}"
+              "raw": "{\n  \"types\": [\"training\"],\n  \"question\": \"How do I submit training documents?\",\n  \"answer\": \"Please submit directly at the academic affairs office.\"\n}"
             },
             "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "inquiry",
-                "inquiries",
-                ":id"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["inquiry", "inquiries", ":id"],
               "variable": [
                 {
                   "key": "id",
@@ -155,14 +133,8 @@
           "request": {
             "method": "DELETE",
             "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "inquiry",
-                "inquiries",
-                ":id"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["inquiry", "inquiries", ":id"],
               "variable": [
                 {
                   "key": "id",
@@ -177,14 +149,8 @@
           "request": {
             "method": "GET",
             "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "inquiry",
-                "inquiries",
-                "stats"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["inquiry", "inquiries", "stats"],
               "query": [
                 {
                   "key": "from",
@@ -203,15 +169,8 @@
           "request": {
             "method": "POST",
             "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "inquiry",
-                "inquiries",
-                ":id",
-                "reply"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["inquiry", "inquiries", ":id", "reply"],
               "variable": [
                 {
                   "key": "id",
@@ -226,15 +185,8 @@
           "request": {
             "method": "GET",
             "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "inquiry",
-                "inquiries",
-                ":id",
-                "reply"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["inquiry", "inquiries", ":id", "reply"],
               "variable": [
                 {
                   "key": "id",

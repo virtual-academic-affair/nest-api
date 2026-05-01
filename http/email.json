@@ -22,13 +22,8 @@
           "request": {
             "method": "GET",
             "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "email",
-                "messages"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["email", "messages"],
               "query": [
                 {
                   "key": "page",
@@ -41,24 +36,25 @@
                 {
                   "key": "keyword",
                   "value": "",
-                  "description": "subject | senderEmail | senderName",
                   "disabled": true
                 },
                 {
-                  "key": "systemLabels[]",
+                  "key": "gmailMessageId",
                   "value": "",
-                  "description": "classRegistration | task | inquiry | other",
+                  "disabled": true
+                },
+                {
+                  "key": "threadId",
+                  "value": "",
                   "disabled": true
                 },
                 {
                   "key": "orderCol",
-                  "value": "sentAt",
-                  "description": "sentAt"
+                  "value": "sentAt"
                 },
                 {
                   "key": "orderDir",
-                  "value": "DESC",
-                  "description": "ASC | DESC"
+                  "value": "DESC"
                 }
               ]
             }
@@ -69,14 +65,8 @@
           "request": {
             "method": "GET",
             "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "email",
-                "messages",
-                ":id"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["email", "messages", ":id"],
               "variable": [
                 {
                   "key": "id",
@@ -87,44 +77,12 @@
           }
         },
         {
-          "name": "sync",
+          "name": "remove",
           "request": {
-            "method": "POST",
+            "method": "DELETE",
             "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "email",
-                "messages",
-                "sync"
-              ]
-            }
-          }
-        },
-        {
-          "name": "updateLabels",
-          "request": {
-            "method": "PUT",
-            "body": {
-              "mode": "raw",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              },
-              "raw": "{\n    \"systemLabels\": [\"task\", \"inquiry\"]\n}"
-            },
-            "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "email",
-                "messages",
-                ":id",
-                "labels"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["email", "messages", ":id"],
               "variable": [
                 {
                   "key": "id",
@@ -140,57 +98,12 @@
       "name": "Labels",
       "item": [
         {
-          "name": "findAll",
-          "request": {
-            "method": "GET",
-            "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "email",
-                "labels"
-              ]
-            }
-          }
-        },
-        {
           "name": "findAllGmailLabels",
           "request": {
             "method": "GET",
             "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "email",
-                "labels",
-                "gmailLabels"
-              ]
-            }
-          }
-        },
-        {
-          "name": "update",
-          "request": {
-            "method": "PUT",
-            "body": {
-              "mode": "raw",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              },
-              "raw": "{\n    \"classRegistration\": \"Label_123\",\n    \"task\": \"Label_456\",\n    \"inquiry\": \"Label_789\",\n    \"other\": \"Label_000\"\n}"
-            },
-            "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "email",
-                "labels"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["email", "labels", "gmailLabels"]
             }
           }
         },
@@ -199,83 +112,18 @@
           "request": {
             "method": "POST",
             "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "email",
-                "labels",
-                "autoCreate"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["email", "labels", "autoCreate"]
             }
           }
         }
       ]
     },
     {
-      "name": "AllowedDomains",
+      "name": "Webhook",
       "item": [
         {
-          "name": "get",
-          "request": {
-            "method": "GET",
-            "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "email",
-                "allowedDomains"
-              ]
-            }
-          }
-        },
-        {
-          "name": "update",
-          "request": {
-            "method": "PUT",
-            "body": {
-              "mode": "raw",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              },
-              "raw": "{\n    \"domains\": [\"example.com\", \"test.com\"]\n}"
-            },
-            "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "email",
-                "allowedDomains"
-              ]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Grants",
-      "item": [
-        {
-          "name": "getAuthUrl",
-          "request": {
-            "method": "GET",
-            "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "email",
-                "grants"
-              ]
-            }
-          }
-        },
-        {
-          "name": "grant",
+          "name": "gmail webhook",
           "request": {
             "method": "POST",
             "body": {
@@ -285,16 +133,11 @@
                   "language": "json"
                 }
               },
-              "raw": "{\n    \"code\": \"<google_oauth_code>\"\n}"
+              "raw": "{\n  \"emailAddress\": \"example@gmail.com\",\n  \"historyId\": \"123456\"\n}"
             },
             "url": {
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "email",
-                "grants"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["email", "webhook"]
             }
           }
         }

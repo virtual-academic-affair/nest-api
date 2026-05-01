@@ -14,30 +14,37 @@ export class StudentsService extends ResourceService<Student> {
   }
 
   async upsertMany(rows: Array<Pick<Student, 'studentCode' | 'studentName' | 'major'>>) {
-    const normalized = rows
-      .map((r) => {
-        const studentCode = String(r.studentCode).trim();
-        const studentName = String(r.studentName).trim();
-        const enrollmentYear = studentCode2EnrollmentYear(studentCode) ?? undefined;
-        const major = r.major?.trim() || undefined;
-        return { studentCode, studentName, enrollmentYear, major };
-      })
-      .filter((r) => r.studentCode && r.studentName);
+    const studentMap = rows.reduce((acc, row) => {
+      const code = String(row.studentCode).trim();
+      const name = String(row.studentName).trim();
 
-    if (normalized.length === 0) {
+      if (code && name) {
+        acc.set(code, {
+          studentCode: code,
+          studentName: name,
+          enrollmentYear: studentCode2EnrollmentYear(code) ?? undefined,
+          major: row.major?.trim() || undefined,
+        });
+      }
+      return acc;
+    }, new Map<string, any>());
+
+    const items = [...studentMap.values()];
+
+    if (items.length === 0) {
       return { insertedOrUpdated: 0 };
     }
 
-    const result = await this.repository.upsert(normalized as any, ['studentCode']);
-    return { insertedOrUpdated: result.identifiers.length + result.generatedMaps.length || normalized.length };
+    await this.repository.upsert(items, ['studentCode']);
+    return { insertedOrUpdated: items.length };
   }
 
   async findByEmail(email: string): Promise<Student | null> {
-    const { cohort, sequence, namePattern } = email2Parts(email);
+    const { nameSlug, cohort, sequence } = email2Parts(email);
 
     const students = await this.repository.find({
       where: {
-        studentName: Raw((alias) => `unaccent(${alias}) ILIKE unaccent('${namePattern}')`),
+        studentName: Raw((alias) => `unaccent(${alias}) ILIKE unaccent('${nameSlug.split('').join('%')}')`),
         enrollmentYear: cohort2EnrollmentYear(Number(cohort)),
       },
       order: { studentCode: 'ASC' },

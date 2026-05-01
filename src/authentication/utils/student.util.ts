@@ -7,7 +7,6 @@ export type EmailLocalPart = {
   nameSlug: string;
   cohort: number;
   sequence: number;
-  namePattern: string;
 };
 
 export function email2Role(email: string, domainsByRole: RoleDomains): Role {
@@ -26,14 +25,8 @@ export function email2Parts(email: string): EmailLocalPart | null {
 
   return {
     nameSlug: match[1],
-    cohort: Number(match[2]),
+    cohort: Number(match[2]) || 0,
     sequence: Number(match[3] || 1),
-    namePattern:
-      match[1]
-        .slice(0, -2)
-        .split('')
-        .map((c) => `${c.toUpperCase()}%`)
-        .join(' ') + ` ${match[1].slice(-2).charAt(0).toUpperCase()}${match[1].slice(-1)}`,
   };
 }
 

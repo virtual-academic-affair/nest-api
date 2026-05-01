@@ -59,7 +59,15 @@ export class IngestService {
 
     const parsedMessage = parseMessage(gmailMessage);
     const senderEmail = parsedMessage.headers.from?.match(/<(.+)>/)?.[1];
-    const student = await this.studentsService.findByEmail(senderEmail);
+    let student = null;
+
+    if (senderEmail) {
+      try {
+        student = await this.studentsService.findByEmail(senderEmail);
+      } catch (error: any) {
+        console.error(`Failed to find student by email ${senderEmail}: ${error.message ?? error}`);
+      }
+    }
 
     const textContent = parsedMessage.textHtml ?? parsedMessage.textPlain ?? '';
     const plainTextContent = htmlToText(textContent, { wordwrap: false });
@@ -74,7 +82,7 @@ export class IngestService {
       senderEmail,
       senderName: parsedMessage.headers.from,
       superEmail,
-      studentCode: student?.studentCode,
+      student,
       content: textContent,
     });
 

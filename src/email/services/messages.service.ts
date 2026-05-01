@@ -34,8 +34,23 @@ export class MessagesService extends ResourceService<Message> {
   }
 
   protected withOne(queryBuilder: SelectQueryBuilder<Message>) {
-    this.withAll(queryBuilder);
-    queryBuilder.addSelect(this.p('content'));
+    queryBuilder
+      .leftJoinAndSelect('inquiry', 'inquiry')
+      .leftJoinAndSelect('classRegistration', 'classRegistration')
+      .leftJoinAndSelect(this.p('student'), 'student')
+      .addSelect(this.p('content'));
+  }
+
+  protected withLatestMessagesOnly(queryBuilder: SelectQueryBuilder<Message>) {
+    queryBuilder.andWhere(`NOT EXISTS (
+      SELECT 1 FROM message m3 
+      WHERE m3.threadId = ${this.p('threadId')}
+      AND m3.sentAt > ${this.p('sentAt')}
+    )`);
+  }
+
+  protected withAll(queryBuilder: SelectQueryBuilder<Message>) {
+    this.withLatestMessagesOnly(queryBuilder);
   }
 
   protected applyCustomFilters(

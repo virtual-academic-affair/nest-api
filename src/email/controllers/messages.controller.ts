@@ -11,7 +11,7 @@ import { ResourceAction } from '@shared/resource/enums/resource-action.enum';
 @Auth(AuthType.Jwt)
 @Roles(Role.Admin)
 @Controller('email/messages')
-@RestrictMethods({ only: [ResourceAction.FindOne, ResourceAction.Delete] })
+@RestrictMethods({ only: [ResourceAction.FindAll, ResourceAction.FindOne, ResourceAction.Delete] })
 export class MessagesController extends ResourceController<Message> {
   constructor(protected readonly service: MessagesService) {
     super(service);

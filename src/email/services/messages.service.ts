@@ -35,8 +35,8 @@ export class MessagesService extends ResourceService<Message> {
 
   protected withOne(queryBuilder: SelectQueryBuilder<Message>) {
     queryBuilder
-      .leftJoinAndSelect('inquiry', 'inquiry')
-      .leftJoinAndSelect('classRegistration', 'classRegistration')
+      .leftJoinAndSelect(this.p('inquiry'), 'inquiry')
+      .leftJoinAndSelect(this.p('classRegistration'), 'classRegistration')
       .leftJoinAndSelect(this.p('student'), 'student')
       .addSelect(this.p('content'));
   }
@@ -44,8 +44,8 @@ export class MessagesService extends ResourceService<Message> {
   protected withLatestMessagesOnly(queryBuilder: SelectQueryBuilder<Message>) {
     queryBuilder.andWhere(`NOT EXISTS (
       SELECT 1 FROM message m3 
-      WHERE m3.threadId = ${this.p('threadId')}
-      AND m3.sentAt > ${this.p('sentAt')}
+      WHERE m3."threadId" = ${this.p('threadId', true)}
+      AND m3."sentAt" > ${this.p('sentAt', true)}
     )`);
   }
 

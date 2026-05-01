@@ -39,14 +39,22 @@ export class HistoryService {
 
         for (const history of data.history) {
           history.messagesAdded?.forEach((item) => {
-            if (item.message?.id && item.message?.labelIds?.includes(parentLabelId)) {
+            if (
+              item.message?.id &&
+              item.message?.labelIds?.includes(parentLabelId) &&
+              !item.message?.labelIds?.includes('SENT')
+            ) {
               added.add(item.message.id);
               removed.delete(item.message.id);
             }
           });
 
           history.labelsAdded?.forEach((item) => {
-            if (item.message?.id && item.labelIds?.includes(parentLabelId)) {
+            if (
+              item.message?.id &&
+              item.labelIds?.includes(parentLabelId) &&
+              !item.message?.labelIds?.includes('SENT')
+            ) {
               added.add(item.message.id);
               removed.delete(item.message.id);
             }

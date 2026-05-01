@@ -26,8 +26,9 @@ export abstract class ResourceService<T extends ObjectLiteral> {
     this.alias = this.repository.metadata.name;
   }
 
-  protected p(column: keyof T | string): string {
-    return `"${this.alias}"."${String(column)}"`; //path
+  protected p(column: keyof T | string, isSqlPath = false): string {
+    // ? join, relation : select, where, order by
+    return isSqlPath ? `"${this.alias}"."${String(column)}"` : `${this.alias}.${String(column)}`;
   }
 
   protected get queryBuilder(): SelectQueryBuilder<T> {

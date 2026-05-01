@@ -6,6 +6,10 @@ import { EncryptedColumn } from '@shared/decorators/encrypted-column.decorator';
 import { BaseEntity } from '@shared/resource/entities/base.entity';
 
 @Entity()
+@Index('UQ_message_current_thread', ['threadId'], {
+  unique: true,
+  where: `"isCurrent" = true AND "threadId" IS NOT NULL`,
+})
 @Unique(['gmailMessageId'])
 export class Message extends BaseEntity {
   @Column()
@@ -15,7 +19,7 @@ export class Message extends BaseEntity {
   headerMessageId?: string;
 
   @Index()
-  @Column({ nullable: true })
+  @Column()
   threadId?: string;
 
   @Column({ nullable: true })
@@ -37,6 +41,10 @@ export class Message extends BaseEntity {
 
   @Column('text', { array: true, default: '{}' })
   labelIds: string[];
+
+  @Index()
+  @Column({ type: 'boolean', default: true })
+  isCurrent: boolean;
 
   @Column({ nullable: true })
   studentCode?: string;

@@ -1,9 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { In, Repository, SelectQueryBuilder } from 'typeorm';
+import { StudentsService } from '@authentication/services/students.service';
+import { ClassRegistration } from '@class-registration/entities/class-registration.entity';
 import { QueryDto } from '@email/dtos/messages/resource.dto';
 import { Message } from '@email/entities/message.entity';
+import { MessageStatus } from '@email/enums/belongs-to-message-status.enum';
 import { LabelsService } from '@email/services/labels.service';
+import { Inquiry } from '@inquiry/entities/inquiry.entity';
 import { ResourceService } from '@shared/resource/services/resource.service';
 
 @Injectable()
@@ -17,8 +21,41 @@ export class MessagesService extends ResourceService<Message> {
   constructor(
     @InjectRepository(Message) repository: Repository<Message>,
     private readonly labelsService: LabelsService,
+    private readonly studentsService: StudentsService,
   ) {
     super(repository);
+  }
+
+  override async create(createDto: Partial<Message>): Promise<Message> {
+    const data = { ...createDto };
+
+    if (data.senderEmail && !data.studentCode) {
+      try {
+        data.student = await this.studentsService.findByEmail(data.senderEmail);
+      } catch (error: any) {
+        this.logger.warn(`Failed to detect student for ${data.senderEmail}: ${error?.message ?? error}`);
+      }
+    }
+
+    return this.repository.manager.transaction(async (manager) => {
+      const messageRepository = manager.getRepository(Message);
+
+      const prevMessage = await messageRepository.findOne({
+        where: { threadId: data.threadId, isCurrent: true },
+        lock: { mode: 'pessimistic_write' },
+      });
+
+      if (prevMessage) {
+        const messageId = prevMessage.id;
+        await Promise.all([
+          messageRepository.update({ threadId: data.threadId, isCurrent: true }, { isCurrent: false }),
+          manager.getRepository(Inquiry).update({ messageId }, { messageStatus: MessageStatus.Old }),
+          manager.getRepository(ClassRegistration).update({ messageId }, { messageStatus: MessageStatus.Old }),
+        ]);
+      }
+
+      return messageRepository.save(messageRepository.create(data));
+    });
   }
 
   override async remove(id: number): Promise<Message> {
@@ -41,23 +78,12 @@ export class MessagesService extends ResourceService<Message> {
       .addSelect(this.p('content'));
   }
 
-  protected withLatestMessagesOnly(queryBuilder: SelectQueryBuilder<Message>) {
-    queryBuilder.andWhere(`NOT EXISTS (
-      SELECT 1 FROM message m3 
-      WHERE m3."threadId" = ${this.p('threadId', true)}
-      AND m3."sentAt" > ${this.p('sentAt', true)}
-    )`);
-  }
-
-  protected withAll(queryBuilder: SelectQueryBuilder<Message>) {
-    this.withLatestMessagesOnly(queryBuilder);
-  }
-
   protected applyCustomFilters(
     queryBuilder: SelectQueryBuilder<Message>,
-    { gmailMessageId, threadId }: QueryDto,
+    { gmailMessageId, threadId, threadView }: QueryDto,
   ): void {
     gmailMessageId && queryBuilder.andWhere({ gmailMessageId });
     threadId && queryBuilder.andWhere({ threadId });
+    threadView && queryBuilder.andWhere({ isCurrent: true });
   }
 }

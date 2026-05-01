@@ -2,6 +2,7 @@ import { Body, Controller, Get, Param, ParseIntPipe, Post, Query } from '@nestjs
 import { GrpcMethod } from '@nestjs/microservices';
 import { Auth, AuthType } from '@authentication/decorators/auth.decorator';
 import { Role, Roles } from '@authentication/decorators/roles.decorator';
+import { LabelsService } from '@email/services/labels.service';
 import { ResourceDto } from '@inquiry/dtos/inquiries/resource.dto';
 import { StatsDto } from '@inquiry/dtos/inquiries/stats.dto';
 import { Inquiry } from '@inquiry/entities/inquiry.entity';
@@ -12,7 +13,10 @@ import { ResourceController } from '@shared/resource/controllers/resource.contro
 @Roles(Role.Admin)
 @Controller('inquiry/inquiries')
 export class InquiriesController extends ResourceController<Inquiry> {
-  constructor(protected readonly service: InquiriesService) {
+  constructor(
+    protected readonly service: InquiriesService,
+    protected readonly labelsService: LabelsService,
+  ) {
     super(service);
   }
 
@@ -32,7 +36,8 @@ export class InquiriesController extends ResourceController<Inquiry> {
 
   @Post(':id/reply')
   async reply(@Param('id', ParseIntPipe) id: number) {
-    return await this.service.sendReply(id);
+    const message = await this.service.sendReply(id);
+    await this.labelsService.label(message, message.inquiry.types);
   }
 
   @Post()

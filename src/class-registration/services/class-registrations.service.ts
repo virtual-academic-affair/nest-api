@@ -6,6 +6,7 @@ import { CreateDto, QueryDto } from '@class-registration/dtos/class-registration
 import { ClassRegistration } from '@class-registration/entities/class-registration.entity';
 import { ClassRegistrationItemsService } from '@class-registration/services/class-registration-items.service';
 import { applyMessageFilters } from '@email/dtos/messages/belongs-to-message.dto';
+import { Message } from '@email/entities/message.entity';
 import { GmailReplyService } from '@email/services/gmail/sending/reply.service';
 import { ClassRegistrationTemplate } from '@email/templates/class-registration.template';
 import { ResourceService } from '@shared/resource/services/resource.service';
@@ -54,11 +55,12 @@ export class ClassRegistrationsService extends ResourceService<ClassRegistration
     return { content: new ClassRegistrationTemplate(this.configService, classRegistration).generate() };
   }
 
-  async sendReply(id: number) {
+  async sendReply(id: number): Promise<Message> {
     const registration = await this.findOne(id);
     const message = registration.message;
     throwUnless(message, new ConflictException('Registration has no message'));
 
     await this.gmailReplyService.reply(message, await this.previewReply(id).then((res) => res.content));
+    return message;
   }
 }

@@ -6,13 +6,18 @@ import { ResourceDto } from '@class-registration/dtos/class-registrations/resour
 import { StatsDto } from '@class-registration/dtos/class-registrations/stats.dto';
 import { ClassRegistration } from '@class-registration/entities/class-registration.entity';
 import { ClassRegistrationsService } from '@class-registration/services/class-registrations.service';
+import { Label } from '@email/enums/label.enum';
+import { LabelsService } from '@email/services/labels.service';
 import { ResourceController } from '@shared/resource/controllers/resource.controller';
 
 @Auth(AuthType.Jwt)
 @Roles(Role.Admin)
 @Controller('classRegistration/classRegistrations')
 export class ClassRegistrationsController extends ResourceController<ClassRegistration> {
-  constructor(protected readonly service: ClassRegistrationsService) {
+  constructor(
+    protected readonly service: ClassRegistrationsService,
+    protected readonly labelsService: LabelsService,
+  ) {
     super(service);
   }
 
@@ -32,7 +37,8 @@ export class ClassRegistrationsController extends ResourceController<ClassRegist
 
   @Post(':id/reply')
   async reply(@Param('id', ParseIntPipe) id: number) {
-    return await this.service.sendReply(id);
+    const message = await this.service.sendReply(id);
+    await this.labelsService.label(message, [Label.ClassRegistration]);
   }
 
   @Post()

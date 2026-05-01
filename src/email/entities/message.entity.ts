@@ -1,4 +1,4 @@
-import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, Unique } from 'typeorm';
+import { Column, Entity, Index, JoinColumn, ManyToOne, OneToOne, Unique } from 'typeorm';
 import { Student } from '@authentication/entities/student.entity';
 import { ClassRegistration } from '@class-registration/entities/class-registration.entity';
 import { Inquiry } from '@inquiry/entities/inquiry.entity';
@@ -48,9 +48,9 @@ export class Message extends BaseEntity {
   @EncryptedColumn({ type: 'text', nullable: true, select: false })
   content?: string;
 
-  @OneToMany(() => Inquiry, (inquiry) => inquiry.message)
-  inquiry: Inquiry[];
+  @OneToOne(() => Inquiry, (inquiry) => inquiry.message, { nullable: true })
+  inquiry: Inquiry;
 
-  @OneToMany(() => ClassRegistration, (classRegistration) => classRegistration.message)
-  classRegistration: ClassRegistration[];
+  @OneToOne(() => ClassRegistration, (classRegistration) => classRegistration.message, { nullable: true })
+  classRegistration: ClassRegistration;
 }

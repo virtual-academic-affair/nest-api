@@ -1,4 +1,4 @@
-import { Column, Index, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Index, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 import { Message } from '@email/entities/message.entity';
 import { MessageStatus } from '@email/enums/belongs-to-message-status.enum';
 import { BaseEntity } from '@shared/resource/entities/base.entity';
@@ -12,7 +12,7 @@ export abstract class BelongsToMessage extends BaseEntity {
   @Column()
   messageId!: number;
 
-  @ManyToOne(() => Message, { onDelete: 'CASCADE' })
+  @OneToOne(() => Message, { onDelete: 'CASCADE' })
   @JoinColumn()
   message!: Message;
 }

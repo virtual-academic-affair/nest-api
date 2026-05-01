@@ -1,62 +1,19 @@
 # Class Registration Module
 
-## Introduction
+## Purpose
 
-Module quản lý đăng ký môn học của sinh viên qua email. Sinh viên gửi email yêu cầu đăng ký/hủy môn học, hệ thống tự
-động parse và tạo đơn đăng ký.
+This module manages academic registration requests from message channels and tracks each case from intake to response handling.
 
-## Entities
+## Notes
 
-| Entity                  | Mô tả                                            |
-|-------------------------|--------------------------------------------------|
-| `ClassRegistration`     | Đơn đăng ký (liên kết với Message qua messageId) |
-| `ClassRegistrationItem` | Chi tiết từng môn trong đơn (đăng ký/hủy)        |
+- Each incoming request is stored as a structured registration case linked to its original communication context.
+- A single case can include multiple requested actions so handling can be reviewed at detailed level.
+- Duplicate intake from the same source communication is blocked to protect data integrity.
+- Processing outcomes are tracked consistently to support transparent follow-up and operational accountability.
+- Daily reporting summarizes workload trends and handling results for management visibility.
+- Reply workflow is tied to the original conversation context to keep outbound communication consistent.
 
-## API Endpoints
+## Core Services
 
-### Class Registrations
-
-| Endpoint                                | Method | Role  | Chức năng                       |
-|-----------------------------------------|--------|-------|---------------------------------|
-| `/classRegistrations`                   | GET    | Admin | Danh sách đơn (phân trang, lọc) |
-| `/classRegistrations/:id`               | GET    | Admin | Chi tiết đơn                    |
-| `/classRegistrations`                   | POST   | Admin | Tạo đơn mới                     |
-| `/classRegistrations/stats/:type`       | GET    | Admin | Thống kê                        |
-| `/classRegistrations/:id/reply/preview` | GET    | Admin | Xem trước email                 |
-| `/classRegistrations/:id/reply`         | POST   | Admin | Gửi email reply                 |
-
-### Registration Items
-
-| Endpoint                                        | Method | Role  | Chức năng       |
-|-------------------------------------------------|--------|-------|-----------------|
-| `/classRegistrations/:registrationId/items`     | GET    | Admin | Danh sách items |
-| `/classRegistrations/:registrationId/items/:id` | GET    | Admin | Chi tiết item   |
-| `/classRegistrations/:registrationId/items`     | POST   | Admin | Tạo item mới    |
-| `/classRegistrations/:registrationId/items/:id` | PUT    | Admin | Cập nhật item   |
-| `/classRegistrations/:registrationId/items/:id` | DELETE | Admin | Xóa item        |
-
-## Services
-
-| Service                         | Chức năng                           |
-|---------------------------------|-------------------------------------|
-| `ClassRegistrationsService`     | CRUD đơn, gửi email reply, thống kê |
-| `ClassRegistrationItemsService` | CRUD items                          |
-
-## Query Parameters
-
-| Param     | Mô tả                             |
-|-----------|-----------------------------------|
-| `page`    | Số trang                          |
-| `limit`   | Số item/trang                     |
-| `keyword` | (deprecated) |
-| `status`  | PENDING, APPROVED, REJECTED       |
-| `action`  | REGISTER, CANCEL, REQUEST_OPEN    |
-| `orderBy` | Sắp xếp (vd: `priority`)          |
-
-## Priority Ordering
-
-Khi `orderBy=priority`:
-
-1. cohort ASC (lay tu email student) - SV năm cuối trước
-2. isInCurriculum DESC - Môn trong CTDT trước
-3. message.sentAt ASC - Email gửi trước
+- Registration case service: manages case lifecycle, duplicate prevention, and response workflow.
+- Registration item service: manages detailed handling records and time-based operational statistics.

@@ -1,38 +1,25 @@
 # Email Module
 
-## Muc tieu
+## Purpose
 
-Module `email` quan ly grant Gmail, dong bo labels, ingest email tu webhook, va phat su kien cho NLP.
+This module manages institutional email intake, classification synchronization, and outbound communication orchestration for academic workflows.
 
-## Luong nghiep vu
+## Notes
 
-1. Admin grant Gmail qua `/authentication/google/grant-gmail`.
-2. He thong luu `email.superEmail` + `email.gmailHistoryId`.
-3. Gmail push webhook vao `POST /email/gmail/webhook`.
-4. `GmailWebhookService` setup/renew Gmail watch va chi resolve history delta (nhan thay doi tu webhook).
-5. `GmailChangeSyncService` xu ly thay doi he thong (ingest email moi + dong bo labels vao DB).
-6. `GmailRabbitPublisherService` phat su kien `ingested` len RabbitMQ.
-7. NLP/worker cap nhat labels qua gRPC `MessageService.UpdateLabels` va dong bo nguoc len Gmail.
+- A privileged mailbox grant is required before automated synchronization and processing can run.
+- Incoming mailbox changes are consumed incrementally to keep internal records aligned with external mailbox state.
+- New relevant messages are normalized, stored, and prepared for downstream intelligence workflows.
+- Label management is synchronized both ways to preserve consistent classification across systems.
+- Obsolete or removed mailbox items are cleaned from internal records to keep datasets accurate.
+- Reply generation preserves conversation continuity and sends responses in the original communication thread.
+- Watch configuration is refreshed on schedule and after major configuration changes to maintain reliability.
 
-## Doi tuong chinh
+## Core Services
 
-- `GmailApiService`: OAuth client + Gmail client.
-- `GmailWebhookService`: chi nhan webhook va dieu phoi luong thay doi.
-- `GmailChangeSyncService`: xu ly thay doi tren he thong.
-- `GmailRabbitPublisherService`: publish event len RabbitMQ.
-- `LabelsService` + `MessageLabelsService`: dong bo label DB/Gmail.
-- `MessagesService`: query/remove message resource.
-
-## Labels he thong
-
-Chi giu 4 labels:
-
-- `classRegistration`
-- `training`
-- `graduation`
-- `pending`
-
-## Settings
-
-- Update `auth.emailDomains`: `PUT /shared/settings/auth.emailDomains`
-- Update `email.labels`: `PUT /shared/settings/email.labels`
+- Mail gateway service: provides authenticated access to external mailbox operations.
+- Webhook orchestration service: processes mailbox change notifications and coordinates synchronization flow.
+- History synchronization service: resolves incremental mailbox changes for additions and removals.
+- Message ingestion service: normalizes incoming messages and emits downstream processing events.
+- Label management service: maintains classification mapping and executes mailbox labeling actions.
+- Reply service: composes contextual responses and dispatches them to the original conversation.
+- Watch management service: maintains long-lived mailbox monitoring and filter alignment.

@@ -1,27 +1,24 @@
 # Authentication Module
 
-## Muc tieu
+## Purpose
 
-Module `authentication` xu ly dang nhap Google OAuth theo Passport, phat hanh JWT, va phan quyen theo role.
+This module governs user identity onboarding, role resolution, session continuity, and authorization readiness for internal academic operations.
 
-## Luong nghiep vu
+## Notes
 
-1. User goi `GET /authentication/google` -> Passport redirect sang Google.
-2. Google callback vao `GET /authentication/google/redirect`.
-3. `GoogleStrategy` tra profile, `GoogleService` upsert user theo email/domain mapping (`setting key: auth.emailDomains`).
-4. `AuthService` phat hanh access/refresh token, refresh token duoc luu cookie.
-5. Cac API private dung `JwtGuard` (Passport JWT), khong verify JWT thu cong.
+- Identity from the sign-in provider is normalized and merged into the internal user profile.
+- Role assignment follows approved organization domain policy and is rejected when policy conditions are not met.
+- Student identities can be enriched by matching institutional email patterns with student records.
+- Session continuity uses short-lived access credentials and renewable credentials with strict rotation.
+- Renewable credentials are centrally tracked and invalidated after use to reduce replay risk.
+- Access is always evaluated against both session validity and account activity state.
+- Administrative handling includes role governance, account state control, student data maintenance, and privileged mailbox grant management.
 
-## Role theo email domain
+## Core Services
 
-- Cau hinh: setting `auth.emailDomains` trong bang `setting` voi format `{ role: string[] }`.
-- `resolveEmail()` map domain -> role.
-- Neu role la `student`, cohort duoc suy ra tu 2 chu so dau local-part email.
-
-## Thanh phan chinh
-
-- `AccessTokenStrategy`: validate JWT va user active.
-- `GoogleStrategy`: OAuth profile provider.
-- Flow login Google dung `@UseGuards(AuthGuard('google'))`.
-- `GoogleService`: business login/upsert/token.
-- `AuthService`: token lifecycle (issue/refresh).
+- Google service: orchestrates sign-in onboarding, profile enrichment, and initial credential issuance.
+- Domain policy service: resolves identity role context from organization rules.
+- Authentication service: handles issuance, renewal validation, and rotation enforcement.
+- User service: manages user governance, lookup, filtering, and role updates.
+- Student service: maintains student records and supports identity matching.
+- Grant service: manages privileged mailbox grant state and synchronization bootstrap.

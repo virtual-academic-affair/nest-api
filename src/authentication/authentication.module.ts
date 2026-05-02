@@ -25,6 +25,7 @@ import { AccessTokenStrategy } from '@authentication/strategies/access-token.str
 import { GoogleGmailStrategy } from '@authentication/strategies/google-gmail.strategy';
 import { GoogleStrategy } from '@authentication/strategies/google.strategy';
 import { EmailModule } from '@email/email.module';
+import gmailExtensionConfig from '@shared/config/gmail-extension.config';
 import googleConfig from '@shared/config/google.config';
 import jwtConfig from '@shared/config/jwt.config';
 
@@ -32,6 +33,7 @@ import jwtConfig from '@shared/config/jwt.config';
   imports: [
     ConfigModule.forFeature(jwtConfig),
     ConfigModule.forFeature(googleConfig),
+    ConfigModule.forFeature(gmailExtensionConfig),
     PassportModule.register({ session: false }),
     JwtModule.registerAsync(jwtConfig.asProvider()),
     TypeOrmModule.forFeature([User, Student]),

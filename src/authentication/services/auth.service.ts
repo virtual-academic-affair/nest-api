@@ -5,16 +5,21 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import type { Redis } from 'ioredis';
 import { Repository } from 'typeorm';
+import { Role } from '@authentication/decorators/roles.decorator';
 import { RefreshTokenDto } from '@authentication/dtos/auth/refresh-token.dto';
 import { User } from '@authentication/entities/user.entity';
+import { SuperEmail } from '@authentication/strategies/google-gmail.strategy';
 import jwtConfig from '@shared/config/jwt.config';
 import { RedisService } from '@shared/redis/redis.service';
+import { SettingKey } from '@shared/setting/enums/setting-key.enum';
+import { SettingService } from '@shared/setting/services/setting.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
     redisService: RedisService,
+    private readonly settingService: SettingService,
     @Inject(jwtConfig.KEY) private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {
@@ -73,5 +78,22 @@ export class AuthService {
         expiresIn,
       },
     );
+  }
+
+  async issueGmailExtensionSession(email: string): Promise<{
+    isAdmin: boolean;
+    isSuperAdmin: boolean;
+    accessToken?: string | null;
+  }> {
+    const user = await this.userRepository.findOneBy({ email });
+    const isAdmin = user?.isActive && user.role === Role.Admin;
+
+    if (!isAdmin || !user) {
+      return { isAdmin, isSuperAdmin: false };
+    }
+
+    const isSuperAdmin = (await this.settingService.get<SuperEmail>(SettingKey.EmailSuperEmail))?.email === email;
+    const tokens = await this.generateTokens(user);
+    return { isAdmin, isSuperAdmin, accessToken: tokens.accessToken };
   }
 }

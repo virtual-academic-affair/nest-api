@@ -1,14 +1,18 @@
-import { Body, Controller, Get, Inject, Post, Req, Res, UnauthorizedException } from '@nestjs/common';
+import { Body, Controller, Get, Headers, Inject, Post, Req, Res, UnauthorizedException } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { GrpcMethod } from '@nestjs/microservices';
 import { Request, Response } from 'express';
 import { ActiveUser } from '@authentication/decorators/active-user.decorator';
 import { Auth, AuthType } from '@authentication/decorators/auth.decorator';
+import { GmailExtensionSessionDto } from '@authentication/dtos/auth/gmail-extension-session.dto';
 import { AuthService } from '@authentication/services/auth.service';
 import { UsersService } from '@authentication/services/users.service';
 import { REFRESH_COOKIE, getClearCookieOptions, getRefreshCookieOptions } from '@authentication/utils/cookie.util';
+import gmailExtensionConfig from '@shared/config/gmail-extension.config';
 import jwtConfig from '@shared/config/jwt.config';
+
+export const GMAIL_EXTENSION_SESSION_SECRET_HEADER = 'x-gmail-session-secret';
 
 @Controller('authentication/auth')
 export class AuthenticationController {
@@ -17,6 +21,8 @@ export class AuthenticationController {
     private readonly authService: AuthService,
     private readonly jwtService: JwtService,
     @Inject(jwtConfig.KEY) private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
+    @Inject(gmailExtensionConfig.KEY)
+    private readonly gmailExtensionConfiguration: ConfigType<typeof gmailExtensionConfig>,
   ) {}
 
   @Post('refresh')
@@ -32,6 +38,16 @@ export class AuthenticationController {
   @Post('logout')
   async logout(@Res({ passthrough: true }) res: Response) {
     return res.clearCookie(REFRESH_COOKIE, getClearCookieOptions());
+  }
+
+  @Post('gmail-extension-session')
+  async gmailExtensionSession(
+    @Body() dto: GmailExtensionSessionDto,
+    @Headers(GMAIL_EXTENSION_SESSION_SECRET_HEADER) sessionSecret: string | string[] | undefined,
+  ) {
+    const expected = this.gmailExtensionConfiguration.sessionSecret ?? '';
+    throwIf(expected && sessionSecret !== expected, new UnauthorizedException('Session secret mismatch'));
+    return this.authService.issueGmailExtensionSession(dto.email);
   }
 
   @Get('me')

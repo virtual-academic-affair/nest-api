@@ -1,5 +1,4 @@
 import { Column, Index, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
-import { Message } from '@email/entities/message.entity';
 import { MessageStatus } from '@email/enums/belongs-to-message-status.enum';
 import { BaseEntity } from '@shared/resource/entities/base.entity';
 
@@ -12,9 +11,9 @@ export abstract class BelongsToMessage extends BaseEntity {
   @Column()
   messageId!: number;
 
-  @OneToOne(() => Message, { onDelete: 'CASCADE' })
+  @OneToOne('Message', { onDelete: 'CASCADE' })
   @JoinColumn()
-  message!: Message;
+  message!: any;
 }
 
 export abstract class MayBelongsToMessage extends BaseEntity {
@@ -22,7 +21,7 @@ export abstract class MayBelongsToMessage extends BaseEntity {
   @Column({ nullable: true })
   messageId?: number | null = null;
 
-  @ManyToOne(() => Message, { nullable: true, onDelete: 'SET NULL' })
+  @ManyToOne('Message', { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn()
-  message?: Message | null;
+  message?: any;
 }

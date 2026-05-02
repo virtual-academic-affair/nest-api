@@ -1,9 +1,9 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, Query } from '@nestjs/common';
-import { GrpcMethod } from '@nestjs/microservices';
+import { Controller, Get, Param, ParseIntPipe, Post, Query } from '@nestjs/common';
+import { GrpcMethod, Payload } from '@nestjs/microservices';
 import { Auth, AuthType } from '@authentication/decorators/auth.decorator';
 import { Role, Roles } from '@authentication/decorators/roles.decorator';
 import { LabelsService } from '@email/services/labels.service';
-import { ResourceDto } from '@inquiry/dtos/inquiries/resource.dto';
+import { CreateDto, ResourceDto } from '@inquiry/dtos/inquiries/resource.dto';
 import { StatsDto } from '@inquiry/dtos/inquiries/stats.dto';
 import { Inquiry } from '@inquiry/entities/inquiry.entity';
 import { InquiriesService } from '@inquiry/services/inquiries.service';
@@ -40,9 +40,9 @@ export class InquiriesController extends ResourceController<Inquiry> {
     await this.labelsService.label(message, message.inquiry.types);
   }
 
-  @Post()
+  @Auth(AuthType.Grpc)
   @GrpcMethod('InquiryService', 'Create')
-  async create(@Body() dto: unknown) {
+  async createGrpc(@Payload() dto: CreateDto) {
     return super.create(dto);
   }
 }

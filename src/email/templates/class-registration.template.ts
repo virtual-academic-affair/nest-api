@@ -17,7 +17,7 @@ export class ClassRegistrationTemplate extends EmailTemplateService {
   private readonly actionConfig: Record<string, { label: string; color: string }> = {
     [RegistrationAction.Register]: { label: 'Đăng ký', color: '#2563EB' },
     [RegistrationAction.Cancel]: { label: 'Hủy', color: '#DC2626' },
-    [RegistrationAction.RequestOpen]: { label: 'YC mở lớp', color: '#D97706' },
+    [RegistrationAction.RequestOpen]: { label: 'Mở lớp', color: '#D97706' },
   };
 
   private readonly statusConfig: Record<string, { label: string; color: string }> = {
@@ -32,22 +32,24 @@ export class ClassRegistrationTemplate extends EmailTemplateService {
 
   protected getTemplateData(): Record<string, unknown> {
     const hasItems = this.classRegistration.items && this.classRegistration.items.length > 0;
-    const studentCode = this.classRegistration.message?.studentCode;
-    const studentName = this.classRegistration.message?.senderName;
+    const msg = this.classRegistration.message;
+    const studentCode = msg?.studentCode;
+    const studentName = msg?.student?.studentName ?? msg?.senderName;
     const items = hasItems
       ? this.classRegistration.items.map((item) => {
           const action = this.actionConfig[item.action];
           const status = this.statusConfig[item.status];
+          const code = (item.subjectCode ?? '').trim();
+          const name = (item.subjectName ?? '').trim();
+          const subjectLine = code && name ? `${code} - ${name}` : code || name || '—';
 
           return {
-            subjectCode: item.subjectCode,
-            subjectName: item.subjectName,
-            className: item.className || '-',
+            subjectLine,
+            className: (item.className ?? '').trim() || '—',
             actionLabel: action.label,
             statusLabel: status.label,
             statusColor: status.color,
             statusBg: status.color + '1A',
-            note: item.note ?? '',
           };
         })
       : [];

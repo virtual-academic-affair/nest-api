@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository, SelectQueryBuilder } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { StudentsService } from '@authentication/services/students.service';
 import { ClassRegistration } from '@class-registration/entities/class-registration.entity';
 import { QueryDto } from '@email/dtos/messages/resource.dto';
@@ -74,6 +74,7 @@ export class MessagesService extends ResourceService<Message> {
     queryBuilder
       .leftJoinAndSelect(this.p('inquiry'), 'inquiry')
       .leftJoinAndSelect(this.p('classRegistration'), 'classRegistration')
+      .leftJoinAndSelect('classRegistration.items', 'items')
       .leftJoinAndSelect(this.p('student'), 'student')
       .addSelect(this.p('content'));
   }

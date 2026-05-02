@@ -13,29 +13,25 @@
       <thead>
         <tr style='border-bottom: 1px solid #000000;'>
           <th style='text-align: center; width: 40px; padding-bottom: 4px;'>#</th>
-          <th style='text-align: center; width: 120px; padding-bottom: 4px;'>Mã môn</th>
-          <th style='text-align: center; width: 260px; padding-bottom: 4px;'>Lớp</th>
-          <th style='text-align: center; width: 140px; padding-bottom: 4px;'>Nguyện vọng</th>
+          <th style='text-align: left; padding-bottom: 4px;'>Môn học</th>
+          <th style='text-align: center; width: 140px; padding-bottom: 4px;'>Lớp</th>
+          <th style='text-align: center; width: 120px; padding-bottom: 4px;'>Nguyện vọng</th>
           <th style='text-align: center; width: 112px; padding-bottom: 4px;'>Kết quả</th>
-          <th style='text-align: center; width: 200px; padding-bottom: 4px;'>Ghi chú</th>
         </tr>
       </thead>
       <tbody>
         {{#each items as |item|}}
           <tr style='border-bottom: 1px solid #F3F4F6; color: #000000;'>
             <td style='padding: 12px; text-align: center; color: #9CA3AF; width: 40px;'>{{item.displayIndex}}</td>
-            <td style='padding: 12px; width: 120px; text-align: center;'>{{item.subjectCode}}</td>
-            <td style='padding: 12px; width: 260px;'>{{item.subjectName}} - {{item.className}}</td>
-            <td style='padding: 12px; width: 140px; text-align: center;'>{{item.actionLabel}}</td>
+            <td style='padding: 12px; text-align: left;'>{{item.subjectLine}}</td>
+            <td style='padding: 12px; width: 140px; text-align: center;'>{{item.className}}</td>
+            <td style='padding: 12px; width: 120px; text-align: center;'>{{item.actionLabel}}</td>
             <td style='padding: 12px; white-space: nowrap; width: 112px; text-align: center;'>
               <span
                 style='width: 80px; font-size: 11px; display: inline-block; padding: 2px; border-radius: 9999px; font-weight: 500; background-color: {{item.statusBg}}; color: {{item.statusColor}};'
               >
                 {{item.statusLabel}}
               </span>
-            </td>
-            <td style='padding: 12px; width: 200px;'>
-              {{{item.note}}}
             </td>
           </tr>
         {{/each}}

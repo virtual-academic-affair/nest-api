@@ -7,6 +7,7 @@ import { ClassRegistration } from '@class-registration/entities/class-registrati
 import { ClassRegistrationItemsService } from '@class-registration/services/class-registration-items.service';
 import { applyMessageFilters } from '@email/dtos/messages/belongs-to-message.dto';
 import { Message } from '@email/entities/message.entity';
+import { MessageStatus } from '@email/enums/belongs-to-message-status.enum';
 import { GmailReplyService } from '@email/services/gmail/sending/reply.service';
 import { ClassRegistrationTemplate } from '@email/templates/class-registration.template';
 import { ResourceService } from '@shared/resource/services/resource.service';
@@ -31,7 +32,10 @@ export class ClassRegistrationsService extends ResourceService<ClassRegistration
   }
 
   protected withOne(queryBuilder: SelectQueryBuilder<ClassRegistration>): void {
-    queryBuilder.leftJoinAndSelect(this.p('items'), 'items').leftJoinAndSelect(this.p('message'), 'message');
+    queryBuilder
+      .leftJoinAndSelect(this.p('items'), 'items')
+      .leftJoinAndSelect(this.p('message'), 'message')
+      .leftJoinAndSelect('message.student', 'student');
   }
 
   protected applyCustomFilters(queryBuilder: SelectQueryBuilder<ClassRegistration>, dto: QueryDto): void {
@@ -60,7 +64,10 @@ export class ClassRegistrationsService extends ResourceService<ClassRegistration
     const message = registration.message;
     throwUnless(message, new ConflictException('Registration has no message'));
 
-    await this.gmailReplyService.reply(message, await this.previewReply(id).then((res) => res.content));
+    await Promise.all([
+      this.gmailReplyService.reply(message, await this.previewReply(id).then((res) => res.content)),
+      this.repository.update(id, { messageStatus: MessageStatus.Replied }),
+    ]);
     return message;
   }
 }

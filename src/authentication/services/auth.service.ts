@@ -89,7 +89,7 @@ export class AuthService {
     const isAdmin = user?.isActive && user.role === Role.Admin;
 
     if (!isAdmin || !user) {
-      return { isAdmin, isSuperAdmin: false };
+      return { isAdmin: false, isSuperAdmin: false };
     }
 
     const isSuperAdmin = (await this.settingService.get<SuperEmail>(SettingKey.EmailSuperEmail))?.email === email;

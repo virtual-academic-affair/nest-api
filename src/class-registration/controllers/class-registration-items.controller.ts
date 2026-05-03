@@ -1,7 +1,7 @@
-import { Controller } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { Auth, AuthType } from '@authentication/decorators/auth.decorator';
 import { Role, Roles } from '@authentication/decorators/roles.decorator';
-import { ResourceDto } from '@class-registration/dtos/class-registration-items/resource.dto';
+import { BulkStatusDto, ResourceDto } from '@class-registration/dtos/class-registration-items/resource.dto';
 import { ClassRegistrationItem } from '@class-registration/entities/class-registration-item.entity';
 import { ClassRegistrationItemsService } from '@class-registration/services/class-registration-items.service';
 import { ResourceController } from '@shared/resource/controllers/resource.controller';
@@ -19,5 +19,10 @@ export class ClassRegistrationItemsController extends ResourceController<ClassRe
 
   protected getDtoClasses() {
     return ResourceDto;
+  }
+
+  @Post('bulkStatus')
+  async bulkUpdateStatus(@Body() dto: BulkStatusDto) {
+    return this.service.bulkUpdateStatus(dto);
   }
 }

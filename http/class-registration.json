@@ -289,6 +289,31 @@
           }
         },
         {
+          "name": "bulkStatus",
+          "request": {
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              },
+              "raw": "{\n  \"ids\": [1, 2],\n  \"status\": \"approved\"\n}"
+            },
+            "url": {
+              "host": ["{{baseUrl}}"],
+              "path": ["classRegistration", "classRegistrations", ":parentId", "items", "bulk-status"],
+              "variable": [
+                {
+                  "key": "parentId",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
           "name": "create",
           "request": {
             "method": "POST",

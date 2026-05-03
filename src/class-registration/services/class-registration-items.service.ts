@@ -3,7 +3,7 @@ import { REQUEST } from '@nestjs/core';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Request as TRequest } from 'express';
 import { In, Repository, SelectQueryBuilder } from 'typeorm';
-import { QueryDto } from '@class-registration/dtos/class-registration-items/resource.dto';
+import { BulkStatusDto, QueryDto } from '@class-registration/dtos/class-registration-items/resource.dto';
 import { ClassRegistrationItem } from '@class-registration/entities/class-registration-item.entity';
 import { RegistrationStatus } from '@class-registration/enums/registration-status.enum';
 import { applyMessageFilters } from '@email/dtos/messages/belongs-to-message.dto';
@@ -16,6 +16,11 @@ export class ClassRegistrationItemsService extends ResourceItemService<ClassRegi
     @Inject(REQUEST) request: TRequest,
   ) {
     super(repository, request);
+  }
+
+  async bulkUpdateStatus({ ids, status }: BulkStatusDto): Promise<{ updated: number; requested: number }> {
+    const result = await this.repository.update({ id: In(ids) }, { status });
+    return { updated: result.affected ?? 0, requested: ids.length };
   }
 
   protected applyCustomFilters(queryBuilder: SelectQueryBuilder<ClassRegistrationItem>, dto: QueryDto): void {

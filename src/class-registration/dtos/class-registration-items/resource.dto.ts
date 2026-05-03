@@ -1,5 +1,16 @@
 import { IntersectionType, PartialType } from '@nestjs/mapped-types';
-import { IsDefined, IsEnum, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  ArrayMaxSize,
+  ArrayMinSize,
+  ArrayUnique,
+  IsArray,
+  IsDefined,
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { RegistrationAction } from '@class-registration/enums/registration-action.enum';
 import { RegistrationStatus } from '@class-registration/enums/registration-status.enum';
 import { BelongsToMessageQueryDto } from '@email/dtos/messages/belongs-to-message.dto';
@@ -57,3 +68,17 @@ export const ResourceDto = {
   create: CreateDto,
   update: UpdateDto,
 };
+
+export class BulkStatusDto {
+  @IsArray()
+  @ArrayMinSize(1)
+  @ArrayMaxSize(200)
+  @ArrayUnique()
+  @IsInt({ each: true })
+  @Type(() => Number)
+  ids!: number[];
+
+  @IsDefined()
+  @IsEnum(RegistrationStatus)
+  status!: RegistrationStatus;
+}

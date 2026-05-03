@@ -170,6 +170,36 @@
           }
         },
         {
+          "name": "itemsOverview",
+          "request": {
+            "method": "GET",
+            "url": {
+              "host": ["{{baseUrl}}"],
+              "path": ["classRegistration", "classRegistrations", "items", "overview"],
+              "query": [
+                {
+                  "key": "messageStatuses[]",
+                  "value": "",
+                  "description": "new | staged | replied | old",
+                  "disabled": true
+                },
+                {
+                  "key": "sentFrom",
+                  "value": "",
+                  "description": "ISO date — Message.sentAt",
+                  "disabled": true
+                },
+                {
+                  "key": "sentTo",
+                  "value": "",
+                  "description": "ISO date",
+                  "disabled": true
+                }
+              ]
+            }
+          }
+        },
+        {
           "name": "previewReply",
           "request": {
             "method": "GET",

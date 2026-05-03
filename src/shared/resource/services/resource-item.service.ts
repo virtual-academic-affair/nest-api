@@ -17,7 +17,7 @@ export abstract class ResourceItemService<T> extends ResourceService<T> {
   }
 
   protected get queryBuilder(): SelectQueryBuilder<T> {
-    return super.queryBuilder.andWhere({ parentId: this.parentId });
+    return super.queryBuilder.andWhere({ ...(this.parentId ? { parentId: this.parentId } : {}) });
   }
 
   async create(createDto: any): Promise<T> {

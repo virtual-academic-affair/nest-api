@@ -2,9 +2,11 @@ import { Inject, Injectable, Scope } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Request as TRequest } from 'express';
-import { Repository } from 'typeorm';
+import { In, Repository, SelectQueryBuilder } from 'typeorm';
+import { QueryDto } from '@class-registration/dtos/class-registration-items/resource.dto';
 import { ClassRegistrationItem } from '@class-registration/entities/class-registration-item.entity';
 import { RegistrationStatus } from '@class-registration/enums/registration-status.enum';
+import { applyMessageFilters } from '@email/dtos/messages/belongs-to-message.dto';
 import { ResourceItemService } from '@shared/resource/services/resource-item.service';
 
 @Injectable({ scope: Scope.REQUEST })
@@ -14,6 +16,13 @@ export class ClassRegistrationItemsService extends ResourceItemService<ClassRegi
     @Inject(REQUEST) request: TRequest,
   ) {
     super(repository, request);
+  }
+
+  protected applyCustomFilters(queryBuilder: SelectQueryBuilder<ClassRegistrationItem>, dto: QueryDto): void {
+    applyMessageFilters(queryBuilder, dto, 'parent');
+    dto.statuses?.length && queryBuilder.andWhere({ status: In(dto.statuses) });
+    dto.actions?.length && queryBuilder.andWhere({ action: In(dto.actions) });
+    dto.subjectName && queryBuilder.andWhere({ subjectName: dto.subjectName });
   }
 
   async stats(startDate: Date, endDate: Date) {

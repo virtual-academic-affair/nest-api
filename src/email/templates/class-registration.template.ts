@@ -31,12 +31,13 @@ export class ClassRegistrationTemplate extends EmailTemplateService {
   }
 
   protected getTemplateData(): Record<string, unknown> {
-    const hasItems = this.classRegistration.items && this.classRegistration.items.length > 0;
+    const replyItems = this.classRegistration.items.filter((item) => item.action !== RegistrationAction.RequestOpen);
+    const hasItems = replyItems.length > 0;
     const msg = this.classRegistration.message;
     const studentCode = msg?.studentCode;
     const studentName = msg?.student?.studentName ?? msg?.senderName;
     const items = hasItems
-      ? this.classRegistration.items.map((item) => {
+      ? replyItems.map((item) => {
           const action = this.actionConfig[item.action];
           const status = this.statusConfig[item.status];
           const code = (item.subjectCode ?? '').trim();

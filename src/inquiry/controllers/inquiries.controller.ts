@@ -37,7 +37,7 @@ export class InquiriesController extends ResourceController<Inquiry> {
   @Post(':id/reply')
   async reply(@Param('id', ParseIntPipe) id: number) {
     const message = await this.service.sendReply(id);
-    await this.labelsService.label(message, message.inquiry.types);
+    await this.labelsService.label(message, message.inquiry?.types ?? []);
   }
 
   @Auth(AuthType.Grpc)

@@ -83,6 +83,7 @@ export class InquiriesService extends ResourceService<Inquiry> {
       this.gmailReplyService.reply(message, await this.previewReply(id).then((res) => res.content)),
       this.repository.update(id, { messageStatus: MessageStatus.Replied }),
     ]);
+    message.inquiry = inquiry;
     return message;
   }
 }

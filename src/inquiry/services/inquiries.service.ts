@@ -22,12 +22,9 @@ export class InquiriesService extends ResourceService<Inquiry> {
     super(repository);
   }
 
-  protected applyCustomFilters(
-    queryBuilder: SelectQueryBuilder<Inquiry>,
-    { messageId, messageStatuses, types }: QueryDto,
-  ): void {
-    applyMessageFilters(queryBuilder, { messageId, messageStatuses });
-    types?.length && queryBuilder.andWhere({ types: ArrayOverlap(types) } as any);
+  protected applyCustomFilters(queryBuilder: SelectQueryBuilder<Inquiry>, dto: QueryDto): void {
+    applyMessageFilters(queryBuilder, dto);
+    dto.types?.length && queryBuilder.andWhere({ types: ArrayOverlap(dto.types) } as any);
   }
 
   protected withOne(queryBuilder: SelectQueryBuilder<Inquiry>): void {

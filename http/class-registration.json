@@ -46,7 +46,17 @@
                 {
                   "key": "messageStatuses[]",
                   "value": "",
-                  "description": "new | staged | replied",
+                  "description": "new | staged | replied | old",
+                  "disabled": true
+                },
+                {
+                  "key": "sentFrom",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "sentTo",
+                  "value": "",
                   "disabled": true
                 },
                 {
@@ -196,6 +206,88 @@
     {
       "name": "ClassRegistrationItems",
       "item": [
+        {
+          "name": "findAll",
+          "request": {
+            "method": "GET",
+            "url": {
+              "host": ["{{baseUrl}}"],
+              "path": ["classRegistration", "classRegistrations", ":parentId", "items"],
+              "variable": [
+                {
+                  "key": "parentId",
+                  "value": "1"
+                }
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "keyword",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "statuses[]",
+                  "value": "pending",
+                  "description": "pending | approved | rejected",
+                  "disabled": true
+                },
+                {
+                  "key": "actions[]",
+                  "value": "register",
+                  "description": "register | cancel | requestOpen",
+                  "disabled": true
+                },
+                {
+                  "key": "subjectCode",
+                  "value": "MATH101",
+                  "disabled": true
+                },
+                {
+                  "key": "subjectName",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "messageId",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "messageStatuses[]",
+                  "value": "",
+                  "description": "new | staged | replied | old",
+                  "disabled": true
+                },
+                {
+                  "key": "sentFrom",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "sentTo",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "orderCol",
+                  "value": "createdAt"
+                },
+                {
+                  "key": "orderDir",
+                  "value": "DESC"
+                }
+              ]
+            }
+          }
+        },
         {
           "name": "create",
           "request": {

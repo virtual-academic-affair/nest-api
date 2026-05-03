@@ -1,6 +1,6 @@
 import { Type } from 'class-transformer';
 import { IsDateString, IsDefined, IsEnum, IsInt, IsOptional, Min } from 'class-validator';
-import { In, LessThanOrEqual, MoreThanOrEqual, ObjectLiteral, SelectQueryBuilder } from 'typeorm';
+import { In, ObjectLiteral, SelectQueryBuilder } from 'typeorm';
 import { MessageStatus } from '@email/enums/belongs-to-message-status.enum';
 import { ResourceQueryDto } from '@shared/resource/dtos/resource-query.dto';
 
@@ -35,6 +35,8 @@ export class BelongsToMessageQueryDto extends ResourceQueryDto {
   sentTo?: string;
 }
 
+const MSG_SENT_ALIAS = 'vaa_msg_sent_range';
+
 export function applyMessageFilters<T extends ObjectLiteral>(
   queryBuilder: SelectQueryBuilder<T>,
   { messageId, messageStatuses, sentFrom, sentTo }: BelongsToMessageQueryDto,
@@ -42,14 +44,17 @@ export function applyMessageFilters<T extends ObjectLiteral>(
 ): void {
   const mainAlias = queryBuilder.expressionMap.mainAlias!.name;
   const nest = (leaf: ObjectLiteral): ObjectLiteral => (via ? ({ [via]: leaf } as ObjectLiteral) : leaf);
-  const messageJoinPath = via ? `${mainAlias}.${via}.message` : `${mainAlias}.message`;
 
   messageId && queryBuilder.andWhere(nest({ messageId }) as ObjectLiteral);
   messageStatuses?.length && queryBuilder.andWhere(nest({ messageStatus: In(messageStatuses) }) as ObjectLiteral);
 
   const sentFromDate = sentFrom != null ? new Date(sentFrom) : undefined;
   const sentToDate = sentTo != null ? new Date(sentTo) : undefined;
-  (sentFromDate || sentToDate) && queryBuilder.innerJoin(messageJoinPath, 'vaa_msg_sent_range');
-  sentFromDate && queryBuilder.andWhere(nest({ message: { sentAt: MoreThanOrEqual(sentFromDate) } }) as ObjectLiteral);
-  sentToDate && queryBuilder.andWhere(nest({ message: { sentAt: LessThanOrEqual(sentToDate) } }) as ObjectLiteral);
+  if (sentFromDate || sentToDate) {
+    via
+      ? queryBuilder.innerJoin(`${mainAlias}.${via}`, 'vaa_parent').innerJoin(`vaa_parent.message`, MSG_SENT_ALIAS)
+      : queryBuilder.innerJoin(`${mainAlias}.message`, MSG_SENT_ALIAS);
+    sentFromDate && queryBuilder.andWhere(`${MSG_SENT_ALIAS}.sentAt >= :vaaSentFrom`, { vaaSentFrom: sentFromDate });
+    sentToDate && queryBuilder.andWhere(`${MSG_SENT_ALIAS}.sentAt <= :vaaSentTo`, { vaaSentTo: sentToDate });
+  }
 }

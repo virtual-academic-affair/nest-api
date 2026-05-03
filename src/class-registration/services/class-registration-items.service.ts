@@ -24,6 +24,13 @@ export class ClassRegistrationItemsService extends ResourceItemService<ClassRegi
     super(repository, request);
   }
 
+  protected withAll(qb: SelectQueryBuilder<ClassRegistrationItem>): void {
+    qb.leftJoinAndSelect(this.p('parent'), 'parent')
+      .leftJoinAndSelect('parent.message', 'message')
+      .orderBy('message.sentAt', 'ASC', 'NULLS LAST')
+      .addOrderBy('message.studentCode', 'ASC', 'NULLS LAST');
+  }
+
   async bulkUpdateStatus({ ids, status }: BulkStatusDto): Promise<{ updated: number; requested: number }> {
     const result = await this.repository.update({ id: In(ids) }, { status });
     return { updated: result.affected ?? 0, requested: ids.length };
@@ -36,7 +43,7 @@ export class ClassRegistrationItemsService extends ResourceItemService<ClassRegi
     // 1. Build Query
     qb.select([
       `${this.p('subjectName')} AS "subjectName"`,
-      `${this.p('subjectCode')} AS "subjectCode"`,
+      `MAX(NULLIF(${this.p('subjectCode')}, '')) AS "subjectCode"`,
       `COALESCE(${this.p('className')}, '') AS "classKey"`,
     ]);
 
@@ -51,7 +58,6 @@ export class ClassRegistrationItemsService extends ResourceItemService<ClassRegi
 
     const rows = await qb
       .groupBy(this.p('subjectName'))
-      .addGroupBy(this.p('subjectCode'))
       .addGroupBy(`COALESCE(${this.p('className')}, '')`)
       .setParameters(params)
       .getRawMany();
@@ -59,9 +65,9 @@ export class ClassRegistrationItemsService extends ResourceItemService<ClassRegi
     // 2. Transform to desired format
     const grouped = rows.reduce(
       (acc, r) => {
-        const sKey = `${r.subjectName}|${r.subjectCode}`;
-
-        acc[sKey] ??= { subjectName: r.subjectName ?? '', subjectCode: r.subjectCode, classes: [] };
+        const sKey = r.subjectName ?? 'Unknown';
+        acc[sKey] ??= { subjectName: sKey, subjectCode: '', classes: [] };
+        acc[sKey].subjectCode ||= r.subjectCode || '';
 
         // Bucketize class data
         const bucket: OverviewClassBucket = {

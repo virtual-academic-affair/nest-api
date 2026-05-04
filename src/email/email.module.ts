@@ -2,6 +2,7 @@ import { Module, forwardRef } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthenticationModule } from '@authentication/authentication.module';
+import { ClassRegistrationModule } from '@class-registration/class-registration.module';
 import { User } from '@authentication/entities/user.entity';
 import { LabelsController } from '@email/controllers/labels.controller';
 import { MessagesController } from '@email/controllers/messages.controller';
@@ -18,6 +19,7 @@ import { WebhookService } from '@email/services/gmail/webhook/webhook.service';
 import { GmailApiService } from '@email/services/gmail-api.service';
 import { LabelsService } from '@email/services/labels.service';
 import { MessagesService } from '@email/services/messages.service';
+import { InquiryModule } from '@inquiry/inquiry.module';
 import gmailWatchConfig from '@shared/config/gmail-watch.config';
 import googleConfig from '@shared/config/google.config';
 import { SettingService } from '@shared/setting/services/setting.service';
@@ -28,6 +30,8 @@ import { SettingService } from '@shared/setting/services/setting.service';
     ConfigModule.forFeature(googleConfig),
     ConfigModule.forFeature(gmailWatchConfig),
     forwardRef(() => AuthenticationModule),
+    forwardRef(() => InquiryModule),
+    forwardRef(() => ClassRegistrationModule),
   ],
   controllers: [LabelsController, MessagesController, WebhookController],
   providers: [

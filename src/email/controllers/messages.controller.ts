@@ -1,6 +1,7 @@
-import { Controller } from '@nestjs/common';
+import { Body, Controller, Post, Query } from '@nestjs/common';
 import { Auth, AuthType } from '@authentication/decorators/auth.decorator';
 import { Role, Roles } from '@authentication/decorators/roles.decorator';
+import { ReplyPluckDto } from '@email/dtos/messages/reply-pluck.dto';
 import { ResourceDto } from '@email/dtos/messages/resource.dto';
 import { Message } from '@email/entities/message.entity';
 import { MessagesService } from '@email/services/messages.service';
@@ -21,5 +22,8 @@ export class MessagesController extends ResourceController<Message> {
     return ResourceDto;
   }
 
-  // TODO: reply
+  @Post('reply-pluck')
+  async replyPluck(@Query() query: ReplyPluckDto, @Body() body: ReplyPluckDto) {
+    return await this.service.replyPluck({ ...query, ...body });
+  }
 }

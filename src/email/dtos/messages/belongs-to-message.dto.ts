@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsDateString, IsDefined, IsEnum, IsInt, IsOptional, Min } from 'class-validator';
+import { IsDateString, IsDefined, IsEnum, IsInt, IsOptional, IsString, Min } from 'class-validator';
 import { In, ObjectLiteral, SelectQueryBuilder } from 'typeorm';
 import { MessageStatus } from '@email/enums/belongs-to-message-status.enum';
 import { ResourceQueryDto } from '@shared/resource/dtos/resource-query.dto';
@@ -33,28 +33,43 @@ export class BelongsToMessageQueryDto extends ResourceQueryDto {
   @IsOptional()
   @IsDateString()
   sentTo?: string;
-}
 
-const MSG_SENT_ALIAS = 'vaa_msg_sent_range';
+  /** Lọc theo thread Gmail (cột `thread_id` của bảng message). */
+  @IsOptional()
+  @IsString()
+  threadId?: string;
+}
 
 export function applyMessageFilters<T extends ObjectLiteral>(
   queryBuilder: SelectQueryBuilder<T>,
-  { messageId, messageStatuses, sentFrom, sentTo }: BelongsToMessageQueryDto,
+  { messageId, messageStatuses, sentFrom, sentTo, threadId }: BelongsToMessageQueryDto,
   via?: string,
 ): void {
   const mainAlias = queryBuilder.expressionMap.mainAlias!.name;
-  const nest = (leaf: ObjectLiteral): ObjectLiteral => (via ? ({ [via]: leaf } as ObjectLiteral) : leaf);
+  const TARGET_ALIAS = via ? 'msg_relation' : mainAlias;
+  const MSG_DETAIL_ALIAS = 'msg_detail';
 
-  messageId && queryBuilder.andWhere(nest({ messageId }) as ObjectLiteral);
-  messageStatuses?.length && queryBuilder.andWhere(nest({ messageStatus: In(messageStatuses) }) as ObjectLiteral);
+  via && queryBuilder.innerJoin(`${mainAlias}.${via}`, TARGET_ALIAS);
+
+  messageId && queryBuilder.andWhere(`${TARGET_ALIAS}.messageId = :messageId`, { messageId });
+  messageStatuses?.length &&
+    queryBuilder.andWhere(`${TARGET_ALIAS}.messageStatus IN (:...messageStatuses)`, { messageStatuses });
 
   const sentFromDate = sentFrom != null ? new Date(sentFrom) : undefined;
   const sentToDate = sentTo != null ? new Date(sentTo) : undefined;
-  if (sentFromDate || sentToDate) {
-    via
-      ? queryBuilder.innerJoin(`${mainAlias}.${via}`, 'vaa_parent').innerJoin(`vaa_parent.message`, MSG_SENT_ALIAS)
-      : queryBuilder.innerJoin(`${mainAlias}.message`, MSG_SENT_ALIAS);
-    sentFromDate && queryBuilder.andWhere(`${MSG_SENT_ALIAS}.sentAt >= :vaaSentFrom`, { vaaSentFrom: sentFromDate });
-    sentToDate && queryBuilder.andWhere(`${MSG_SENT_ALIAS}.sentAt <= :vaaSentTo`, { vaaSentTo: sentToDate });
+  const threadIdNorm = threadId?.trim();
+
+  const needMessageJoin = !!(threadIdNorm || sentFromDate || sentToDate);
+  if (needMessageJoin) {
+    queryBuilder.innerJoin(`${TARGET_ALIAS}.message`, MSG_DETAIL_ALIAS);
+  }
+  if (threadIdNorm) {
+    queryBuilder.andWhere(`${MSG_DETAIL_ALIAS}.threadId = :vaaThreadId`, { vaaThreadId: threadIdNorm });
+  }
+  if (sentFromDate) {
+    queryBuilder.andWhere(`${MSG_DETAIL_ALIAS}.sentAt >= :vaaSentFrom`, { vaaSentFrom: sentFromDate });
+  }
+  if (sentToDate) {
+    queryBuilder.andWhere(`${MSG_DETAIL_ALIAS}.sentAt <= :vaaSentTo`, { vaaSentTo: sentToDate });
   }
 }

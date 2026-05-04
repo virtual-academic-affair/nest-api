@@ -63,6 +63,8 @@ export abstract class ResourceService<T extends ObjectLiteral> {
         ? orderCol
         : this.autoOrderableColumns[0];
 
+    console.log(qb.getSql(), qb.getParameters());
+
     const [items, total] = await qb
       .addOrderBy(this.p(orderColumn), orderDir === 'DESC' ? 'DESC' : 'ASC')
       .addOrderBy(this.p('createdAt'), 'DESC')

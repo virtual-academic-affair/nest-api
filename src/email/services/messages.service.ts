@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { StudentsService } from '@authentication/services/students.service';
 import { ClassRegistration } from '@class-registration/entities/class-registration.entity';
 import { QueryDto } from '@email/dtos/messages/resource.dto';
@@ -49,8 +49,12 @@ export class MessagesService extends ResourceService<Message> {
         const messageId = prevMessage.id;
         await Promise.all([
           messageRepository.update({ threadId: data.threadId, isCurrent: true }, { isCurrent: false }),
-          manager.getRepository(Inquiry).update({ messageId }, { messageStatus: MessageStatus.Old }),
-          manager.getRepository(ClassRegistration).update({ messageId }, { messageStatus: MessageStatus.Old }),
+          manager
+            .getRepository(Inquiry)
+            .update({ messageId, messageStatus: MessageStatus.Staged }, { messageStatus: MessageStatus.Conflict }),
+          manager
+            .getRepository(ClassRegistration)
+            .update({ messageId, messageStatus: MessageStatus.Staged }, { messageStatus: MessageStatus.Conflict }),
         ]);
       }
 
@@ -81,10 +85,31 @@ export class MessagesService extends ResourceService<Message> {
 
   protected applyCustomFilters(
     queryBuilder: SelectQueryBuilder<Message>,
-    { gmailMessageId, threadId, threadView }: QueryDto,
+    { gmailMessageId, threadId, threadView, hasConflict }: QueryDto,
   ): void {
     gmailMessageId && queryBuilder.andWhere({ gmailMessageId });
     threadId && queryBuilder.andWhere({ threadId });
     threadView && queryBuilder.andWhere({ isCurrent: true });
+
+    if (hasConflict) {
+      const conflictEntities = [
+        { entity: Inquiry, alias: 'iqc' },
+        { entity: ClassRegistration, alias: 'crc' },
+      ];
+
+      const existConditions = conflictEntities.map(({ entity, alias }) => {
+        const subQuery = queryBuilder
+          .subQuery()
+          .select('1')
+          .from(entity, alias)
+          .where(`${alias}.messageId = ${this.alias}.id`)
+          .andWhere(`${alias}.messageStatus = '${MessageStatus.Conflict}'`)
+          .getQuery();
+
+        return `EXISTS ${subQuery}`;
+      });
+
+      queryBuilder.andWhere(`(${existConditions.join(' OR ')})`);
+    }
   }
 }

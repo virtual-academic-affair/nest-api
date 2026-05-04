@@ -14,6 +14,10 @@ export class QueryDto extends ResourceQueryDto {
   @IsOptional()
   @IsBooleanQuery()
   threadView?: boolean;
+
+  @IsOptional()
+  @IsBooleanQuery()
+  hasConflict?: boolean;
 }
 
 export const ResourceDto = {

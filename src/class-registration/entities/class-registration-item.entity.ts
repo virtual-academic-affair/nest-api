@@ -1,11 +1,11 @@
-import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, Index, JoinColumn, ManyToOne, Unique } from 'typeorm';
 import { RegistrationAction } from '@class-registration/enums/registration-action.enum';
 import { RegistrationStatus } from '@class-registration/enums/registration-status.enum';
 import { BaseEntity } from '@shared/resource/entities/base.entity';
 import { ClassRegistration } from './class-registration.entity';
 
 @Entity()
-@Index('IDX_item_createdAt_action', ['createdAt', 'action'])
+@Unique('UQ_item_line', ['parentId', 'subjectName', 'className', 'action'])
 export class ClassRegistrationItem extends BaseEntity {
   @Index()
   @Column()

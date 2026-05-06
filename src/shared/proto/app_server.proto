@@ -4,3 +4,4 @@ import "common.proto";
 import "auth.proto";
 import "inquiry.proto";
 import "class-registration.proto";
+import "message.proto";

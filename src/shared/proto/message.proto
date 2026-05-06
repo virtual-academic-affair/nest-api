@@ -1,0 +1,15 @@
+syntax = "proto3";
+package app_server;
+
+message GetMessageStateRequest {
+  int32 messageId = 1;
+}
+
+message GetMessageStateResponse {
+  bool isCurrent = 1;
+  bool hasRecords = 2;
+}
+
+service MessageService {
+  rpc GetState(GetMessageStateRequest) returns (GetMessageStateResponse);
+}

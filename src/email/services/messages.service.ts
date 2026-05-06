@@ -1,6 +1,3 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, SelectQueryBuilder } from 'typeorm';
 import { StudentsService } from '@authentication/services/students.service';
 import { ClassRegistration } from '@class-registration/entities/class-registration.entity';
 import { ClassRegistrationsService } from '@class-registration/services/class-registrations.service';
@@ -12,7 +9,10 @@ import { Label } from '@email/enums/label.enum';
 import { LabelsService } from '@email/services/labels.service';
 import { Inquiry } from '@inquiry/entities/inquiry.entity';
 import { InquiriesService } from '@inquiry/services/inquiries.service';
+import { Injectable, Logger } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { ResourceService } from '@shared/resource/services/resource.service';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 
 @Injectable()
 export class MessagesService extends ResourceService<Message> {
@@ -30,6 +30,12 @@ export class MessagesService extends ResourceService<Message> {
     private readonly classRegistrationsService: ClassRegistrationsService,
   ) {
     super(repository);
+  }
+
+  async getState(id: number): Promise<{ isCurrent: boolean; hasRecords: boolean }> {
+    const message = await this.findOne(id);
+
+    return { isCurrent: message.isCurrent, hasRecords: !!(message.inquiry || message.classRegistration) };
   }
 
   async replyPluck(dto: ReplyPluckDto) {

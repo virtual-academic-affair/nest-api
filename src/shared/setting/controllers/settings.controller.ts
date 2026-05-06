@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Param, Put, Query } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Param, ParseEnumPipe, Put, Query } from '@nestjs/common';
 import { Auth, AuthType } from '@authentication/decorators/auth.decorator';
 import { Role, Roles } from '@authentication/decorators/roles.decorator';
 import { WatchService } from '@email/services/gmail/webhook/watch.service';
@@ -57,5 +57,10 @@ export class SettingsController {
     await this.settingService.set(key, body, true);
     const currentValue = await this.settingService.get(key);
     await config.postProcess?.(oldValue, currentValue);
+  }
+
+  @Delete(':key')
+  async remove(@Param('key', new ParseEnumPipe(SettingKey)) key: SettingKey) {
+    await this.settingService.remove(key);
   }
 }

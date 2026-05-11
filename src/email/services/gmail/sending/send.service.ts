@@ -1,5 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+import MailComposer = require('nodemailer/lib/mail-composer');
 import { SuperEmail } from '@authentication/strategies/google-gmail.strategy';
 import { SendEmailDto } from '@email/dtos/messages/send-email.dto';
 import { GmailApiService } from '@email/services/gmail-api.service';
@@ -22,28 +24,20 @@ export class GmailSendService {
     senderName ??= this.configService.get<string>('app.name');
     const account = await this.settingService.get<SuperEmail>(SettingKey.EmailSuperEmail);
 
-    const headers: Record<string, string> = {
-      To: to,
-      Subject: subject,
-      From: `"${senderName}" <${account.email}>`,
-      'MIME-Version': '1.0',
-      'Content-Type': 'text/html; charset=UTF-8',
-    };
+    const headers: Record<string, string> = {};
+    messageId && (headers['In-Reply-To'] = messageId);
+    messageId && (headers['References'] = messageId);
+    const compiledMime = await new MailComposer({
+      from: `"${senderName}" <${account.email}>`,
+      to,
+      subject,
+      html: content ?? '',
+      headers,
+    })
+      .compile()
+      .build();
 
-    threadId && (headers['Thread-Id'] = threadId);
-
-    if (messageId) {
-      headers['In-Reply-To'] = messageId;
-      headers['References'] = messageId;
-    }
-
-    let emailContent = '';
-    for (const [key, value] of Object.entries(headers)) {
-      emailContent += `${key}: ${value}\r\n`;
-    }
-    emailContent += '\r\n' + content;
-
-    const encodedEmail = Buffer.from(emailContent)
+    const encodedEmail = Buffer.from(compiledMime)
       .toString('base64')
       .replace(/\+/g, '-')
       .replace(/\//g, '_')
@@ -51,7 +45,7 @@ export class GmailSendService {
 
     const { data } = await gmail.users.messages.send({
       userId: 'me',
-      requestBody: { raw: encodedEmail, threadId: threadId },
+      requestBody: { raw: encodedEmail, threadId },
     });
 
     this.logger.log(`Email sent to ${to} with message ID: ${data.id}`);

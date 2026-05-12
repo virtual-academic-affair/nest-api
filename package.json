@@ -13,6 +13,8 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "test": "jest",
+    "test:watch": "jest --watch",
     "typeorm": "typeorm-ts-node-commonjs",
     "migration:autogen": "npm run typeorm migration:generate -- ./src/migrations/Auto -d ./src/data-source.ts",
     "prepare": "husky"
@@ -109,6 +111,17 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "setupFilesAfterEnv": [
+      "<rootDir>/app/test/jest-setup.ts"
+    ],
+    "moduleNameMapper": {
+      "^@authentication/(.*)$": "<rootDir>/authentication/$1",
+      "^@email/(.*)$": "<rootDir>/email/$1",
+      "^@shared/(.*)$": "<rootDir>/shared/$1",
+      "^@class-registration/(.*)$": "<rootDir>/class-registration/$1",
+      "^@inquiry/(.*)$": "<rootDir>/inquiry/$1",
+      "^@app/(.*)$": "<rootDir>/app/$1"
+    }
   }
 }

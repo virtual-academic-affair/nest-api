@@ -49,7 +49,7 @@ export abstract class ResourceService<T extends ObjectLiteral> {
       qb.andWhere(
         new Brackets((sub) => {
           const rawConcat = this.searchableColumns
-            .map((col) => `COALESCE(${this.p(col)}::text, '')`)
+            .map((col) => `COALESCE(${this.p(col, true)}::text, '')`)
             .join(` || ' ' || `);
           sub.where(`unaccent(${rawConcat}) ILIKE unaccent(:keyword)`, { keyword: `%${keyword.trim()}%` });
         }),

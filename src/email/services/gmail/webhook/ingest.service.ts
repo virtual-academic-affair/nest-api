@@ -77,6 +77,8 @@ export class IngestService {
 
     this.client.emit(INGESTED, {
       messageId: message.id,
+      threadId: message.threadId,
+      gmailMessageId: message.gmailMessageId,
       subject: message.subject,
       senderEmail: message.senderEmail,
       senderName: message.senderName,

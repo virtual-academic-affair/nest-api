@@ -32,13 +32,18 @@ export class AuthService {
     return `refresh_token:${refreshTokenId}`;
   }
 
-  async generateTokens(user: User) {
+  async generateTokens(user: User, withRefreshToken: boolean = true) {
     throwUnless(user?.isActive, new ForbiddenException('User is banned'));
 
     const accessToken = await this.signToken(user.id, this.jwtConfiguration.accessTokenTtl, {
       email: user.email,
       role: user.role,
+      ...(user.studentCode ? { studentCode: user.studentCode } : {}),
     });
+
+    if (!withRefreshToken) {
+      return { accessToken };
+    }
 
     const refreshTokenId = randomUUID();
     const refreshToken = await this.signToken(user.id, this.jwtConfiguration.refreshTokenTtl, { refreshTokenId });
@@ -93,7 +98,7 @@ export class AuthService {
     }
 
     const isSuperAdmin = (await this.settingService.get<SuperEmail>(SettingKey.EmailSuperEmail))?.email === email;
-    const tokens = await this.generateTokens(user);
+    const tokens = await this.generateTokens(user, false);
     return { isAdmin, isSuperAdmin, accessToken: tokens.accessToken };
   }
 }

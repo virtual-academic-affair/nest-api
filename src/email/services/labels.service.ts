@@ -43,10 +43,12 @@ export class LabelsService {
 
     return this.gmailLabelingService.label(
       message.gmailMessageId,
-      await Promise.all(
-        toAdds.map((key) => labels[key] ?? (force ? this.gmailLabelingService.create(LabelLang[key]) : null)),
-      ),
-      toRemoves.map((label) => labels[label] as string),
+      (
+        await Promise.all(
+          toAdds.map((key) => labels[key] ?? (force ? this.gmailLabelingService.create(LabelLang[key]) : null)),
+        )
+      ).filter((label): label is string => !!label),
+      toRemoves.map((label) => labels[label] as string).filter(Boolean),
     );
   }
 }

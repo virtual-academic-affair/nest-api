@@ -2,7 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Raw, Repository } from 'typeorm';
 import { Student } from '@authentication/entities/student.entity';
-import { cohort2EnrollmentYear, email2Parts, studentCode2EnrollmentYear } from '@authentication/utils/student.util';
+import {
+  cohort2EnrollmentYear,
+  email2Parts,
+  studentCode2EnrollmentYear,
+  email2StudentCode,
+} from '@authentication/utils/student.util';
 import { ResourceService } from '@shared/resource/services/resource.service';
 
 @Injectable()
@@ -40,8 +45,12 @@ export class StudentsService extends ResourceService<Student> {
   }
 
   async findByEmail(email: string): Promise<Student | null> {
-    const { nameSlug, cohort, sequence } = email2Parts(email);
+    const studentCode = email2StudentCode(email);
+    if (studentCode) {
+      return this.repository.findOneBy({ studentCode });
+    }
 
+    const { nameSlug, cohort, sequence } = email2Parts(email);
     const students = await this.repository.find({
       where: {
         studentName: Raw((alias) => `unaccent(${alias}) ILIKE unaccent('${nameSlug.split('').join('%')}')`),

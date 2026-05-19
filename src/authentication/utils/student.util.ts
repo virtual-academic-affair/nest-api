@@ -30,6 +30,11 @@ export function email2Parts(email: string): EmailLocalPart | null {
   };
 }
 
+export function email2StudentCode(email: string): string | null {
+  const localPart = email.trim().toLowerCase().split('@')[0] ?? '';
+  return /^\d{8}$/.test(localPart) ? localPart : null;
+}
+
 export function studentCode2EnrollmentYear(studentCode: string): number {
   return cohort2EnrollmentYear(Number(studentCode.slice(0, 2)));
 }

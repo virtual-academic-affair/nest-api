@@ -31,7 +31,7 @@ export function email2Parts(email: string): EmailLocalPart | null {
 }
 
 export function email2StudentCode(email: string): string | null {
-  const localPart = email.trim().toLowerCase().split('@')[0] ?? '';
+  const localPart = email.split('@')[0] ?? '';
   return /^\d{8}$/.test(localPart) ? localPart : null;
 }
 

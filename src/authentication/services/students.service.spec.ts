@@ -1,7 +1,7 @@
 import { TestingModule } from '@nestjs/testing';
-import { Student } from '@authentication/entities/student.entity';
-import { compileTypeOrmTestingModule } from '@app/test/typeorm-integration-testing.module';
 import { hasDbUrl } from '@app/test/load-env';
+import { compileTypeOrmTestingModule } from '@app/test/typeorm-integration-testing.module';
+import { Student } from '@authentication/entities/student.entity';
 import { StudentsService } from './students.service';
 
 (hasDbUrl() ? describe : describe.skip)('StudentsService.findByEmail', () => {
@@ -22,9 +22,9 @@ import { StudentsService } from './students.service';
 
   it.each([
     ['ndan22@clc.fitus.edu.vn', '22127006'],
-    ['22127006@student.hcmus.edu.vn', '22127006'],
     ['tmthu222@clc.fitus.edu.vn', '22127405'],
     ['tmthu221@clc.fitus.edu.vn', '22127404'],
+    ['22127006@student.hcmus.edu.vn', '22127006'],
     ['22127104@student.hcmus.edu.vn', '22127104'],
   ])('maps %s to studentCode %s', async (email, expectedStudentCode) => {
     const student = await studentsService.findByEmail(email);

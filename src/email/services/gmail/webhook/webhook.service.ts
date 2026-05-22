@@ -34,6 +34,7 @@ export class WebhookService {
     const { addedMessageIds, removedMessageIds, latestHistoryId } = await this.historyService.listLabelDelta(
       previousHistoryId,
       parentLabelId,
+      payload.emailAddress,
     );
 
     await this.settingService.set(SettingKey.EmailGmailHistoryId, latestHistoryId ?? historyId);

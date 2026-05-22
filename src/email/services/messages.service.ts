@@ -38,15 +38,20 @@ export class MessagesService extends ResourceService<Message> {
     return { isCurrent: message.isCurrent, hasRecords: !!(message.inquiry || message.classRegistration) };
   }
 
-  async replyPluck(dto: ReplyPluckDto) {
+  async replyPluck(dto: ReplyPluckDto, actorEmail?: string | null) {
     const [inquiryIds, classRegIds] = await Promise.all([
       this.collectAllIds(this.inquiriesService, dto),
       this.collectAllIds(this.classRegistrationsService, dto),
     ]);
 
     const results = await Promise.all([
-      this.processReplies('inquiry', inquiryIds, (id) => this.inquiriesService.sendReply(id)),
-      this.processReplies('classRegistration', classRegIds, (id) => this.classRegistrationsService.sendReply(id)),
+      this.processReplies('inquiry', inquiryIds, (id) => this.inquiriesService.sendReply(id, actorEmail), actorEmail),
+      this.processReplies(
+        'classRegistration',
+        classRegIds,
+        (id) => this.classRegistrationsService.sendReply(id, actorEmail),
+        actorEmail,
+      ),
     ]);
 
     const [inquiryRes, classRegRes] = results;
@@ -82,7 +87,12 @@ export class MessagesService extends ResourceService<Message> {
     return [...firstPage.items, ...remainingResults.flatMap((res) => res.items)].map((item) => item.id);
   }
 
-  private async processReplies(type: ReplyPluckEntity, ids: number[], sender: (id: number) => Promise<any>) {
+  private async processReplies(
+    type: ReplyPluckEntity,
+    ids: number[],
+    sender: (id: number) => Promise<any>,
+    actorEmail?: string | null,
+  ) {
     const chunkSize = 10;
     const failures: any[] = [];
     let success = 0;
@@ -95,7 +105,7 @@ export class MessagesService extends ResourceService<Message> {
           try {
             const message = await sender(id);
             const labels = type === 'classRegistration' ? [Label.ClassRegistration] : (message.inquiry?.types ?? []);
-            await this.labelsService.label(message, labels);
+            await this.labelsService.label(message, labels, [], false, actorEmail);
             success++;
           } catch (error) {
             failures.push({ type, id, reason: error instanceof Error ? error.message : String(error) });
@@ -142,11 +152,11 @@ export class MessagesService extends ResourceService<Message> {
     });
   }
 
-  override async remove(id: number): Promise<Message> {
+  override async remove(id: number, actorEmail?: string | null): Promise<Message> {
     const entity = await this.findOne(id);
 
     try {
-      await this.labelsService.label(entity, [], ['parent']);
+      await this.labelsService.label(entity, [], ['parent'], false, actorEmail);
     } catch (error: any) {
       this.logger.warn(`Failed to remove label from message with ID ${id} before deletion. Error: ${error?.message}`);
     }

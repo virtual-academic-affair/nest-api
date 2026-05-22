@@ -1,5 +1,6 @@
 import { Controller, Get, Param, ParseIntPipe, Post, Query } from '@nestjs/common';
 import { GrpcMethod, Payload } from '@nestjs/microservices';
+import { ActiveUser } from '@authentication/decorators/active-user.decorator';
 import { Auth, AuthType } from '@authentication/decorators/auth.decorator';
 import { Role, Roles } from '@authentication/decorators/roles.decorator';
 import { CreateDto, ResourceDto } from '@class-registration/dtos/class-registrations/resource.dto';
@@ -36,9 +37,9 @@ export class ClassRegistrationsController extends ResourceController<ClassRegist
   }
 
   @Post(':id/reply')
-  async reply(@Param('id', ParseIntPipe) id: number) {
-    const message = await this.service.sendReply(id);
-    await this.labelsService.label(message, [Label.ClassRegistration]);
+  async reply(@Param('id', ParseIntPipe) id: number, @ActiveUser('email') actorEmail: string) {
+    const message = await this.service.sendReply(id, actorEmail);
+    await this.labelsService.label(message, [Label.ClassRegistration], [], false, actorEmail);
   }
 
   @Auth(AuthType.Grpc)

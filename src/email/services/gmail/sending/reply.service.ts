@@ -44,17 +44,25 @@ export class GmailReplyService {
     return /^re:/i.test(subject) ? subject : `Re: ${subject}`.trim();
   }
 
-  async reply(message: Message, content: string, senderName?: string): Promise<string> {
+  async reply(message: Message, content: string, senderName?: string, actorEmail?: string | null): Promise<string> {
     throwUnless(message.senderEmail, new Error('Cannot reply: message does not have sender email'));
     throwUnless(message.threadId, new Error('Cannot reply: message does not have thread ID'));
 
-    return this.gmailSendService.send({
-      to: message.senderEmail,
-      subject: this.getSubject(message),
-      content: await this.getContent(message, content),
-      senderName,
-      threadId: message.threadId,
-      messageId: message.headerMessageId,
-    });
+    return this.gmailSendService.send(
+      {
+        to: message.senderEmail,
+        subject: this.getSubject(message),
+        content: await this.getContent(message, content),
+        senderName,
+        threadId: message.threadId,
+        messageId: message.headerMessageId,
+      },
+      {
+        accountEmail: actorEmail ?? null,
+        action: 'Gửi phản hồi',
+        to: message.senderEmail,
+        detailGmailMessageId: message.gmailMessageId,
+      },
+    );
   }
 }

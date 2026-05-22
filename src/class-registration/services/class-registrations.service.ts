@@ -59,13 +59,18 @@ export class ClassRegistrationsService extends ResourceService<ClassRegistration
     return { content: new ClassRegistrationTemplate(this.configService, classRegistration).generate() };
   }
 
-  async sendReply(id: number): Promise<Message> {
+  async sendReply(id: number, actorEmail?: string | null): Promise<Message> {
     const registration = await this.findOne(id);
     const message = registration.message;
     throwUnless(message, new ConflictException('Registration has no message'));
 
     await Promise.all([
-      this.gmailReplyService.reply(message, await this.previewReply(id).then((res) => res.content)),
+      this.gmailReplyService.reply(
+        message,
+        await this.previewReply(id).then((res) => res.content),
+        undefined,
+        actorEmail,
+      ),
       this.repository.update(id, { messageStatus: MessageStatus.Replied }),
     ]);
     return message;

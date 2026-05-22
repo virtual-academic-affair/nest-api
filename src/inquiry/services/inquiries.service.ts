@@ -71,13 +71,18 @@ export class InquiriesService extends ResourceService<Inquiry> {
     return { content: new InquiryTemplate(this.configService, inquiry).generate() };
   }
 
-  async sendReply(id: number): Promise<Message> {
+  async sendReply(id: number, actorEmail?: string | null): Promise<Message> {
     const inquiry = await this.findOne(id);
     const message = inquiry.message;
     throwUnless(message, new ConflictException('Inquiry has no message'));
 
     await Promise.all([
-      this.gmailReplyService.reply(message, await this.previewReply(id).then((res) => res.content)),
+      this.gmailReplyService.reply(
+        message,
+        await this.previewReply(id).then((res) => res.content),
+        undefined,
+        actorEmail,
+      ),
       this.repository.update(id, { messageStatus: MessageStatus.Replied }),
     ]);
     message.inquiry = inquiry;

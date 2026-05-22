@@ -1,10 +1,11 @@
+import { ActiveUser } from '@authentication/decorators/active-user.decorator';
 import { Auth, AuthType } from '@authentication/decorators/auth.decorator';
 import { Role, Roles } from '@authentication/decorators/roles.decorator';
 import { ReplyPluckDto } from '@email/dtos/messages/reply-pluck.dto';
 import { ResourceDto } from '@email/dtos/messages/resource.dto';
 import { Message } from '@email/entities/message.entity';
 import { MessagesService } from '@email/services/messages.service';
-import { Body, Controller, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Param, ParseIntPipe, Post, Query } from '@nestjs/common';
 import { GrpcMethod, Payload } from '@nestjs/microservices';
 import { ResourceController } from '@shared/resource/controllers/resource.controller';
 import { RestrictMethods } from '@shared/resource/decorators/restrict-methods.decorator';
@@ -30,7 +31,16 @@ export class MessagesController extends ResourceController<Message> {
   }
 
   @Post('reply-pluck')
-  async replyPluck(@Query() query: ReplyPluckDto, @Body() body: ReplyPluckDto) {
-    return await this.service.replyPluck({ ...query, ...body });
+  async replyPluck(
+    @Query() query: ReplyPluckDto,
+    @Body() body: ReplyPluckDto,
+    @ActiveUser('email') actorEmail: string,
+  ) {
+    return await this.service.replyPluck({ ...query, ...body }, actorEmail);
+  }
+
+  @Delete(':id')
+  override async remove(@Param('id') id: string, @ActiveUser('email') actorEmail?: string) {
+    return await this.service.remove(+id, actorEmail);
   }
 }

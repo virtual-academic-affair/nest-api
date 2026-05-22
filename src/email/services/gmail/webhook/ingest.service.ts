@@ -1,4 +1,5 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ClientProxy } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as parseMessage from 'gmail-api-parse-message';
@@ -6,6 +7,7 @@ import { gmail_v1 } from 'googleapis';
 import { htmlToText } from 'html-to-text';
 import { Repository } from 'typeorm';
 import { SuperEmail } from '@authentication/strategies/google-gmail.strategy';
+import { GMAIL_ACTION_TRIGGERED_EVENT } from '@email/constants/gmail-log.constants';
 import { Message } from '@email/entities/message.entity';
 import { GmailApiService } from '@email/services/gmail-api.service';
 import { MessagesService } from '@email/services/messages.service';
@@ -25,6 +27,7 @@ export class IngestService {
     private readonly settingService: SettingService,
     private readonly gmailApiService: GmailApiService,
     private readonly messagesService: MessagesService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async ingestMessages(gmailMessageIds: string[]): Promise<void> {
@@ -51,40 +54,69 @@ export class IngestService {
     if (isExisted) {
       return;
     }
-    const { data: gmailMessage } = await gmail.users.messages.get({
-      userId: 'me',
-      id: gmailMessageId,
-      format: 'full',
-    });
+    let from: string | null = null;
+    let to: string | null = superEmail;
 
-    const parsedMessage = parseMessage(gmailMessage);
-    const senderEmail = parsedMessage.headers.from?.match(/<(.+)>/)?.[1];
-    const textContent = parsedMessage.textHtml ?? parsedMessage.textPlain ?? '';
-    const plainTextContent = htmlToText(textContent, { wordwrap: false });
+    try {
+      const { data: gmailMessage } = await gmail.users.messages.get({
+        userId: 'me',
+        id: gmailMessageId,
+        format: 'full',
+      });
 
-    const message = await this.messagesService.create({
-      gmailMessageId,
-      headerMessageId: parsedMessage.headers['message-id'],
-      threadId: gmailMessage.threadId,
-      subject: parsedMessage.headers.subject,
-      labelIds: gmailMessage.labelIds ?? [],
-      sentAt: parsedMessage.headers.date ? new Date(parsedMessage.headers.date) : undefined,
-      senderEmail,
-      senderName: parsedMessage.headers.from,
-      superEmail,
-      content: textContent,
-    });
+      const parsedMessage = parseMessage(gmailMessage);
+      const senderEmail = parsedMessage.headers.from?.match(/<(.+)>/)?.[1];
+      const textContent = parsedMessage.textHtml ?? parsedMessage.textPlain ?? '';
+      const plainTextContent = htmlToText(textContent, { wordwrap: false });
+      from = parsedMessage.headers.from ?? senderEmail ?? null;
+      to = parsedMessage.headers.to ?? superEmail;
 
-    this.client.emit(INGESTED, {
-      messageId: message.id,
-      threadId: message.threadId,
-      gmailMessageId: message.gmailMessageId,
-      subject: message.subject,
-      senderEmail: message.senderEmail,
-      senderName: message.senderName,
-      content: plainTextContent,
-    });
+      const message = await this.messagesService.create({
+        gmailMessageId,
+        headerMessageId: parsedMessage.headers['message-id'],
+        threadId: gmailMessage.threadId,
+        subject: parsedMessage.headers.subject,
+        labelIds: gmailMessage.labelIds ?? [],
+        sentAt: parsedMessage.headers.date ? new Date(parsedMessage.headers.date) : undefined,
+        senderEmail,
+        senderName: parsedMessage.headers.from,
+        superEmail,
+        content: textContent,
+      });
 
-    return message.id;
+      this.client.emit(INGESTED, {
+        messageId: message.id,
+        threadId: message.threadId,
+        gmailMessageId: message.gmailMessageId,
+        subject: message.subject,
+        senderEmail: message.senderEmail,
+        senderName: message.senderName,
+        content: plainTextContent,
+      });
+
+      this.eventEmitter.emit(GMAIL_ACTION_TRIGGERED_EVENT, {
+        accountEmail: superEmail,
+        action: 'Nhận email',
+        status: 'success',
+        from,
+        to,
+        gmailMessageId,
+        dedupeKey: `receive:${gmailMessageId}`,
+      });
+
+      return message.id;
+    } catch (error: any) {
+      this.eventEmitter.emit(GMAIL_ACTION_TRIGGERED_EVENT, {
+        accountEmail: superEmail,
+        action: 'Nhận email',
+        status: 'failed',
+        from,
+        to,
+        gmailMessageId,
+        error: error?.message ?? String(error),
+        dedupeKey: `receive:${gmailMessageId}`,
+      });
+      throw error;
+    }
   }
 }

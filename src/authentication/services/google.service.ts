@@ -18,7 +18,7 @@ export class GoogleService {
     const email = profile.email.toLowerCase();
     let user: Partial<User> = await this.userRepository.findOneBy({ email });
 
-    if (!user.role) {
+    if (!user?.role) {
       const identity = await this.domainsService.email2Identify(email);
       user = { ...user, ...identity };
     }

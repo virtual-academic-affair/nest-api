@@ -27,7 +27,7 @@ export class User extends BaseEntity {
   @Column({ nullable: true })
   studentCode?: string;
 
-  @ManyToOne(() => Student, { nullable: true, eager: false })
+  @ManyToOne(() => Student, { nullable: true, eager: true })
   @JoinColumn({ name: 'studentCode', referencedColumnName: 'studentCode' })
   student?: Student;
 }

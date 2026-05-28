@@ -38,7 +38,7 @@ export class AuthService {
     const accessToken = await this.signToken(user.id, this.jwtConfiguration.accessTokenTtl, {
       email: user.email,
       role: user.role,
-      ...(user.studentCode ? { studentCode: user.studentCode } : {}),
+      ...(user.studentCode ? { studentCode: user?.studentCode, enrollmentYear: user?.student?.enrollmentYear } : {}),
     });
 
     if (!withRefreshToken) {

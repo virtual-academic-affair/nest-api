@@ -83,6 +83,8 @@ export class IngestService {
       senderEmail: message.senderEmail,
       senderName: message.senderName,
       content: plainTextContent,
+      studentCode: message.studentCode,
+      enrollmentYear: message.student?.enrollmentYear,
     });
 
     return message.id;

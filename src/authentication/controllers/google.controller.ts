@@ -24,9 +24,15 @@ export class GoogleController {
   @UseGuards(GoogleGuard)
   async googleRedirect(@Req() req: Request, @Query('state') state: string, @Res() res: Response) {
     const profile = req.user as GoogleProfile;
-    const tokens = await this.googleService.login(profile);
-    res.cookie(REFRESH_COOKIE, tokens.refreshToken, getRefreshCookieOptions(this.jwtConfiguration.refreshTokenTtl));
-    return res.redirect(`${state}?token="${tokens.accessToken}"`);
+
+    try {
+      const tokens = await this.googleService.login(profile);
+      res.cookie(REFRESH_COOKIE, tokens.refreshToken, getRefreshCookieOptions(this.jwtConfiguration.refreshTokenTtl));
+      return res.redirect(`${state}?token="${tokens.accessToken}"`);
+    } catch (error) {
+      const message = (error as Error)?.message || 'Authentication failed';
+      return res.redirect(`${state}?error=${encodeURIComponent(message)}`);
+    }
   }
 
   @Get('grant-gmail')

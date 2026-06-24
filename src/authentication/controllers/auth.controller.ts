@@ -28,7 +28,7 @@ export class AuthenticationController {
   @Post('refresh')
   async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const refreshToken = req.cookies[REFRESH_COOKIE];
-    throwUnless(refreshToken, new UnauthorizedException('Refresh token cookie is missing'));
+    if (!refreshToken) throw new UnauthorizedException('Refresh token cookie is missing');
     const tokens = await this.authService.refreshTokens({ refreshToken });
     res.cookie(REFRESH_COOKIE, tokens.refreshToken, getRefreshCookieOptions(this.jwtConfiguration.refreshTokenTtl));
 
@@ -36,8 +36,17 @@ export class AuthenticationController {
   }
 
   @Post('logout')
-  async logout(@Res({ passthrough: true }) res: Response) {
-    return res.clearCookie(REFRESH_COOKIE, getClearCookieOptions());
+  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const refreshToken = req.cookies[REFRESH_COOKIE];
+    
+    // Clear the cookie first so the browser deletes it
+    res.clearCookie(REFRESH_COOKIE, getClearCookieOptions());
+    
+    if (refreshToken) {
+      this.authService.invalidateRefreshToken(refreshToken).catch(() => {});
+    }
+
+    return { success: true };
   }
 
   @Post('gmail-extension-session')

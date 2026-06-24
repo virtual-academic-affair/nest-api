@@ -12,7 +12,11 @@ export class HttpResponseInterceptor implements NestInterceptor {
   }
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    if (context.getType() !== 'http') {
+    const request = context.switchToHttp().getRequest();
+    const path = request.url || "";
+
+    // Skip intercepting for logout to prevent crash with native objects (TCPWrap)
+    if (path.includes("/logout") || context.getType() !== "http") {
       return next.handle();
     }
 

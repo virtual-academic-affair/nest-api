@@ -67,10 +67,25 @@ export class AuthService {
     throwUnless(userId, new UnauthorizedException('Refresh token has expired'));
 
     const user = await this.userRepository.findOneBy({ id: +userId });
-    throwUnless(!!user?.isActive, new ForbiddenException('User is banned'));
+    throwUnless(user, new UnauthorizedException('User not found'));
+    throwUnless(user.isActive, new ForbiddenException('User is banned'));
 
     await this.redis.del(this.getRFTRedisKey(payload.refreshTokenId));
     return this.generateTokens(user);
+  }
+
+  async invalidateRefreshToken(refreshToken: string) {
+    try {
+      const payload = await this.jwtService.verifyAsync<{
+        refreshTokenId: string;
+      }>(refreshToken, this.jwtConfiguration);
+
+      if (payload?.refreshTokenId) {
+        await this.redis.del(this.getRFTRedisKey(payload.refreshTokenId));
+      }
+    } catch {
+      // Ignore errors if token is already expired or invalid
+    }
   }
 
   private async signToken<T>(sub: number, expiresIn: number, payload?: T) {

@@ -1,16 +1,16 @@
-import { Body, Controller, Get, Headers, Inject, Post, Req, Res, UnauthorizedException } from '@nestjs/common';
-import { ConfigType } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
-import { GrpcMethod } from '@nestjs/microservices';
-import { Request, Response } from 'express';
 import { ActiveUser } from '@authentication/decorators/active-user.decorator';
 import { Auth, AuthType } from '@authentication/decorators/auth.decorator';
 import { GmailExtensionSessionDto } from '@authentication/dtos/auth/gmail-extension-session.dto';
 import { AuthService } from '@authentication/services/auth.service';
 import { UsersService } from '@authentication/services/users.service';
 import { REFRESH_COOKIE, getClearCookieOptions, getRefreshCookieOptions } from '@authentication/utils/cookie.util';
+import { Body, Controller, Get, Headers, Inject, Post, Req, Res, UnauthorizedException } from '@nestjs/common';
+import { ConfigType } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
+import { GrpcMethod } from '@nestjs/microservices';
 import gmailExtensionConfig from '@shared/config/gmail-extension.config';
 import jwtConfig from '@shared/config/jwt.config';
+import { Request, Response } from 'express';
 
 export const GMAIL_EXTENSION_SESSION_SECRET_HEADER = 'x-gmail-session-secret';
 
@@ -36,8 +36,14 @@ export class AuthenticationController {
   }
 
   @Post('logout')
-  async logout(@Res({ passthrough: true }) res: Response) {
-    return res.clearCookie(REFRESH_COOKIE, getClearCookieOptions());
+  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    try {
+      await this.authService.deleteRefreshToken(req.cookies[REFRESH_COOKIE]);
+    } catch {
+    } finally {
+      res.clearCookie(REFRESH_COOKIE, getClearCookieOptions());
+    }
+    return {};
   }
 
   @Post('gmail-extension-session')

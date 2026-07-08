@@ -14,8 +14,4 @@ export const getRefreshCookieOptions = (ttlSeconds: number): CookieOptions => ({
   maxAge: ttlSeconds * 1000,
 });
 
-export const getClearCookieOptions = (): CookieOptions => ({
-  ...BASE_COOKIE_OPTIONS,
-  maxAge: 0,
-  expires: new Date(0),
-});
+export const getClearCookieOptions = (): CookieOptions => BASE_COOKIE_OPTIONS;

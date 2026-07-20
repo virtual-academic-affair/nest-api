@@ -58,19 +58,23 @@ export class AuthService {
   }
 
   async refreshTokens(dto: RefreshTokenDto) {
-    const payload = await this.jwtService.verifyAsync<{
-      refreshTokenId: string;
-    }>(dto.refreshToken, this.jwtConfiguration);
-    throwUnless(payload?.refreshTokenId, new UnauthorizedException('Refresh token is invalid'));
-
-    const userId = await this.redis.get(this.getRFTRedisKey(payload.refreshTokenId));
-    throwUnless(userId, new UnauthorizedException('Refresh token has expired'));
-
+    const userId = await this.deleteRefreshToken(dto.refreshToken);
     const user = await this.userRepository.findOneBy({ id: +userId });
     throwUnless(!!user?.isActive, new ForbiddenException('User is banned'));
 
-    await this.redis.del(this.getRFTRedisKey(payload.refreshTokenId));
     return this.generateTokens(user);
+  }
+
+  async deleteRefreshToken(refreshToken: string): Promise<string> {
+    const payload = await this.jwtService.verifyAsync<{ refreshTokenId: string }>(refreshToken, this.jwtConfiguration);
+    throwUnless(payload?.refreshTokenId, new UnauthorizedException('Refresh token is invalid'));
+
+    const redisKey = this.getRFTRedisKey(payload.refreshTokenId);
+    const userId = await this.redis.get(redisKey);
+    throwUnless(userId, new UnauthorizedException('Refresh token has expired'));
+
+    await this.redis.del(redisKey);
+    return userId;
   }
 
   private async signToken<T>(sub: number, expiresIn: number, payload?: T) {

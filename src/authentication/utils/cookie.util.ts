@@ -9,8 +9,9 @@ const BASE_COOKIE_OPTIONS: CookieOptions = {
   path: '/',
 };
 
-export function getRefreshCookieOptions(ttlSeconds: number): CookieOptions {
-  return { ...BASE_COOKIE_OPTIONS, maxAge: ttlSeconds * 1000 };
-}
+export const getRefreshCookieOptions = (ttlSeconds: number): CookieOptions => ({
+  ...BASE_COOKIE_OPTIONS,
+  maxAge: ttlSeconds * 1000,
+});
 
 export const getClearCookieOptions = (): CookieOptions => BASE_COOKIE_OPTIONS;

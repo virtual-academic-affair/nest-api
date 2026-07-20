@@ -6,7 +6,10 @@ export default registerAs('rabbitmq', () => ({
   options: {
     urls: [process.env.RABBITMQ_URL ?? 'amqp://localhost:5672'],
     queue: process.env.RABBITMQ_QUEUE ?? 'queue',
-    queueOptions: { durable: true },
+    queueOptions: {
+      durable: true,
+      deadLetterExchange: process.env.RABBITMQ_QUEUE_DLX,
+    },
     noAck: true,
     prefetchCount: 50,
   },
